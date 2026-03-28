@@ -94,7 +94,7 @@ func _set_attack_range_debug_visible(visible_state: bool) -> void:
 
 func _apply_debug_attack_range_to_all_soldiers() -> void:
     for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
-        var soldier = node
+        var soldier: Swordsman = node as Swordsman
         if soldier != null:
             soldier.set_debug_attack_range_visible(show_attack_range_debug)
 
@@ -192,7 +192,7 @@ func _spawn_unit_for_team(scene: PackedScene, team: int) -> void:
         push_warning("Cannot summon: BattleLanePath curve is not configured.")
         return
 
-    var unit = scene.instantiate()
+    var unit: Swordsman = scene.instantiate() as Swordsman
     if unit == null:
         return
 
@@ -212,7 +212,7 @@ func _spawn_unit_for_team(scene: PackedScene, team: int) -> void:
     unit.set_lane_side_offsets(player_side_offset, enemy_side_offset)
 
     unit.setup_lane_travel(battle_lane_path, start_offset, start_offset)
-    unit.set_mode(_to_unit_mode(_get_active_mode_for_team(team)))
+    unit.set_mode(_to_swordsman_mode(_get_active_mode_for_team(team)))
 
 
 func _apply_debug_toggle_dependent_ui() -> void:
@@ -255,17 +255,17 @@ func _get_active_mode_for_team(team: int) -> UnitMode:
     return player_active_mode if team == GameConstants.TEAM_PLAYER else enemy_active_mode
 
 
-func _to_unit_mode(mode: UnitMode) -> int:
+func _to_swordsman_mode(mode: UnitMode) -> int:
     return GameConstants.UNIT_MODE_DEFEND if mode == UnitMode.DEFEND else GameConstants.UNIT_MODE_ATTACK
 
 
 func _apply_mode_to_team_soldiers(team: int) -> void:
     for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
-        var soldier = node
-        if soldier == null or not soldier.is_in_group(&"soldiers") or soldier.get("team_id") != team:
+        var soldier: Swordsman = node as Swordsman
+        if soldier == null or soldier.team_id != team:
             continue
 
-        soldier.set_mode(_to_unit_mode(_get_active_mode_for_team(team)))
+        soldier.set_mode(_to_swordsman_mode(_get_active_mode_for_team(team)))
 
 
 func _get_lane_offset_near_castle(is_player_side: bool) -> float:

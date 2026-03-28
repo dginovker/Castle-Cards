@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="1_6mje0"]
 [ext_resource type="Texture2D" uid="uid://djcoow14ahdpv" path="res://assets/units/soldier/sword-swing.png" id="1_r7u1p"]
-[ext_resource type="Script" path="res://scripts/combat_unit.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://0y2jpfoufapo" path="res://scripts/swordsman.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://mjx8r1h4bo08" path="res://assets/units/soldier/walking-1.png" id="2_r7u1p"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_bac06"]
@@ -36,17 +36,3 @@ sprite_frames = SubResource("SpriteFrames_bac06")
 animation = &"fight"
 frame_progress = 0.8240049
 script = ExtResource("1_script")
-unit_archetype_name = "swordsman"
-move_speed = 70.0
-attack_range = 2.0
-attack_damage = 1.0
-max_health = 3.0
-attack_interval_seconds = 0.55
-active_mode = 0
-defend_protection_radius_pixels = 220.0
-defend_limit_targets_near_own_castle = true
-can_attack_castles_in_defend = false
-attack_uses_frontline_anchor = false
-frontline_anchor_excluded_archetype_name = ""
-frontline_follow_distance_pixels = 56.0
-defend_retreat_distance_pixels = 0.0

@@ -1,8 +1,8 @@
-class_name Swordsman
+class_name CombatUnit
 extends AnimatedSprite2D
 
 signal health_changed(current_health: float, max_health: float)
-signal died(swordsman: Swordsman)
+signal died(unit: Node)
 
 enum CombatState {
     IDLE,
@@ -10,6 +10,7 @@ enum CombatState {
     ATTACKING,
 }
 
+@export var unit_archetype_name: String = "soldier"
 @export var team_id: int = GameConstants.TEAM_PLAYER
 @export var move_speed: float = 70.0
 @export var target_render_height: float = 48.0
@@ -20,6 +21,14 @@ enum CombatState {
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
 @export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
 @export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
+@export var defend_limit_targets_near_own_castle: bool = true
+@export var can_attack_castles_in_defend: bool = false
+
+# Formation / positioning behavior (composition by data)
+@export var attack_uses_frontline_anchor: bool = false
+@export var frontline_anchor_excluded_archetype_name: String = ""
+@export_range(0.0, 1000.0, 1.0) var frontline_follow_distance_pixels: float = 56.0
+@export_range(0.0, 1000.0, 1.0) var defend_retreat_distance_pixels: float = 0.0
 
 @export var debug_range_fill_color: Color = Color(1.0, 0.2, 0.2, 0.14)
 @export var debug_range_outline_color: Color = Color(1.0, 0.2, 0.2, 0.9)
@@ -34,7 +43,7 @@ var debug_attack_range_visible: bool = false
 
 var combat_state: CombatState = CombatState.IDLE
 var current_health: float = 0.0
-var current_target_soldier: Swordsman
+var current_target_unit: Node
 var current_target_castle: Castle
 var own_castle: Castle
 var enemy_castle: Castle
@@ -66,7 +75,7 @@ func setup_lane_travel(path: Path2D, start_offset: float, end_offset: float) -> 
     lane_curve = path.curve if path != null else null
 
     if lane_curve == null:
-        push_warning("Swordsman.setup_lane_travel: Missing lane curve.")
+        push_warning("CombatUnit.setup_lane_travel: Missing lane curve.")
         return
 
     current_offset = start_offset
@@ -142,9 +151,77 @@ func _refresh_movement_target_for_mode() -> void:
 
 func _get_mode_destination_offset() -> float:
     if active_mode == GameConstants.UNIT_MODE_DEFEND:
-        return _get_own_side_offset()
+        return _get_defend_destination_offset()
 
-    return _get_enemy_side_offset()
+    return _get_attack_destination_offset()
+
+
+func _get_attack_destination_offset() -> float:
+    if not attack_uses_frontline_anchor:
+        return _get_enemy_side_offset()
+
+    var result: Dictionary = _find_frontline_anchor_offset()
+    if not result.get("found", false):
+        return _get_enemy_side_offset()
+
+    var frontline_offset: float = result.get("offset", _get_enemy_side_offset())
+    var desired_offset: float = (
+        frontline_offset - frontline_follow_distance_pixels
+        if team_id == GameConstants.TEAM_PLAYER
+        else frontline_offset + frontline_follow_distance_pixels
+    )
+
+    return _clamp_to_lane_bounds(desired_offset)
+
+
+func _get_defend_destination_offset() -> float:
+    var own_side_offset: float = _get_own_side_offset()
+
+    if defend_retreat_distance_pixels <= 0.0:
+        return own_side_offset
+
+    var desired_offset: float = (
+        own_side_offset - defend_retreat_distance_pixels
+        if team_id == GameConstants.TEAM_PLAYER
+        else own_side_offset + defend_retreat_distance_pixels
+    )
+
+    return _clamp_to_lane_bounds(desired_offset)
+
+
+func _find_frontline_anchor_offset() -> Dictionary:
+    if lane_curve == null or lane_path == null:
+        return {"found": false, "offset": 0.0}
+
+    var found: bool = false
+    var selected_offset: float = 0.0
+
+    for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
+        var unit: Node = node
+        if unit == null or unit == self:
+            continue
+        if not unit.is_in_group(&"soldiers"):
+            continue
+        if unit.get("team_id") != team_id or unit.call("is_dead"):
+            continue
+
+        if frontline_anchor_excluded_archetype_name != "" and String(unit.get("unit_archetype_name")) == frontline_anchor_excluded_archetype_name:
+            continue
+
+        var ally_offset: float = lane_curve.get_closest_offset(lane_path.to_local(unit.global_position))
+
+        if not found:
+            selected_offset = ally_offset
+            found = true
+        elif team_id == GameConstants.TEAM_PLAYER and ally_offset > selected_offset:
+            selected_offset = ally_offset
+        elif team_id == GameConstants.TEAM_ENEMY and ally_offset < selected_offset:
+            selected_offset = ally_offset
+
+    return {
+        "found": found,
+        "offset": selected_offset,
+    }
 
 
 func _get_own_side_offset() -> float:
@@ -188,6 +265,9 @@ func refresh_attack_range_shape() -> void:
 
 
 func _process(delta: float) -> void:
+    if combat_state != CombatState.ATTACKING:
+        _refresh_movement_target_for_mode()
+
     _update_targets_from_attack_overlap()
 
     match combat_state:
@@ -235,8 +315,8 @@ func _process_attacking(delta: float) -> void:
 
     _attack_cooldown_remaining = attack_interval_seconds
 
-    if _is_current_soldier_target_attackable():
-        current_target_soldier.take_damage(attack_damage)
+    if _is_current_unit_target_attackable():
+        current_target_unit.call("take_damage", attack_damage)
         return
 
     if _is_current_castle_target_attackable():
@@ -270,10 +350,10 @@ func _resume_after_attack_lost_target() -> void:
 
 
 func _has_attack_target() -> bool:
-    if _is_current_soldier_target_attackable():
+    if _is_current_unit_target_attackable():
         return true
 
-    current_target_soldier = null
+    current_target_unit = null
 
     if _is_current_castle_target_attackable():
         return true
@@ -286,7 +366,7 @@ func _update_targets_from_attack_overlap() -> void:
     if _attack_area == null:
         return
 
-    current_target_soldier = null
+    current_target_unit = null
     current_target_castle = null
 
     for overlap_area: Area2D in _attack_area.get_overlapping_areas():
@@ -295,13 +375,13 @@ func _update_targets_from_attack_overlap() -> void:
 
         var overlap_parent: Node = overlap_area.get_parent()
 
-        var soldier: Swordsman = overlap_parent as Swordsman
-        if soldier != null:
-            if soldier == self or soldier.team_id == team_id or soldier.is_dead():
+        var unit: Node = overlap_parent
+        if unit != null and unit.is_in_group(&"soldiers"):
+            if unit == self or unit.get("team_id") == team_id or unit.call("is_dead"):
                 continue
-            if not _is_target_allowed_for_current_mode(soldier.global_position, false):
+            if not _is_target_allowed_for_current_mode(unit.global_position, false):
                 continue
-            current_target_soldier = soldier
+            current_target_unit = unit
             current_target_castle = null
             return
 
@@ -315,17 +395,17 @@ func _update_targets_from_attack_overlap() -> void:
                 current_target_castle = castle
 
 
-func _is_current_soldier_target_attackable() -> bool:
-    if current_target_soldier == null or not is_instance_valid(current_target_soldier):
+func _is_current_unit_target_attackable() -> bool:
+    if current_target_unit == null or not is_instance_valid(current_target_unit):
         return false
 
-    if current_target_soldier == self or current_target_soldier.team_id == team_id or current_target_soldier.is_dead():
+    if current_target_unit == self or current_target_unit.get("team_id") == team_id or current_target_unit.call("is_dead"):
         return false
 
-    if not _is_target_allowed_for_current_mode(current_target_soldier.global_position, false):
+    if not _is_target_allowed_for_current_mode(current_target_unit.global_position, false):
         return false
 
-    var hurtbox: Area2D = current_target_soldier.get_hurtbox()
+    var hurtbox: Area2D = current_target_unit.call("get_hurtbox") as Area2D
     if hurtbox == null:
         return false
 
@@ -353,8 +433,11 @@ func _is_target_allowed_for_current_mode(target_global_position: Vector2, is_cas
     if active_mode != GameConstants.UNIT_MODE_DEFEND:
         return true
 
-    if is_castle_target:
+    if is_castle_target and not can_attack_castles_in_defend:
         return false
+
+    if not defend_limit_targets_near_own_castle:
+        return true
 
     if own_castle == null or not is_instance_valid(own_castle):
         return true
@@ -443,4 +526,11 @@ func _ensure_hurtbox() -> void:
         circle_shape = CircleShape2D.new()
         _hurtbox_shape_node.shape = circle_shape
 
-    circle_shape.radius = maxf(8.0, get_attack_range_radius_pixels() * 0.25)
+    circle_shape.radius = maxf(8.0, target_render_height * 0.22)
+
+
+func _clamp_to_lane_bounds(offset_value: float) -> float:
+    if lane_curve == null:
+        return offset_value
+
+    return clampf(offset_value, 0.0, lane_curve.get_baked_length())
