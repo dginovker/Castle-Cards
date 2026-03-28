@@ -15,9 +15,9 @@ enum CombatState {
 @export var move_speed: float = 70.0
 @export var target_render_height: float = 48.0
 
-@export_range(1.0, 30.0, 1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
-@export_range(1.0, 10.0, 1.0) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
-@export_range(1.0, 30.0, 1.0) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
+@export_range(0.0, 100.0, 0.1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
+@export_range(0.0, 1000.0, 1.0) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
+@export_range(1.0, 1000.0, 1.0) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
 @export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
 @export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
@@ -38,22 +38,12 @@ enum CombatState {
 @export var debug_range_outline_color: Color = Color(1.0, 0.2, 0.2, 0.9)
 @export_range(1.0, 8.0, 0.1) var debug_range_outline_width: float = 2.0
 
-@export var show_health_bar: bool = true
-@export var show_health_bar_only_when_damaged: bool = true
-@export var health_bar_bg_color: Color = Color(0.08, 0.08, 0.08, 0.9)
-@export var health_bar_fill_color: Color = Color(0.2, 0.95, 0.25, 1.0)
-@export var health_bar_border_color: Color = Color(0.0, 0.0, 0.0, 1.0)
-@export_range(8.0, 80.0, 1.0) var health_bar_width_pixels: float = 34.0
-@export_range(2.0, 16.0, 1.0) var health_bar_height_pixels: float = 5.0
-@export_range(0.0, 40.0, 1.0) var health_bar_vertical_offset_pixels: float = 18.0
-
 var lane_path: Path2D
 var lane_curve: Curve2D
 var current_offset: float = 0.0
 var target_offset: float = 0.0
 var has_target: bool = false
 var debug_attack_range_visible: bool = false
-var debug_force_show_health_bar: bool = false
 
 var combat_state: CombatState = CombatState.IDLE
 var current_health: float = 0.0
@@ -134,11 +124,10 @@ func set_mode(mode: int) -> void:
 
 
 func set_debug_attack_range_visible(visible_state: bool) -> void:
-    if debug_attack_range_visible == visible_state and debug_force_show_health_bar == visible_state:
+    if debug_attack_range_visible == visible_state:
         return
 
     debug_attack_range_visible = visible_state
-    debug_force_show_health_bar = visible_state
     queue_redraw()
 
 
@@ -257,7 +246,6 @@ func take_damage(amount: float) -> void:
 
     current_health = clampf(current_health - amount, 0.0, max_health)
     health_changed.emit(current_health, max_health)
-    queue_redraw()
 
     if is_zero_approx(current_health):
         died.emit(self)
@@ -298,9 +286,6 @@ func _process(delta: float) -> void:
         CombatState.IDLE:
             if _has_attack_target():
                 _enter_attacking_state()
-
-    # Keep debug/healthbar visuals responsive even when values change at runtime.
-    queue_redraw()
 
 
 func _process_moving(delta: float) -> void:
@@ -468,48 +453,7 @@ func _is_target_allowed_for_current_mode(target_global_position: Vector2, is_cas
     return own_castle.global_position.distance_to(target_global_position) <= defend_protection_radius_pixels
 
 
-func _should_draw_health_bar() -> bool:
-    if max_health <= 0.0 or is_dead():
-        return false
-
-    # Debug mode always forces visibility, even if show_health_bar is disabled per-unit.
-    if debug_force_show_health_bar:
-        return true
-
-    if not show_health_bar:
-        return false
-
-    if show_health_bar_only_when_damaged and is_equal_approx(current_health, max_health):
-        return false
-
-    return true
-
-
 func _draw() -> void:
-    if _should_draw_health_bar():
-        # Draw the healthbar in scale-independent space so it remains visible/readable
-        # even if the unit node itself is scaled.
-        var sx: float = maxf(0.001, absf(scale.x))
-        var sy: float = maxf(0.001, absf(scale.y))
-        draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0 / sx, 1.0 / sy))
-
-        var health_ratio: float = clampf(current_health / maxf(0.001, max_health), 0.0, 1.0)
-        var bar_width: float = health_bar_width_pixels
-        var bar_height: float = health_bar_height_pixels
-        var top_left: Vector2 = Vector2(-bar_width * 0.5, -target_render_height * 0.5 - health_bar_vertical_offset_pixels)
-        var bar_rect: Rect2 = Rect2(top_left, Vector2(bar_width, bar_height))
-
-        draw_rect(bar_rect, health_bar_bg_color, true)
-
-        var fill_width: float = bar_width * health_ratio
-        if fill_width > 0.0:
-            draw_rect(Rect2(top_left, Vector2(fill_width, bar_height)), health_bar_fill_color, true)
-
-        draw_rect(bar_rect, health_bar_border_color, false, 1.0)
-
-        # Reset transform so any other debug draw (e.g. range) keeps expected behavior.
-        draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-
     if not debug_attack_range_visible:
         return
 
@@ -615,13 +559,13 @@ func _get_center_out_slot_index(slot_count: int, sequence_index: int) -> int:
     if slot_count <= 1:
         return 0
 
-    var center: int = int(floor(float(slot_count) / 2.0))
+    var center: int = slot_count / 2
     var cycle_index: int = sequence_index % slot_count
 
     if cycle_index == 0:
         return center
 
-    var step: int = int(ceil(float(cycle_index) / 2.0))
+    var step: int = int((cycle_index + 1) / 2)
     if cycle_index % 2 == 1:
         return min(slot_count - 1, center + step)
 

@@ -15,9 +15,9 @@ enum CombatState {
 @export var move_speed: float = 70.0
 @export var target_render_height: float = 48.0
 
-@export_range(1.0, 30.0, 1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
-@export_range(1.0, 10.0, 1.0) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
-@export_range(1.0, 30.0, 1.0) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
+@export_range(0.0, 100.0, 0.1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
+@export_range(0.0, 1000.0, 1.0) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
+@export_range(1.0, 1000.0, 1.0) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
 @export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
 @export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
@@ -299,9 +299,6 @@ func _process(delta: float) -> void:
             if _has_attack_target():
                 _enter_attacking_state()
 
-    # Keep debug/healthbar visuals responsive even when values change at runtime.
-    queue_redraw()
-
 
 func _process_moving(delta: float) -> void:
     if _has_attack_target():
@@ -487,12 +484,6 @@ func _should_draw_health_bar() -> bool:
 
 func _draw() -> void:
     if _should_draw_health_bar():
-        # Draw the healthbar in scale-independent space so it remains visible/readable
-        # even if the unit node itself is scaled.
-        var sx: float = maxf(0.001, absf(scale.x))
-        var sy: float = maxf(0.001, absf(scale.y))
-        draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0 / sx, 1.0 / sy))
-
         var health_ratio: float = clampf(current_health / maxf(0.001, max_health), 0.0, 1.0)
         var bar_width: float = health_bar_width_pixels
         var bar_height: float = health_bar_height_pixels
@@ -506,9 +497,6 @@ func _draw() -> void:
             draw_rect(Rect2(top_left, Vector2(fill_width, bar_height)), health_bar_fill_color, true)
 
         draw_rect(bar_rect, health_bar_border_color, false, 1.0)
-
-        # Reset transform so any other debug draw (e.g. range) keeps expected behavior.
-        draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
     if not debug_attack_range_visible:
         return
@@ -615,13 +603,13 @@ func _get_center_out_slot_index(slot_count: int, sequence_index: int) -> int:
     if slot_count <= 1:
         return 0
 
-    var center: int = int(floor(float(slot_count) / 2.0))
+    var center: int = slot_count / 2
     var cycle_index: int = sequence_index % slot_count
 
     if cycle_index == 0:
         return center
 
-    var step: int = int(ceil(float(cycle_index) / 2.0))
+    var step: int = int((cycle_index + 1) / 2)
     if cycle_index % 2 == 1:
         return min(slot_count - 1, center + step)
 
