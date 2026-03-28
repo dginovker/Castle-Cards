@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="5_swordsman_icon"]
 [ext_resource type="Script" uid="uid://fdfppgfw6op5" path="res://scripts/castle.gd" id="6_castle_script"]
-[ext_resource type="Texture2D" path="res://assets/units/archer/archer-walking-0.png" id="6_archer_icon"]
 [ext_resource type="Texture2D" path="res://assets/generated/mode_attack_crossed_swords_frame_0_1774738110.png" id="7_mode_attack_icon"]
 [ext_resource type="Texture2D" path="res://assets/generated/mode_defend_shield_frame_0_1774738123.png" id="8_mode_defend_icon"]
 
@@ -116,45 +115,22 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
-[node name="SummonArcherButton" type="Button" parent="UI"]
-custom_minimum_size = Vector2(76, 76)
-offset_left = 100.0
-offset_top = 16.0
-offset_right = 176.0
-offset_bottom = 92.0
-tooltip_text = "Summon Archer"
-theme_override_constants/icon_max_width = 48
-icon = ExtResource("6_archer_icon")
-icon_alignment = 1
-
 [node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI" unique_id=1245557394]
-visible = false
-custom_minimum_size = Vector2(76, 76)
-offset_left = 976.0
-offset_top = 16.0
-offset_right = 1052.0
-offset_bottom = 92.0
-tooltip_text = "[DEBUG] Spawn Enemy Swordsman"
-theme_override_constants/icon_max_width = 48
-icon = ExtResource("5_swordsman_icon")
-icon_alignment = 1
-
-[node name="DebugSpawnEnemyArcherButton" type="Button" parent="UI"]
 visible = false
 custom_minimum_size = Vector2(76, 76)
 offset_left = 1060.0
 offset_top = 16.0
 offset_right = 1136.0
 offset_bottom = 92.0
-tooltip_text = "[DEBUG] Spawn Enemy Archer"
+tooltip_text = "[DEBUG] Spawn Enemy Swordsman"
 theme_override_constants/icon_max_width = 48
-icon = ExtResource("6_archer_icon")
+icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
 [node name="Debug" type="CheckButton" parent="UI" unique_id=859335075]
-offset_left = 188.0
+offset_left = 104.0
 offset_top = 36.0
-offset_right = 416.0
+offset_right = 332.0
 offset_bottom = 60.0
 theme_override_styles/normal = SubResource("StyleBoxFlat_debug_toggle_bg")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_debug_toggle_bg")

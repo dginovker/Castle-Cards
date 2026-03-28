@@ -102,6 +102,9 @@ func set_mode(mode: int) -> void:
         else GameConstants.UNIT_MODE_ATTACK
     )
 
+    if active_mode == normalized_mode:
+        return
+
     active_mode = normalized_mode
     _refresh_movement_target_for_mode()
 

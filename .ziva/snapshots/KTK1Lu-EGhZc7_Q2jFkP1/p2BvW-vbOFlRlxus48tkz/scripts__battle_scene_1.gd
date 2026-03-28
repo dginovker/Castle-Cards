@@ -2,7 +2,6 @@ class_name BattleScene1
 extends Node2D
 
 const SWORDSMAN_SCENE: PackedScene = preload("res://scenes/swordsman.tscn")
-const ARCHER_SCENE: PackedScene = preload("res://scenes/archer.tscn")
 
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
@@ -19,13 +18,11 @@ enum UnitMode {
 @onready var player_castle: Castle = $PlayerCastle as Castle
 @onready var enemy_castle: Castle = $EnemyCastle as Castle
 @onready var summon_button: Button = $UI/SummonSwordsmanButton
-@onready var summon_archer_button: Button = get_node_or_null("UI/SummonArcherButton") as Button
 @onready var battle_lane_path: Path2D = $BattleLanePath
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
 @onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
 @onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
 @onready var debug_spawn_enemy_swordsman_button: Button = get_node_or_null("UI/DebugSpawnEnemySwordsmanButton") as Button
-@onready var debug_spawn_enemy_archer_button: Button = get_node_or_null("UI/DebugSpawnEnemyArcherButton") as Button
 
 @onready var player_mode_attack_button: Button = get_node_or_null("UI/PlayerModeAttackButton") as Button
 @onready var player_mode_defend_button: Button = get_node_or_null("UI/PlayerModeDefendButton") as Button
@@ -36,14 +33,8 @@ enum UnitMode {
 func _ready() -> void:
     summon_button.pressed.connect(_on_summon_swordsman_pressed)
 
-    if summon_archer_button != null:
-        summon_archer_button.pressed.connect(_on_summon_archer_pressed)
-
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
-
-    if debug_spawn_enemy_archer_button != null:
-        debug_spawn_enemy_archer_button.pressed.connect(_on_debug_spawn_enemy_archer_pressed)
 
     if player_mode_attack_button != null:
         player_mode_attack_button.pressed.connect(_on_player_mode_attack_pressed)
@@ -147,14 +138,6 @@ func _on_debug_spawn_enemy_swordsman_pressed() -> void:
     _spawn_swordsman_for_team(GameConstants.TEAM_ENEMY)
 
 
-func _on_summon_archer_pressed() -> void:
-    _spawn_archer_for_team(GameConstants.TEAM_PLAYER)
-
-
-func _on_debug_spawn_enemy_archer_pressed() -> void:
-    _spawn_archer_for_team(GameConstants.TEAM_ENEMY)
-
-
 func _on_player_mode_attack_pressed() -> void:
     player_active_mode = UnitMode.ATTACK
     _sync_mode_buttons_visuals()
@@ -180,47 +163,43 @@ func _on_enemy_mode_defend_pressed() -> void:
 
 
 func _spawn_swordsman_for_team(team: int) -> void:
-    _spawn_unit_for_team(SWORDSMAN_SCENE, team)
-
-
-func _spawn_archer_for_team(team: int) -> void:
-    _spawn_unit_for_team(ARCHER_SCENE, team)
-
-
-func _spawn_unit_for_team(scene: PackedScene, team: int) -> void:
     if battle_lane_path.curve == null or battle_lane_path.curve.get_baked_length() <= 0.0:
         push_warning("Cannot summon: BattleLanePath curve is not configured.")
         return
 
-    var unit: Swordsman = scene.instantiate() as Swordsman
-    if unit == null:
+    var swordsman: Swordsman = SWORDSMAN_SCENE.instantiate() as Swordsman
+    if swordsman == null:
         return
 
-    add_child(unit)
-    unit.team_id = team
-    unit.set_debug_attack_range_visible(show_attack_range_debug)
+    add_child(swordsman)
+    swordsman.team_id = team
+    swordsman.set_debug_attack_range_visible(show_attack_range_debug)
 
     var player_side_offset: float = _get_lane_offset_near_castle(true)
     var enemy_side_offset: float = _get_lane_offset_near_castle(false)
     var starts_from_player_side: bool = team == GameConstants.TEAM_PLAYER
     var start_offset: float = player_side_offset if starts_from_player_side else enemy_side_offset
 
-    unit.set_castle_references(
+    swordsman.set_castle_references(
         player_castle if team == GameConstants.TEAM_PLAYER else enemy_castle,
         enemy_castle if team == GameConstants.TEAM_PLAYER else player_castle
     )
-    unit.set_lane_side_offsets(player_side_offset, enemy_side_offset)
+    swordsman.set_lane_side_offsets(player_side_offset, enemy_side_offset)
 
-    unit.setup_lane_travel(battle_lane_path, start_offset, start_offset)
-    unit.set_mode(_to_swordsman_mode(_get_active_mode_for_team(team)))
+    var mode: UnitMode = _get_active_mode_for_team(team)
+    var end_offset: float = (
+        enemy_side_offset if mode == UnitMode.ATTACK and team == GameConstants.TEAM_PLAYER
+        else player_side_offset if mode == UnitMode.ATTACK
+        else start_offset
+    )
+
+    swordsman.setup_lane_travel(battle_lane_path, start_offset, end_offset)
+    swordsman.set_mode(_to_swordsman_mode(mode))
 
 
 func _apply_debug_toggle_dependent_ui() -> void:
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.visible = show_attack_range_debug
-
-    if debug_spawn_enemy_archer_button != null:
-        debug_spawn_enemy_archer_button.visible = show_attack_range_debug
 
     if enemy_mode_attack_button != null:
         enemy_mode_attack_button.visible = show_attack_range_debug

@@ -12,12 +12,6 @@ const SOLDIER_ATTACK_RANGE: float = 2.0
 const SOLDIER_ATTACK_DAMAGE: float = 1.0
 const SOLDIER_MAX_HEALTH: float = 3.0
 
-# Archer baseline stats from the game plan.
-const ARCHER_ATTACK_RANGE: float = 10.0
-const ARCHER_ATTACK_DAMAGE: float = 2.0
-const ARCHER_MAX_HEALTH: float = 2.0
-const ARCHER_ATTACK_INTERVAL_SECONDS: float = 0.75
-
 # Shared unit behavior modes.
 const UNIT_MODE_ATTACK: int = 0
 const UNIT_MODE_DEFEND: int = 1

@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://dq7qmrcb1o5p5"]
+
+[ext_resource type="Texture2D" uid="uid://bko6255540trt" path="res://assets/units/archer/archer-walking-0.png" id="1_walk0"]
+[ext_resource type="Texture2D" uid="uid://c6w6en7ag5om0" path="res://assets/units/archer/archer-walking-1.png" id="2_walk1"]
+[ext_resource type="Texture2D" uid="uid://db1j6tqmjo3k3" path="res://assets/units/archer/shooting.png" id="3_shoot"]
+[ext_resource type="Script" uid="uid://b33avuinhgsiv" path="res://scripts/archer.gd" id="4_script"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_archer"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_shoot")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1_walk0")
+}],
+"loop": true,
+"name": &"fight",
+"speed": 2.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_walk0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_walk1")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
+
+[node name="Archer" type="AnimatedSprite2D" unique_id=69697206]
+z_index = 10
+sprite_frames = SubResource("SpriteFrames_archer")
+animation = &"walk"
+script = ExtResource("4_script")
