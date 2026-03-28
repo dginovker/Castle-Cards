@@ -219,8 +219,8 @@ func _update_targets_from_attack_overlap() -> void:
     if _attack_area == null:
         return
 
-    current_target_soldier = null
-    current_target_castle = null
+    var enemy_soldier_candidate: Swordsman
+    var enemy_castle_candidate: Castle
 
     for overlap_area: Area2D in _attack_area.get_overlapping_areas():
         if overlap_area == null:
@@ -232,16 +232,18 @@ func _update_targets_from_attack_overlap() -> void:
         if soldier != null:
             if soldier == self or soldier.team_id == team_id or soldier.is_dead():
                 continue
-            current_target_soldier = soldier
-            current_target_castle = null
-            return
+            enemy_soldier_candidate = soldier
+            break
 
         var castle: Castle = overlap_parent as Castle
         if castle != null:
             if castle.team_id == team_id or castle.is_destroyed():
                 continue
-            if current_target_castle == null:
-                current_target_castle = castle
+            if enemy_castle_candidate == null:
+                enemy_castle_candidate = castle
+
+    current_target_soldier = enemy_soldier_candidate
+    current_target_castle = enemy_castle_candidate if current_target_soldier == null else null
 
 
 func _is_current_soldier_target_attackable() -> bool:
