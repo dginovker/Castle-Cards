@@ -1,9 +1,27 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://ltru2fwwwdy7"]
 
-[ext_resource type="Script" path="res://scripts/swordsman.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/generated/swordsman_unit_frame_0_1774732749.png" id="2_texture"]
+[ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="1_6mje0"]
+[ext_resource type="Script" uid="uid://0y2jpfoufapo" path="res://scripts/swordsman.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://mjx8r1h4bo08" path="res://assets/units/soldier/walking-1.png" id="2_r7u1p"]
 
-[node name="Swordsman" type="Sprite2D"]
-script = ExtResource("1_script")
-texture = ExtResource("2_texture")
+[sub_resource type="SpriteFrames" id="SpriteFrames_bac06"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_6mje0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r7u1p")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
+
+[node name="Swordsman" type="AnimatedSprite2D" unique_id=1480401425]
 z_index = 10
+sprite_frames = SubResource("SpriteFrames_bac06")
+animation = &"walk"
+frame = 1
+frame_progress = 0.013433729
+script = ExtResource("1_script")

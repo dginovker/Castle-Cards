@@ -1,69 +1,75 @@
 class_name Swordsman
-extends Sprite2D
+extends AnimatedSprite2D
 
 @export var move_speed: float = 110.0
+@export var target_render_height: float = 48.0
 
 var lane_path: Path2D
-var travel_distance: float = 0.0
-var target_distance: float = 0.0
+var lane_curve: Curve2D
+var current_offset: float = 0.0
+var target_offset: float = 0.0
 var has_target: bool = false
 
 
 func _ready() -> void:
+    _apply_visual_scale()
+    stop()
     set_process(false)
 
 
-func setup_lane_travel(path: Path2D, start_distance: float, end_distance: float) -> void:
+func setup_lane_travel(path: Path2D, start_offset: float, end_offset: float) -> void:
     lane_path = path
+    lane_curve = path.curve if path != null else null
 
-    if lane_path == null or lane_path.curve == null:
-        has_target = false
-        set_process(false)
+    if lane_curve == null:
+        push_warning("Swordsman.setup_lane_travel: Missing lane curve.")
         return
 
-    var lane_length: float = lane_path.curve.get_baked_length()
-    travel_distance = clampf(start_distance, 0.0, lane_length)
-    target_distance = clampf(end_distance, 0.0, lane_length)
-
+    current_offset = start_offset
+    target_offset = end_offset
     has_target = true
-    _update_position_from_lane()
+
+    _update_world_position_from_offset()
+
+    flip_h = target_offset < current_offset
+    play(&"walk")
     set_process(true)
 
 
 func _process(delta: float) -> void:
-    if not has_target:
+    if not has_target or lane_curve == null:
         return
 
-    if lane_path == null or lane_path.curve == null:
-        set_process(false)
-        return
+    current_offset = move_toward(current_offset, target_offset, move_speed * delta)
+    _update_world_position_from_offset()
 
-    var direction: float = signf(target_distance - travel_distance)
-    if is_zero_approx(direction):
-        set_process(false)
-        return
-
-    travel_distance += direction * move_speed * delta
-
-    var reached_target: bool = (
-        (direction > 0.0 and travel_distance >= target_distance)
-        or (direction < 0.0 and travel_distance <= target_distance)
-    )
-
-    if reached_target:
-        travel_distance = target_distance
+    if is_equal_approx(current_offset, target_offset) or absf(current_offset - target_offset) <= 0.5:
+        current_offset = target_offset
+        _update_world_position_from_offset()
         has_target = false
-
-    _update_position_from_lane()
-    flip_h = direction < 0.0
-
-    if reached_target:
+        stop()
         set_process(false)
 
 
-func _update_position_from_lane() -> void:
-    if lane_path == null or lane_path.curve == null:
+func _update_world_position_from_offset() -> void:
+    if lane_path == null or lane_curve == null:
         return
 
-    var lane_position: Vector2 = lane_path.curve.sample_baked(travel_distance, true)
-    global_position = lane_path.to_global(lane_position)
+    var lane_local_position: Vector2 = lane_curve.sample_baked(current_offset, true)
+    global_position = lane_path.to_global(lane_local_position)
+
+
+func _apply_visual_scale() -> void:
+    if sprite_frames == null or not sprite_frames.has_animation(&"walk"):
+        return
+
+    var texture: Texture2D = sprite_frames.get_frame_texture(&"walk", 0)
+    if texture == null:
+        return
+
+    var texture_height: float = texture.get_size().y
+    if texture_height <= 0.0:
+        return
+
+    var scale_factor: float = target_render_height / texture_height
+    scale = Vector2.ONE * scale_factor

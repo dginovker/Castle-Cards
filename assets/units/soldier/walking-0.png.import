@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c5scr0j2n7j33"
-path="res://.godot/imported/enemy-castle.png-d32422ed11a6cec1ddc97b5c20162cb9.ctex"
+uid="uid://gie1u6uttoy5"
+path="res://.godot/imported/walking-0.png-174059fe586c7ef5286364483ae7730e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/enemy-castle.png"
-dest_files=["res://.godot/imported/enemy-castle.png-d32422ed11a6cec1ddc97b5c20162cb9.ctex"]
+source_file="res://assets/units/soldier/walking-0.png"
+dest_files=["res://.godot/imported/walking-0.png-174059fe586c7ef5286364483ae7730e.ctex"]
 
 [params]
 

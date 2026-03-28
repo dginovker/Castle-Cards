@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjw6iv4w1iamh"
-path="res://.godot/imported/swordsman_unit_frame_0_1774732749.png-4d24e37727eb61c02d2a49e58f7a60a9.ctex"
+uid="uid://mjx8r1h4bo08"
+path="res://.godot/imported/walking-1.png-2a010eabcb119057bd4fbd9e079327c6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/generated/swordsman_unit_frame_0_1774732749.png"
-dest_files=["res://.godot/imported/swordsman_unit_frame_0_1774732749.png-4d24e37727eb61c02d2a49e58f7a60a9.ctex"]
+source_file="res://assets/units/soldier/walking-1.png"
+dest_files=["res://.godot/imported/walking-1.png-2a010eabcb119057bd4fbd9e079327c6.ctex"]
 
 [params]
 
