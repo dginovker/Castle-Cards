@@ -141,25 +141,21 @@ func _on_debug_spawn_enemy_swordsman_pressed() -> void:
 func _on_player_mode_attack_pressed() -> void:
     player_active_mode = UnitMode.ATTACK
     _sync_mode_buttons_visuals()
-    _apply_mode_to_team_soldiers(GameConstants.TEAM_PLAYER)
 
 
 func _on_player_mode_defend_pressed() -> void:
     player_active_mode = UnitMode.DEFEND
     _sync_mode_buttons_visuals()
-    _apply_mode_to_team_soldiers(GameConstants.TEAM_PLAYER)
 
 
 func _on_enemy_mode_attack_pressed() -> void:
     enemy_active_mode = UnitMode.ATTACK
     _sync_mode_buttons_visuals()
-    _apply_mode_to_team_soldiers(GameConstants.TEAM_ENEMY)
 
 
 func _on_enemy_mode_defend_pressed() -> void:
     enemy_active_mode = UnitMode.DEFEND
     _sync_mode_buttons_visuals()
-    _apply_mode_to_team_soldiers(GameConstants.TEAM_ENEMY)
 
 
 func _spawn_swordsman_for_team(team: int) -> void:
@@ -175,26 +171,12 @@ func _spawn_swordsman_for_team(team: int) -> void:
     swordsman.team_id = team
     swordsman.set_debug_attack_range_visible(show_attack_range_debug)
 
-    var player_side_offset: float = _get_lane_offset_near_castle(true)
-    var enemy_side_offset: float = _get_lane_offset_near_castle(false)
     var starts_from_player_side: bool = team == GameConstants.TEAM_PLAYER
-    var start_offset: float = player_side_offset if starts_from_player_side else enemy_side_offset
-
-    swordsman.set_castle_references(
-        player_castle if team == GameConstants.TEAM_PLAYER else enemy_castle,
-        enemy_castle if team == GameConstants.TEAM_PLAYER else player_castle
+    swordsman.setup_lane_travel(
+        battle_lane_path,
+        _get_lane_offset_near_castle(starts_from_player_side),
+        _get_lane_offset_near_castle(not starts_from_player_side)
     )
-    swordsman.set_lane_side_offsets(player_side_offset, enemy_side_offset)
-
-    var mode: UnitMode = _get_active_mode_for_team(team)
-    var end_offset: float = (
-        enemy_side_offset if mode == UnitMode.ATTACK and team == GameConstants.TEAM_PLAYER
-        else player_side_offset if mode == UnitMode.ATTACK
-        else start_offset
-    )
-
-    swordsman.setup_lane_travel(battle_lane_path, start_offset, end_offset)
-    swordsman.set_mode(_to_swordsman_mode(mode))
 
 
 func _apply_debug_toggle_dependent_ui() -> void:
@@ -228,23 +210,6 @@ func _sync_mode_buttons_visuals() -> void:
 
     if enemy_mode_defend_button != null:
         enemy_mode_defend_button.button_pressed = enemy_active_mode == UnitMode.DEFEND
-
-
-func _get_active_mode_for_team(team: int) -> UnitMode:
-    return player_active_mode if team == GameConstants.TEAM_PLAYER else enemy_active_mode
-
-
-func _to_swordsman_mode(mode: UnitMode) -> int:
-    return GameConstants.UNIT_MODE_DEFEND if mode == UnitMode.DEFEND else GameConstants.UNIT_MODE_ATTACK
-
-
-func _apply_mode_to_team_soldiers(team: int) -> void:
-    for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
-        var soldier: Swordsman = node as Swordsman
-        if soldier == null or soldier.team_id != team:
-            continue
-
-        soldier.set_mode(_to_swordsman_mode(_get_active_mode_for_team(team)))
 
 
 func _get_lane_offset_near_castle(is_player_side: bool) -> float:

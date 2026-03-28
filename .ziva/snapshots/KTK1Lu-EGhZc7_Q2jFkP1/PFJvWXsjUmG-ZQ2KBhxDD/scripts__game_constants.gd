@@ -12,13 +12,6 @@ const SOLDIER_ATTACK_RANGE: float = 2.0
 const SOLDIER_ATTACK_DAMAGE: float = 1.0
 const SOLDIER_MAX_HEALTH: float = 3.0
 
-# Shared unit behavior modes.
-const UNIT_MODE_ATTACK: int = 0
-const UNIT_MODE_DEFEND: int = 1
-
-# In Defend mode, soldiers only engage enemies near their own castle.
-const SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS: float = 220.0
-
 # Physics layer bit used by damageable hurtboxes (Area2D). Keep this shared
 # so every attacker can discover all valid damage targets consistently.
 const COMBAT_HURTBOX_LAYER: int = 1 << 5

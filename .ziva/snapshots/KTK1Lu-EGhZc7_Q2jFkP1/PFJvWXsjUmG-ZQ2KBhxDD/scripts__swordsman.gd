@@ -18,8 +18,6 @@ enum CombatState {
 @export_range(0.0, 1000.0, 1.0) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
 @export_range(1.0, 1000.0, 1.0) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
-@export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
-@export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
 
 @export var debug_range_fill_color: Color = Color(1.0, 0.2, 0.2, 0.14)
 @export var debug_range_outline_color: Color = Color(1.0, 0.2, 0.2, 0.9)
@@ -36,10 +34,6 @@ var combat_state: CombatState = CombatState.IDLE
 var current_health: float = 0.0
 var current_target_soldier: Swordsman
 var current_target_castle: Castle
-var own_castle: Castle
-var enemy_castle: Castle
-var lane_player_side_offset: float = 0.0
-var lane_enemy_side_offset: float = 0.0
 var _attack_cooldown_remaining: float = 0.0
 
 var _attack_area: Area2D
@@ -71,42 +65,15 @@ func setup_lane_travel(path: Path2D, start_offset: float, end_offset: float) -> 
 
     current_offset = start_offset
     target_offset = end_offset
-    has_target = not is_equal_approx(current_offset, target_offset)
-    combat_state = CombatState.MOVING if has_target else CombatState.IDLE
+    has_target = true
+    combat_state = CombatState.MOVING
 
     _update_world_position_from_offset()
 
     flip_h = target_offset < current_offset
-    if has_target and sprite_frames != null and sprite_frames.has_animation(&"walk"):
+    if sprite_frames != null and sprite_frames.has_animation(&"walk"):
         play(&"walk")
-    else:
-        stop()
     set_process(true)
-
-
-func set_castle_references(own: Castle, enemy: Castle) -> void:
-    own_castle = own
-    enemy_castle = enemy
-
-
-func set_lane_side_offsets(player_side: float, enemy_side: float) -> void:
-    lane_player_side_offset = player_side
-    lane_enemy_side_offset = enemy_side
-    _refresh_movement_target_for_mode()
-
-
-func set_mode(mode: int) -> void:
-    var normalized_mode: int = (
-        GameConstants.UNIT_MODE_DEFEND
-        if mode == GameConstants.UNIT_MODE_DEFEND
-        else GameConstants.UNIT_MODE_ATTACK
-    )
-
-    if active_mode == normalized_mode:
-        return
-
-    active_mode = normalized_mode
-    _refresh_movement_target_for_mode()
 
 
 func set_debug_attack_range_visible(visible_state: bool) -> void:
@@ -119,43 +86,6 @@ func set_debug_attack_range_visible(visible_state: bool) -> void:
 
 func is_dead() -> bool:
     return current_health <= 0.0
-
-
-func _refresh_movement_target_for_mode() -> void:
-    if lane_curve == null:
-        return
-
-    target_offset = _get_mode_destination_offset()
-    has_target = not is_equal_approx(current_offset, target_offset)
-
-    if combat_state == CombatState.ATTACKING:
-        return
-
-    if has_target:
-        combat_state = CombatState.MOVING
-        flip_h = target_offset < current_offset
-        if sprite_frames != null and sprite_frames.has_animation(&"walk"):
-            play(&"walk")
-        else:
-            stop()
-    else:
-        combat_state = CombatState.IDLE
-        stop()
-
-
-func _get_mode_destination_offset() -> float:
-    if active_mode == GameConstants.UNIT_MODE_DEFEND:
-        return _get_own_side_offset()
-
-    return _get_enemy_side_offset()
-
-
-func _get_own_side_offset() -> float:
-    return lane_player_side_offset if team_id == GameConstants.TEAM_PLAYER else lane_enemy_side_offset
-
-
-func _get_enemy_side_offset() -> float:
-    return lane_enemy_side_offset if team_id == GameConstants.TEAM_PLAYER else lane_player_side_offset
 
 
 func take_damage(amount: float) -> void:
@@ -302,8 +232,6 @@ func _update_targets_from_attack_overlap() -> void:
         if soldier != null:
             if soldier == self or soldier.team_id == team_id or soldier.is_dead():
                 continue
-            if not _is_target_allowed_for_current_mode(soldier.global_position, false):
-                continue
             current_target_soldier = soldier
             current_target_castle = null
             return
@@ -311,8 +239,6 @@ func _update_targets_from_attack_overlap() -> void:
         var castle: Castle = overlap_parent as Castle
         if castle != null:
             if castle.team_id == team_id or castle.is_destroyed():
-                continue
-            if not _is_target_allowed_for_current_mode(castle.global_position, true):
                 continue
             if current_target_castle == null:
                 current_target_castle = castle
@@ -323,9 +249,6 @@ func _is_current_soldier_target_attackable() -> bool:
         return false
 
     if current_target_soldier == self or current_target_soldier.team_id == team_id or current_target_soldier.is_dead():
-        return false
-
-    if not _is_target_allowed_for_current_mode(current_target_soldier.global_position, false):
         return false
 
     var hurtbox: Area2D = current_target_soldier.get_hurtbox()
@@ -342,27 +265,11 @@ func _is_current_castle_target_attackable() -> bool:
     if current_target_castle.team_id == team_id or current_target_castle.is_destroyed():
         return false
 
-    if not _is_target_allowed_for_current_mode(current_target_castle.global_position, true):
-        return false
-
     var hurtbox: Area2D = current_target_castle.get_hurtbox()
     if hurtbox == null:
         return false
 
     return _attack_area != null and _attack_area.overlaps_area(hurtbox)
-
-
-func _is_target_allowed_for_current_mode(target_global_position: Vector2, is_castle_target: bool) -> bool:
-    if active_mode != GameConstants.UNIT_MODE_DEFEND:
-        return true
-
-    if is_castle_target:
-        return false
-
-    if own_castle == null or not is_instance_valid(own_castle):
-        return true
-
-    return own_castle.global_position.distance_to(target_global_position) <= defend_protection_radius_pixels
 
 
 func _draw() -> void:
