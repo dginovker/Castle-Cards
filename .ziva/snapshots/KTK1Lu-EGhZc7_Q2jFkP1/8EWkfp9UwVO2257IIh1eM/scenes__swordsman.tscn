@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="1_6mje0"]
 [ext_resource type="Texture2D" uid="uid://djcoow14ahdpv" path="res://assets/units/soldier/sword-swing.png" id="1_r7u1p"]
-[ext_resource type="Script" path="res://scripts/swordsman_wrapper.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://c3liybcxitoxs" path="res://scripts/combat_unit.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://mjx8r1h4bo08" path="res://assets/units/soldier/walking-1.png" id="2_r7u1p"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_bac06"]
