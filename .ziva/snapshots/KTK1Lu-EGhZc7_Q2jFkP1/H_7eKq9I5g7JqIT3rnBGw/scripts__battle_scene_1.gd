@@ -26,7 +26,6 @@ func _ready() -> void:
         debug_attack_range_toggle.button_pressed = show_attack_range_debug
 
     _apply_debug_attack_range_to_all_soldiers()
-    _apply_debug_hurtbox_to_castles()
 
     if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
         push_warning("BattleLanePath.curve is missing or has fewer than 2 points. Edit BattleLanePath in the inspector to define the lane curve.")
@@ -51,7 +50,6 @@ func _set_attack_range_debug_visible(visible_state: bool) -> void:
         debug_attack_range_toggle.button_pressed = visible_state
 
     _apply_debug_attack_range_to_all_soldiers()
-    _apply_debug_hurtbox_to_castles()
 
 
 func _apply_debug_attack_range_to_all_soldiers() -> void:
@@ -61,18 +59,9 @@ func _apply_debug_attack_range_to_all_soldiers() -> void:
             soldier.set_debug_attack_range_visible(show_attack_range_debug)
 
 
-func _apply_debug_hurtbox_to_castles() -> void:
-    if player_castle != null:
-        player_castle.set_debug_hurtbox_visible(show_attack_range_debug)
-
-    if enemy_castle != null:
-        enemy_castle.set_debug_hurtbox_visible(show_attack_range_debug)
-
-
 func _setup_castles() -> void:
     if player_castle != null:
         player_castle.team_id = GameConstants.TEAM_PLAYER
-        player_castle.set_debug_hurtbox_visible(show_attack_range_debug)
         player_castle.health_changed.connect(_on_player_castle_health_changed)
         player_castle.destroyed.connect(_on_castle_destroyed)
         player_castle_hp_bar.max_value = player_castle.max_health
@@ -80,7 +69,6 @@ func _setup_castles() -> void:
 
     if enemy_castle != null:
         enemy_castle.team_id = GameConstants.TEAM_ENEMY
-        enemy_castle.set_debug_hurtbox_visible(show_attack_range_debug)
         enemy_castle.health_changed.connect(_on_enemy_castle_health_changed)
         enemy_castle.destroyed.connect(_on_castle_destroyed)
         enemy_castle_hp_bar.max_value = enemy_castle.max_health

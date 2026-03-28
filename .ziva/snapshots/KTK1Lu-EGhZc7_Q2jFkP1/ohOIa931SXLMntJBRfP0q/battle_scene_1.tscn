@@ -5,7 +5,6 @@
 [ext_resource type="Script" uid="uid://bfhop4p3vhdxl" path="res://scripts/battle_scene_1.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="5_swordsman_icon"]
-[ext_resource type="Script" uid="uid://fdfppgfw6op5" path="res://scripts/castle.gd" id="6_castle_script"]
 
 [sub_resource type="Curve2D" id="Curve2D_xmomn"]
 _data = {
@@ -49,13 +48,11 @@ position = Vector2(1052, 330)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_xmomn")
 flip_h = true
-script = ExtResource("6_castle_script")
 
 [node name="PlayerCastle" type="Sprite2D" parent="." unique_id=1632866983]
 position = Vector2(100, 330)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_xmomn")
-script = ExtResource("6_castle_script")
 
 [node name="BattleLanePath" type="Path2D" parent="." unique_id=1209325944]
 curve = SubResource("Curve2D_xmomn")
@@ -97,9 +94,9 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
-[node name="DebugAttackRangeToggle" type="CheckButton" parent="UI" unique_id=859335075]
+[node name="DebugAttackRangeToggle" type="CheckButton" parent="UI"]
 offset_left = 104.0
 offset_top = 36.0
 offset_right = 332.0
 offset_bottom = 60.0
-text = "Debug Range (F3)"
+text = "Debug Soldier Range (F3)"

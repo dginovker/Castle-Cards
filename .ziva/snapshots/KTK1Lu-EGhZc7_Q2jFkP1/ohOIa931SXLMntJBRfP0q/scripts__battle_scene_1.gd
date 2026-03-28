@@ -8,25 +8,21 @@ const DOOR_Y_FACTOR: float = 0.44
 
 @export var show_attack_range_debug: bool = false
 
-@onready var player_castle: Castle = $PlayerCastle as Castle
-@onready var enemy_castle: Castle = $EnemyCastle as Castle
+@onready var player_castle: Sprite2D = $PlayerCastle
+@onready var enemy_castle: Sprite2D = $EnemyCastle
 @onready var summon_button: Button = $UI/SummonSwordsmanButton
 @onready var battle_lane_path: Path2D = $BattleLanePath
-@onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
-@onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
 @onready var debug_attack_range_toggle: CheckButton = get_node_or_null("UI/DebugAttackRangeToggle") as CheckButton
 
 
 func _ready() -> void:
     summon_button.pressed.connect(_on_summon_swordsman_pressed)
-    _setup_castles()
 
     if debug_attack_range_toggle != null:
         debug_attack_range_toggle.toggled.connect(_on_debug_attack_range_toggled)
         debug_attack_range_toggle.button_pressed = show_attack_range_debug
 
     _apply_debug_attack_range_to_all_soldiers()
-    _apply_debug_hurtbox_to_castles()
 
     if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
         push_warning("BattleLanePath.curve is missing or has fewer than 2 points. Edit BattleLanePath in the inspector to define the lane curve.")
@@ -51,7 +47,6 @@ func _set_attack_range_debug_visible(visible_state: bool) -> void:
         debug_attack_range_toggle.button_pressed = visible_state
 
     _apply_debug_attack_range_to_all_soldiers()
-    _apply_debug_hurtbox_to_castles()
 
 
 func _apply_debug_attack_range_to_all_soldiers() -> void:
@@ -61,57 +56,14 @@ func _apply_debug_attack_range_to_all_soldiers() -> void:
             soldier.set_debug_attack_range_visible(show_attack_range_debug)
 
 
-func _apply_debug_hurtbox_to_castles() -> void:
-    if player_castle != null:
-        player_castle.set_debug_hurtbox_visible(show_attack_range_debug)
-
-    if enemy_castle != null:
-        enemy_castle.set_debug_hurtbox_visible(show_attack_range_debug)
-
-
-func _setup_castles() -> void:
-    if player_castle != null:
-        player_castle.team_id = GameConstants.TEAM_PLAYER
-        player_castle.set_debug_hurtbox_visible(show_attack_range_debug)
-        player_castle.health_changed.connect(_on_player_castle_health_changed)
-        player_castle.destroyed.connect(_on_castle_destroyed)
-        player_castle_hp_bar.max_value = player_castle.max_health
-        player_castle_hp_bar.value = player_castle.current_health
-
-    if enemy_castle != null:
-        enemy_castle.team_id = GameConstants.TEAM_ENEMY
-        enemy_castle.set_debug_hurtbox_visible(show_attack_range_debug)
-        enemy_castle.health_changed.connect(_on_enemy_castle_health_changed)
-        enemy_castle.destroyed.connect(_on_castle_destroyed)
-        enemy_castle_hp_bar.max_value = enemy_castle.max_health
-        enemy_castle_hp_bar.value = enemy_castle.current_health
-
-
-func _on_player_castle_health_changed(current_health: float, max_health: float) -> void:
-    player_castle_hp_bar.max_value = max_health
-    player_castle_hp_bar.value = current_health
-
-
-func _on_enemy_castle_health_changed(current_health: float, max_health: float) -> void:
-    enemy_castle_hp_bar.max_value = max_health
-    enemy_castle_hp_bar.value = current_health
-
-
-func _on_castle_destroyed(castle: Castle) -> void:
-    print("Castle destroyed: ", castle.name)
-
-
 func _on_summon_swordsman_pressed() -> void:
     if battle_lane_path.curve == null or battle_lane_path.curve.get_baked_length() <= 0.0:
         push_warning("Cannot summon: BattleLanePath curve is not configured.")
         return
 
     var swordsman: Swordsman = SWORDSMAN_SCENE.instantiate() as Swordsman
-    if swordsman == null:
-        return
 
     add_child(swordsman)
-    swordsman.team_id = GameConstants.TEAM_PLAYER
     swordsman.set_debug_attack_range_visible(show_attack_range_debug)
     swordsman.setup_lane_travel(
         battle_lane_path,
