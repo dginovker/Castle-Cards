@@ -12,25 +12,6 @@ _data = {
 }
 point_count = 3
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
-bg_color = Color(0.121569, 0.121569, 0.121569, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.0509804, 0.0509804, 0.0509804, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
-bg_color = Color(0.803922, 0.203922, 0.203922, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
 [node name="Node2D" type="Node2D" unique_id=524830098]
 script = ExtResource("3_script")
 
@@ -59,37 +40,15 @@ curve = SubResource("Curve2D_xmomn")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1162858540]
 
-[node name="PlayerCastleHPBar" type="ProgressBar" parent="UI" unique_id=1258044814]
-offset_left = 20.0
-offset_top = 248.0
-offset_right = 180.0
-offset_bottom = 270.0
-theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
-max_value = 20.0
-step = 1.0
-value = 20.0
-show_percentage = false
-
-[node name="EnemyCastleHPBar" type="ProgressBar" parent="UI" unique_id=1078524951]
-offset_left = 972.0
-offset_top = 248.0
-offset_right = 1132.0
-offset_bottom = 270.0
-theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
-max_value = 20.0
-step = 1.0
-value = 20.0
-show_percentage = false
-
 [node name="SummonSwordsmanButton" type="Button" parent="UI" unique_id=955954823]
 custom_minimum_size = Vector2(76, 76)
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 92.0
 offset_bottom = 92.0
+text = ""
 tooltip_text = "Summon Swordsman"
-theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
+expand_icon = false
 icon_alignment = 1
+theme_override_constants/icon_max_width = 48
