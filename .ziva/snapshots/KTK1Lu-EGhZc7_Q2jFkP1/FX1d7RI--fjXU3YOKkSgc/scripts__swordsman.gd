@@ -4,25 +4,17 @@ extends AnimatedSprite2D
 @export var move_speed: float = 110.0
 @export var target_render_height: float = 48.0
 
-@export_range(0.0, 100.0, 0.1) var attack_range: float = 2.0
-@export var debug_range_fill_color: Color = Color(1.0, 0.2, 0.2, 0.14)
-@export var debug_range_outline_color: Color = Color(1.0, 0.2, 0.2, 0.9)
-@export_range(1.0, 8.0, 0.1) var debug_range_outline_width: float = 2.0
-
 var lane_path: Path2D
 var lane_curve: Curve2D
 var current_offset: float = 0.0
 var target_offset: float = 0.0
 var has_target: bool = false
-var debug_attack_range_visible: bool = false
 
 
 func _ready() -> void:
-    add_to_group(&"soldiers")
     _apply_visual_scale()
     stop()
     set_process(false)
-    queue_redraw()
 
 
 func setup_lane_travel(path: Path2D, start_offset: float, end_offset: float) -> void:
@@ -44,18 +36,6 @@ func setup_lane_travel(path: Path2D, start_offset: float, end_offset: float) -> 
     set_process(true)
 
 
-func set_debug_attack_range_visible(visible_state: bool) -> void:
-    if debug_attack_range_visible == visible_state:
-        return
-
-    debug_attack_range_visible = visible_state
-    queue_redraw()
-
-
-func get_attack_range_radius_pixels() -> float:
-    return maxf(0.0, attack_range * GameConstants.ATTACK_RANGE_UNIT_PIXELS)
-
-
 func _process(delta: float) -> void:
     if not has_target or lane_curve == null:
         return
@@ -69,18 +49,6 @@ func _process(delta: float) -> void:
         has_target = false
         stop()
         set_process(false)
-
-
-func _draw() -> void:
-    if not debug_attack_range_visible:
-        return
-
-    var radius: float = get_attack_range_radius_pixels()
-    if radius <= 0.0:
-        return
-
-    draw_circle(Vector2.ZERO, radius, debug_range_fill_color)
-    draw_arc(Vector2.ZERO, radius, 0.0, TAU, 64, debug_range_outline_color, debug_range_outline_width, true)
 
 
 func _update_world_position_from_offset() -> void:

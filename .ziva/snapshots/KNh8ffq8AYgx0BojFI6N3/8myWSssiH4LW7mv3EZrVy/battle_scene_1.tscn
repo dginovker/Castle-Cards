@@ -93,10 +93,3 @@ tooltip_text = "Summon Swordsman"
 theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
-
-[node name="DebugAttackRangeToggle" type="CheckButton" parent="UI"]
-offset_left = 104.0
-offset_top = 36.0
-offset_right = 332.0
-offset_bottom = 60.0
-text = "Debug Soldier Range (F3)"

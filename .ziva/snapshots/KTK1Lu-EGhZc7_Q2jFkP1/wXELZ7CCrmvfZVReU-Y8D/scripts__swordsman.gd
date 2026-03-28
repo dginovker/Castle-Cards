@@ -5,6 +5,7 @@ extends AnimatedSprite2D
 @export var target_render_height: float = 48.0
 
 @export_range(0.0, 100.0, 0.1) var attack_range: float = 2.0
+@export_range(1.0, 256.0, 1.0) var attack_range_unit_pixels: float = 64.0
 @export var debug_range_fill_color: Color = Color(1.0, 0.2, 0.2, 0.14)
 @export var debug_range_outline_color: Color = Color(1.0, 0.2, 0.2, 0.9)
 @export_range(1.0, 8.0, 0.1) var debug_range_outline_width: float = 2.0
@@ -53,7 +54,7 @@ func set_debug_attack_range_visible(visible_state: bool) -> void:
 
 
 func get_attack_range_radius_pixels() -> float:
-    return maxf(0.0, attack_range * GameConstants.ATTACK_RANGE_UNIT_PIXELS)
+    return maxf(0.0, attack_range * attack_range_unit_pixels)
 
 
 func _process(delta: float) -> void:

@@ -6,54 +6,17 @@ const SWORDSMAN_SCENE: PackedScene = preload("res://scenes/swordsman.tscn")
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
 
-@export var show_attack_range_debug: bool = false
-
 @onready var player_castle: Sprite2D = $PlayerCastle
 @onready var enemy_castle: Sprite2D = $EnemyCastle
 @onready var summon_button: Button = $UI/SummonSwordsmanButton
 @onready var battle_lane_path: Path2D = $BattleLanePath
-@onready var debug_attack_range_toggle: CheckButton = get_node_or_null("UI/DebugAttackRangeToggle") as CheckButton
 
 
 func _ready() -> void:
     summon_button.pressed.connect(_on_summon_swordsman_pressed)
 
-    if debug_attack_range_toggle != null:
-        debug_attack_range_toggle.toggled.connect(_on_debug_attack_range_toggled)
-        debug_attack_range_toggle.button_pressed = show_attack_range_debug
-
-    _apply_debug_attack_range_to_all_soldiers()
-
     if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
         push_warning("BattleLanePath.curve is missing or has fewer than 2 points. Edit BattleLanePath in the inspector to define the lane curve.")
-
-
-func _unhandled_input(event: InputEvent) -> void:
-    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
-        _set_attack_range_debug_visible(not show_attack_range_debug)
-
-
-func _on_debug_attack_range_toggled(is_pressed: bool) -> void:
-    _set_attack_range_debug_visible(is_pressed)
-
-
-func _set_attack_range_debug_visible(visible_state: bool) -> void:
-    if show_attack_range_debug == visible_state:
-        return
-
-    show_attack_range_debug = visible_state
-
-    if debug_attack_range_toggle != null and debug_attack_range_toggle.button_pressed != visible_state:
-        debug_attack_range_toggle.button_pressed = visible_state
-
-    _apply_debug_attack_range_to_all_soldiers()
-
-
-func _apply_debug_attack_range_to_all_soldiers() -> void:
-    for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
-        var soldier: Swordsman = node as Swordsman
-        if soldier != null:
-            soldier.set_debug_attack_range_visible(show_attack_range_debug)
 
 
 func _on_summon_swordsman_pressed() -> void:
@@ -64,7 +27,6 @@ func _on_summon_swordsman_pressed() -> void:
     var swordsman: Swordsman = SWORDSMAN_SCENE.instantiate() as Swordsman
 
     add_child(swordsman)
-    swordsman.set_debug_attack_range_visible(show_attack_range_debug)
     swordsman.setup_lane_travel(
         battle_lane_path,
         _get_lane_offset_near_castle(true),

@@ -1,11 +1,23 @@
 [gd_scene format=3 uid="uid://ltru2fwwwdy7"]
 
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="1_6mje0"]
+[ext_resource type="Texture2D" uid="uid://djcoow14ahdpv" path="res://assets/units/soldier/sword-swing.png" id="1_r7u1p"]
 [ext_resource type="Script" uid="uid://0y2jpfoufapo" path="res://scripts/swordsman.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://mjx8r1h4bo08" path="res://assets/units/soldier/walking-1.png" id="2_r7u1p"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_bac06"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r7u1p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r7u1p")
+}],
+"loop": true,
+"name": &"fight",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("1_6mje0")
@@ -21,7 +33,6 @@ animations = [{
 [node name="Swordsman" type="AnimatedSprite2D" unique_id=1480401425]
 z_index = 10
 sprite_frames = SubResource("SpriteFrames_bac06")
-animation = &"walk"
-frame = 1
-frame_progress = 0.013433729
+animation = &"fight"
+frame_progress = 0.20952198
 script = ExtResource("1_script")

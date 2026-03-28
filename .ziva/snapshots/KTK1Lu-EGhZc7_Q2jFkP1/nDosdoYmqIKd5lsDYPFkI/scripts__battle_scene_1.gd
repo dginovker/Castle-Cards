@@ -37,14 +37,14 @@ func _on_debug_attack_range_toggled(is_pressed: bool) -> void:
     _set_attack_range_debug_visible(is_pressed)
 
 
-func _set_attack_range_debug_visible(visible_state: bool) -> void:
-    if show_attack_range_debug == visible_state:
+func _set_attack_range_debug_visible(is_visible: bool) -> void:
+    if show_attack_range_debug == is_visible:
         return
 
-    show_attack_range_debug = visible_state
+    show_attack_range_debug = is_visible
 
-    if debug_attack_range_toggle != null and debug_attack_range_toggle.button_pressed != visible_state:
-        debug_attack_range_toggle.button_pressed = visible_state
+    if debug_attack_range_toggle != null and debug_attack_range_toggle.button_pressed != is_visible:
+        debug_attack_range_toggle.button_pressed = is_visible
 
     _apply_debug_attack_range_to_all_soldiers()
 
