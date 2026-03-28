@@ -30,10 +30,6 @@ enum CombatState {
 @export_range(0.0, 1000.0, 1.0) var frontline_follow_distance_pixels: float = 56.0
 @export_range(0.0, 1000.0, 1.0) var defend_retreat_distance_pixels: float = 0.0
 
-# Visual anti-stacking offset (units still pass through each other)
-@export_range(0.0, 64.0, 1.0) var formation_y_spread_pixels: float = 12.0
-@export_range(1, 15, 1) var formation_y_slots: int = 7
-
 @export var debug_range_fill_color: Color = Color(1.0, 0.2, 0.2, 0.14)
 @export var debug_range_outline_color: Color = Color(1.0, 0.2, 0.2, 0.9)
 @export_range(1.0, 8.0, 0.1) var debug_range_outline_width: float = 2.0
@@ -59,15 +55,11 @@ var _attack_area: Area2D
 var _attack_area_shape_node: CollisionShape2D
 var _hurtbox_area: Area2D
 var _hurtbox_shape_node: CollisionShape2D
-var _formation_y_offset_pixels: float = 0.0
-
-static var _formation_spawn_counter: int = 0
 
 
 func _ready() -> void:
     add_to_group(&"soldiers")
     current_health = max_health
-    _assign_formation_y_offset()
     _apply_visual_scale()
     _ensure_attack_area()
     _ensure_hurtbox()
@@ -470,7 +462,7 @@ func _update_world_position_from_offset() -> void:
         return
 
     var lane_local_position: Vector2 = lane_curve.sample_baked(current_offset, true)
-    global_position = lane_path.to_global(lane_local_position) + Vector2(0.0, _formation_y_offset_pixels)
+    global_position = lane_path.to_global(lane_local_position)
 
 
 func _apply_visual_scale() -> void:
@@ -535,41 +527,6 @@ func _ensure_hurtbox() -> void:
         _hurtbox_shape_node.shape = circle_shape
 
     circle_shape.radius = maxf(8.0, target_render_height * 0.22)
-
-
-func _assign_formation_y_offset() -> void:
-    if formation_y_spread_pixels <= 0.0:
-        _formation_y_offset_pixels = 0.0
-        return
-
-    var slot_count: int = max(1, formation_y_slots)
-    var sequence_index: int = _formation_spawn_counter
-    _formation_spawn_counter += 1
-
-    var slot_index: int = _get_center_out_slot_index(slot_count, sequence_index)
-    if slot_count == 1:
-        _formation_y_offset_pixels = 0.0
-        return
-
-    var t: float = float(slot_index) / float(slot_count - 1)
-    _formation_y_offset_pixels = lerpf(-formation_y_spread_pixels, formation_y_spread_pixels, t)
-
-
-func _get_center_out_slot_index(slot_count: int, sequence_index: int) -> int:
-    if slot_count <= 1:
-        return 0
-
-    var center: int = slot_count / 2
-    var cycle_index: int = sequence_index % slot_count
-
-    if cycle_index == 0:
-        return center
-
-    var step: int = int((cycle_index + 1) / 2)
-    if cycle_index % 2 == 1:
-        return min(slot_count - 1, center + step)
-
-    return max(0, center - step)
 
 
 func _clamp_to_lane_bounds(offset_value: float) -> float:
