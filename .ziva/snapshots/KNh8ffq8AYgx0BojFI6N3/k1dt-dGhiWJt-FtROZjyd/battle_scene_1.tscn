@@ -5,23 +5,25 @@
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
 
 [node name="Node2D" type="Node2D" unique_id=524830098]
+position = Vector2(58, 0)
 
 [node name="Background" type="Sprite2D" parent="." unique_id=1059486313]
-position = Vector2(576, 185.00006)
+position = Vector2(518, 185.00006)
+rotation = -0.0015914536
 texture = ExtResource("1_5cvnn")
 
 [node name="Groud" type="Sprite2D" parent="." unique_id=1043487902]
-position = Vector2(576, 490)
-scale = Vector2(0.665, 0.56)
+position = Vector2(505, 490)
+scale = Vector2(0.56, 0.56)
 texture = ExtResource("2_u576h")
 
 [node name="EnemyCastle" type="Sprite2D" parent="." unique_id=47905881]
-position = Vector2(1052, 330)
+position = Vector2(1067, 276)
 scale = Vector2(0.2, 0.2)
-texture = ExtResource("4_xmomn")
 flip_h = true
+texture = ExtResource("4_xmomn")
 
 [node name="PlayerCastle" type="Sprite2D" parent="." unique_id=1632866983]
-position = Vector2(100, 330)
+position = Vector2(-56, 276)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_xmomn")
