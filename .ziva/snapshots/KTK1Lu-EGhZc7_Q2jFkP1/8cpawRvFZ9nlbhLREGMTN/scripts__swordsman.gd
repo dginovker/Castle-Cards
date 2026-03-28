@@ -1,9 +1,6 @@
 class_name Swordsman
 extends AnimatedSprite2D
 
-signal health_changed(current_health: float, max_health: float)
-signal died(swordsman: Swordsman)
-
 enum CombatState {
     IDLE,
     MOVING,
@@ -14,9 +11,8 @@ enum CombatState {
 @export var move_speed: float = 110.0
 @export var target_render_height: float = 48.0
 
-@export_range(0.0, 100.0, 0.1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
-@export_range(0.0, 1000.0, 1.0) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
-@export_range(1.0, 1000.0, 1.0) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
+@export_range(0.0, 100.0, 0.1) var attack_range: float = 2.0
+@export_range(1.0, 1000.0, 1.0) var attack_damage: float = 1.0
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
 
 @export var debug_range_fill_color: Color = Color(1.0, 0.2, 0.2, 0.14)
@@ -31,25 +27,18 @@ var has_target: bool = false
 var debug_attack_range_visible: bool = false
 
 var combat_state: CombatState = CombatState.IDLE
-var current_health: float = 0.0
-var current_target_soldier: Swordsman
 var current_target_castle: Castle
 var _attack_cooldown_remaining: float = 0.0
 
 var _attack_area: Area2D
 var _attack_area_shape_node: CollisionShape2D
-var _hurtbox_area: Area2D
-var _hurtbox_shape_node: CollisionShape2D
 
 
 func _ready() -> void:
     add_to_group(&"soldiers")
-    current_health = max_health
     _apply_visual_scale()
     _ensure_attack_area()
-    _ensure_hurtbox()
     refresh_attack_range_shape()
-    health_changed.emit(current_health, max_health)
     stop()
     set_process(false)
     queue_redraw()
@@ -84,26 +73,6 @@ func set_debug_attack_range_visible(visible_state: bool) -> void:
     queue_redraw()
 
 
-func is_dead() -> bool:
-    return current_health <= 0.0
-
-
-func take_damage(amount: float) -> void:
-    if amount <= 0.0 or is_dead():
-        return
-
-    current_health = clampf(current_health - amount, 0.0, max_health)
-    health_changed.emit(current_health, max_health)
-
-    if is_zero_approx(current_health):
-        died.emit(self)
-        queue_free()
-
-
-func get_hurtbox() -> Area2D:
-    return _hurtbox_area
-
-
 func get_attack_range_radius_pixels() -> float:
     return maxf(0.0, attack_range * GameConstants.ATTACK_RANGE_UNIT_PIXELS)
 
@@ -121,7 +90,7 @@ func refresh_attack_range_shape() -> void:
 
 
 func _process(delta: float) -> void:
-    _update_targets_from_attack_overlap()
+    _update_castle_target_from_attack_overlap()
 
     match combat_state:
         CombatState.ATTACKING:
@@ -129,12 +98,12 @@ func _process(delta: float) -> void:
         CombatState.MOVING:
             _process_moving(delta)
         CombatState.IDLE:
-            if _has_attack_target():
+            if current_target_castle != null:
                 _enter_attacking_state()
 
 
 func _process_moving(delta: float) -> void:
-    if _has_attack_target():
+    if current_target_castle != null:
         _enter_attacking_state()
         return
 
@@ -155,7 +124,8 @@ func _process_moving(delta: float) -> void:
 
 
 func _process_attacking(delta: float) -> void:
-    if not _has_attack_target():
+    if not _is_current_castle_target_attackable():
+        current_target_castle = null
         _resume_after_attack_lost_target()
         return
 
@@ -167,17 +137,11 @@ func _process_attacking(delta: float) -> void:
         return
 
     _attack_cooldown_remaining = attack_interval_seconds
-
-    if _is_current_soldier_target_attackable():
-        current_target_soldier.take_damage(attack_damage)
-        return
-
-    if _is_current_castle_target_attackable():
-        current_target_castle.take_damage(attack_damage)
+    current_target_castle.take_damage(attack_damage)
 
 
 func _enter_attacking_state() -> void:
-    if not _has_attack_target():
+    if current_target_castle == null:
         return
 
     combat_state = CombatState.ATTACKING
@@ -202,62 +166,28 @@ func _resume_after_attack_lost_target() -> void:
     stop()
 
 
-func _has_attack_target() -> bool:
-    if _is_current_soldier_target_attackable():
-        return true
-
-    current_target_soldier = null
-
-    if _is_current_castle_target_attackable():
-        return true
-
-    current_target_castle = null
-    return false
-
-
-func _update_targets_from_attack_overlap() -> void:
+func _update_castle_target_from_attack_overlap() -> void:
     if _attack_area == null:
         return
 
-    var enemy_soldier_candidate: Swordsman
-    var enemy_castle_candidate: Castle
+    if _is_current_castle_target_attackable():
+        return
+
+    current_target_castle = null
 
     for overlap_area: Area2D in _attack_area.get_overlapping_areas():
         if overlap_area == null:
             continue
 
-        var overlap_parent: Node = overlap_area.get_parent()
+        var castle: Castle = overlap_area.get_parent() as Castle
+        if castle == null:
+            continue
 
-        var soldier: Swordsman = overlap_parent as Swordsman
-        if soldier != null:
-            if soldier == self or soldier.team_id == team_id or soldier.is_dead():
-                continue
-            enemy_soldier_candidate = soldier
-            break
+        if castle.team_id == team_id or castle.is_destroyed():
+            continue
 
-        var castle: Castle = overlap_parent as Castle
-        if castle != null:
-            if castle.team_id == team_id or castle.is_destroyed():
-                continue
-            if enemy_castle_candidate == null:
-                enemy_castle_candidate = castle
-
-    current_target_soldier = enemy_soldier_candidate
-    current_target_castle = enemy_castle_candidate if current_target_soldier == null else null
-
-
-func _is_current_soldier_target_attackable() -> bool:
-    if current_target_soldier == null or not is_instance_valid(current_target_soldier):
-        return false
-
-    if current_target_soldier == self or current_target_soldier.team_id == team_id or current_target_soldier.is_dead():
-        return false
-
-    var hurtbox: Area2D = current_target_soldier.get_hurtbox()
-    if hurtbox == null:
-        return false
-
-    return _attack_area != null and _attack_area.overlaps_area(hurtbox)
+        current_target_castle = castle
+        return
 
 
 func _is_current_castle_target_attackable() -> bool:
@@ -330,29 +260,3 @@ func _ensure_attack_area() -> void:
 
     if not (_attack_area_shape_node.shape is CircleShape2D):
         _attack_area_shape_node.shape = CircleShape2D.new()
-
-
-func _ensure_hurtbox() -> void:
-    _hurtbox_area = get_node_or_null("Hurtbox") as Area2D
-    if _hurtbox_area == null:
-        _hurtbox_area = Area2D.new()
-        _hurtbox_area.name = "Hurtbox"
-        add_child(_hurtbox_area)
-
-    _hurtbox_area.monitoring = false
-    _hurtbox_area.monitorable = true
-    _hurtbox_area.collision_layer = GameConstants.COMBAT_HURTBOX_LAYER
-    _hurtbox_area.collision_mask = 0
-
-    _hurtbox_shape_node = _hurtbox_area.get_node_or_null("CollisionShape2D") as CollisionShape2D
-    if _hurtbox_shape_node == null:
-        _hurtbox_shape_node = CollisionShape2D.new()
-        _hurtbox_shape_node.name = "CollisionShape2D"
-        _hurtbox_area.add_child(_hurtbox_shape_node)
-
-    var circle_shape: CircleShape2D = _hurtbox_shape_node.shape as CircleShape2D
-    if circle_shape == null:
-        circle_shape = CircleShape2D.new()
-        _hurtbox_shape_node.shape = circle_shape
-
-    circle_shape.radius = maxf(8.0, get_attack_range_radius_pixels() * 0.25)

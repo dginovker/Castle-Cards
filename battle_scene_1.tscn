@@ -113,7 +113,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
-[node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI"]
+[node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI" unique_id=1245557394]
 visible = false
 custom_minimum_size = Vector2(76, 76)
 offset_left = 1060.0
