@@ -1,16 +1,10 @@
-[gd_scene format=3 uid="uid://dl42m0goxv7ma"]
+[gd_scene load_steps=6 format=3 uid="uid://dl42m0goxv7ma"]
 
 [ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="1_5cvnn"]
 [ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="2_u576h"]
-[ext_resource type="Script" uid="uid://bfhop4p3vhdxl" path="res://scripts/battle_scene_1.gd" id="3_script"]
+[ext_resource type="Script" path="res://scripts/battle_scene_1.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
-[ext_resource type="Texture2D" uid="uid://bjw6iv4w1iamh" path="res://assets/generated/swordsman_unit_frame_0_1774732749.png" id="5_swordsman_icon"]
-
-[sub_resource type="Curve2D" id="Curve2D_xmomn"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 138, 422, 0, 0, 0, 0, 577, 533, 0, 0, 0, 0, 1017, 426)
-}
-point_count = 3
+[ext_resource type="Texture2D" path="res://assets/generated/swordsman_unit_frame_0_1774732749.png" id="5_swordsman_icon"]
 
 [node name="Node2D" type="Node2D" unique_id=524830098]
 script = ExtResource("3_script")
@@ -35,15 +29,16 @@ position = Vector2(100, 330)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_xmomn")
 
-[node name="BattleLanePath" type="Path2D" parent="." unique_id=1209325944]
-curve = SubResource("Curve2D_xmomn")
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 1
 
-[node name="UI" type="CanvasLayer" parent="." unique_id=1162858540]
-
-[node name="SummonSwordsmanButton" type="Button" parent="UI" unique_id=955954823]
-offset_left = 16.0
+[node name="SummonSwordsmanButton" type="Button" parent="UI"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -92.0
 offset_top = 16.0
-offset_right = 92.0
+offset_right = -16.0
 offset_bottom = 92.0
-tooltip_text = "Summon Swordsman"
+text = ""
 icon = ExtResource("5_swordsman_icon")
+tooltip_text = "Summon Swordsman"
