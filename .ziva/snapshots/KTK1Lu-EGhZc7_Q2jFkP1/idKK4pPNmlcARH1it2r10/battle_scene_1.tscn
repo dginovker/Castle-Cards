@@ -32,22 +32,6 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_debug_toggle_bg"]
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
-bg_color = Color(0, 0, 0, 0.55)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.2)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [node name="Node2D" type="Node2D" unique_id=524830098]
 script = ExtResource("3_script")
 
@@ -113,25 +97,9 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
-[node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI"]
-visible = false
-custom_minimum_size = Vector2(76, 76)
-offset_left = 1060.0
-offset_top = 16.0
-offset_right = 1136.0
-offset_bottom = 92.0
-tooltip_text = "[DEBUG] Spawn Enemy Swordsman"
-theme_override_constants/icon_max_width = 48
-icon = ExtResource("5_swordsman_icon")
-icon_alignment = 1
-
-[node name="Debug" type="CheckButton" parent="UI" unique_id=859335075]
+[node name="DebugRangeToggle" type="CheckButton" parent="UI" unique_id=859335075]
 offset_left = 104.0
 offset_top = 36.0
 offset_right = 332.0
 offset_bottom = 60.0
-theme_override_styles/normal = SubResource("StyleBoxFlat_debug_toggle_bg")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_debug_toggle_bg")
-theme_override_styles/hover = SubResource("StyleBoxFlat_debug_toggle_bg")
-theme_override_styles/focus = SubResource("StyleBoxFlat_debug_toggle_bg")
-text = "Debug (F3)"
+text = "Debug Range (F3)"

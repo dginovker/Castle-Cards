@@ -6,7 +6,7 @@ const SWORDSMAN_SCENE: PackedScene = preload("res://scenes/swordsman.tscn")
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
 
-@export var show_attack_range_debug: bool = true
+@export var show_attack_range_debug: bool = false
 
 @onready var player_castle: Castle = $PlayerCastle as Castle
 @onready var enemy_castle: Castle = $EnemyCastle as Castle
@@ -14,16 +14,11 @@ const DOOR_Y_FACTOR: float = 0.44
 @onready var battle_lane_path: Path2D = $BattleLanePath
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
 @onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
-@onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
-@onready var debug_spawn_enemy_swordsman_button: Button = get_node_or_null("UI/DebugSpawnEnemySwordsmanButton") as Button
+@onready var debug_attack_range_toggle: CheckButton = get_node_or_null("UI/DebugAttackRangeToggle") as CheckButton
 
 
 func _ready() -> void:
     summon_button.pressed.connect(_on_summon_swordsman_pressed)
-
-    if debug_spawn_enemy_swordsman_button != null:
-        debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
-
     _setup_castles()
 
     if debug_attack_range_toggle != null:
@@ -32,7 +27,6 @@ func _ready() -> void:
 
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
-    _apply_debug_toggle_dependent_ui()
 
     if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
         push_warning("BattleLanePath.curve is missing or has fewer than 2 points. Edit BattleLanePath in the inspector to define the lane curve.")
@@ -58,7 +52,6 @@ func _set_attack_range_debug_visible(visible_state: bool) -> void:
 
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
-    _apply_debug_toggle_dependent_ui()
 
 
 func _apply_debug_attack_range_to_all_soldiers() -> void:
@@ -109,14 +102,6 @@ func _on_castle_destroyed(castle: Castle) -> void:
 
 
 func _on_summon_swordsman_pressed() -> void:
-    _spawn_swordsman_for_team(GameConstants.TEAM_PLAYER)
-
-
-func _on_debug_spawn_enemy_swordsman_pressed() -> void:
-    _spawn_swordsman_for_team(GameConstants.TEAM_ENEMY)
-
-
-func _spawn_swordsman_for_team(team: int) -> void:
     if battle_lane_path.curve == null or battle_lane_path.curve.get_baked_length() <= 0.0:
         push_warning("Cannot summon: BattleLanePath curve is not configured.")
         return
@@ -126,28 +111,13 @@ func _spawn_swordsman_for_team(team: int) -> void:
         return
 
     add_child(swordsman)
-    swordsman.team_id = team
+    swordsman.team_id = GameConstants.TEAM_PLAYER
     swordsman.set_debug_attack_range_visible(show_attack_range_debug)
-
-    var starts_from_player_side: bool = team == GameConstants.TEAM_PLAYER
     swordsman.setup_lane_travel(
         battle_lane_path,
-        _get_lane_offset_near_castle(starts_from_player_side),
-        _get_lane_offset_near_castle(not starts_from_player_side)
+        _get_lane_offset_near_castle(true),
+        _get_lane_offset_near_castle(false)
     )
-
-
-func _apply_debug_toggle_dependent_ui() -> void:
-    if debug_spawn_enemy_swordsman_button != null:
-        debug_spawn_enemy_swordsman_button.visible = show_attack_range_debug
-
-
-func _find_debug_toggle() -> CheckButton:
-    var toggle: CheckButton = get_node_or_null("UI/Debug") as CheckButton
-    if toggle != null:
-        return toggle
-
-    return get_node_or_null("UI/DebugRangeToggle") as CheckButton
 
 
 func _get_lane_offset_near_castle(is_player_side: bool) -> float:

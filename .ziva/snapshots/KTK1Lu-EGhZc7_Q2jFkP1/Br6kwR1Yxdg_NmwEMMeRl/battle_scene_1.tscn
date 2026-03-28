@@ -113,19 +113,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
-[node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI"]
-visible = false
-custom_minimum_size = Vector2(76, 76)
-offset_left = 1060.0
-offset_top = 16.0
-offset_right = 1136.0
-offset_bottom = 92.0
-tooltip_text = "[DEBUG] Spawn Enemy Swordsman"
-theme_override_constants/icon_max_width = 48
-icon = ExtResource("5_swordsman_icon")
-icon_alignment = 1
-
-[node name="Debug" type="CheckButton" parent="UI" unique_id=859335075]
+[node name="DebugRangeToggle" type="CheckButton" parent="UI" unique_id=859335075]
 offset_left = 104.0
 offset_top = 36.0
 offset_right = 332.0
