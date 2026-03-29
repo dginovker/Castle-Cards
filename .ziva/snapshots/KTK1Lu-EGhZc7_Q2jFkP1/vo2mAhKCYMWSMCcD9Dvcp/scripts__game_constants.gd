@@ -25,12 +25,6 @@ const DRUMMER_MAX_HEALTH: float = 5.0
 const DRUMMER_LEADERSHIP_RANGE: float = 4.0
 const DRUMMER_LEADERSHIP_BONUS: float = 0.5
 
-# Cannon (tower-like structure) baseline stats.
-const CANNON_ATTACK_RANGE: float = 5.0
-const CANNON_ATTACK_DAMAGE: float = 1.0
-const CANNON_MAX_HEALTH: float = 1.0
-const CANNON_COST_WOOD: int = 10
-
 # Shared unit behavior modes.
 const UNIT_MODE_ATTACK: int = 0
 const UNIT_MODE_DEFEND: int = 1

@@ -25,8 +25,6 @@ enum UnitMode {
 @onready var summon_drummer_button: Button = get_node_or_null("UI/SummonDrummerButton") as Button
 @onready var summon_cannon_button: Button = get_node_or_null("UI/SummonCannonButton") as Button
 @onready var battle_lane_path: Path2D = $BattleLanePath
-@onready var player_cannon_mount: Node2D = get_node_or_null("PlayerCannonMount") as Node2D
-@onready var enemy_cannon_mount: Node2D = get_node_or_null("EnemyCannonMount") as Node2D
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
 @onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
 @onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
@@ -257,17 +255,16 @@ func _spawn_cannon_for_team(team: int) -> void:
     else:
         _enemy_has_purchased_cannon = true
 
-    var mount_node: Node2D = player_cannon_mount if team == GameConstants.TEAM_PLAYER else enemy_cannon_mount
-    if mount_node != null:
-        cannon.global_position = mount_node.global_position
-    else:
-        var castle: Castle = player_castle if team == GameConstants.TEAM_PLAYER else enemy_castle
-        if castle != null:
-            cannon.global_position = castle.global_position + Vector2(0.0, -24.0)
-
-    var cannon_sprite: AnimatedSprite2D = cannon as AnimatedSprite2D
-    if cannon_sprite != null:
-        cannon_sprite.flip_h = team == GameConstants.TEAM_ENEMY
+    var castle: Castle = player_castle if team == GameConstants.TEAM_PLAYER else enemy_castle
+    if castle != null:
+        if castle.texture == null:
+            cannon.global_position = castle.global_position + Vector2(0.0, -36.0)
+        else:
+            var scaled_size: Vector2 = Vector2(
+                castle.texture.get_size().x * absf(castle.scale.x),
+                castle.texture.get_size().y * absf(castle.scale.y)
+            )
+            cannon.global_position = castle.global_position + Vector2(0.0, -scaled_size.y * 0.28)
 
     if summon_cannon_button != null:
         summon_cannon_button.disabled = _player_has_purchased_cannon

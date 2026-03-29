@@ -265,10 +265,6 @@ func _spawn_cannon_for_team(team: int) -> void:
         if castle != null:
             cannon.global_position = castle.global_position + Vector2(0.0, -24.0)
 
-    var cannon_sprite: AnimatedSprite2D = cannon as AnimatedSprite2D
-    if cannon_sprite != null:
-        cannon_sprite.flip_h = team == GameConstants.TEAM_ENEMY
-
     if summon_cannon_button != null:
         summon_cannon_button.disabled = _player_has_purchased_cannon
         summon_cannon_button.modulate = Color(1.0, 1.0, 1.0, 0.45) if _player_has_purchased_cannon else Color(1.0, 1.0, 1.0, 1.0)

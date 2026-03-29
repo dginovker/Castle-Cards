@@ -82,7 +82,7 @@ script = ExtResource("6_castle_script")
 position = Vector2(123, 302)
 
 [node name="EnemyCannonMount" type="Marker2D" parent="." unique_id=1681182019]
-position = Vector2(1029, 302)
+position = Vector2(1052, 306)
 
 [node name="BattleLanePath" type="Path2D" parent="." unique_id=1209325944]
 curve = SubResource("Curve2D_xmomn")

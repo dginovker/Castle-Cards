@@ -5,12 +5,12 @@
 [ext_resource type="Script" uid="uid://bfhop4p3vhdxl" path="res://scripts/battle_scene_1.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="5_swordsman_icon"]
-[ext_resource type="Texture2D" uid="uid://bko6255540trt" path="res://assets/units/archer/archer-walking-0.png" id="6_archer_icon"]
 [ext_resource type="Script" uid="uid://fdfppgfw6op5" path="res://scripts/castle.gd" id="6_castle_script"]
-[ext_resource type="Texture2D" uid="uid://h03jounvm55n" path="res://assets/generated/mode_attack_crossed_swords_frame_0_1774738110.png" id="7_mode_attack_icon"]
-[ext_resource type="Texture2D" uid="uid://cm4t8e2h13ac5" path="res://assets/generated/mode_defend_shield_frame_0_1774738123.png" id="8_mode_defend_icon"]
-[ext_resource type="Texture2D" uid="uid://b1h0k3u2hddoj" path="res://assets/units/drummer/drumming.png" id="9_drummer_icon"]
-[ext_resource type="Texture2D" uid="uid://b2htfvsls74go" path="res://assets/units/cannon/cannon-idle.png" id="10_cannon_icon"]
+[ext_resource type="Texture2D" path="res://assets/units/archer/archer-walking-0.png" id="6_archer_icon"]
+[ext_resource type="Texture2D" path="res://assets/units/drummer/drumming.png" id="9_drummer_icon"]
+[ext_resource type="Texture2D" path="res://assets/units/cannon/cannon-idle.png" id="10_cannon_icon"]
+[ext_resource type="Texture2D" path="res://assets/generated/mode_attack_crossed_swords_frame_0_1774738110.png" id="7_mode_attack_icon"]
+[ext_resource type="Texture2D" path="res://assets/generated/mode_defend_shield_frame_0_1774738123.png" id="8_mode_defend_icon"]
 
 [sub_resource type="Curve2D" id="Curve2D_xmomn"]
 _data = {
@@ -78,12 +78,6 @@ scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_xmomn")
 script = ExtResource("6_castle_script")
 
-[node name="PlayerCannonMount" type="Marker2D" parent="." unique_id=54462900]
-position = Vector2(123, 302)
-
-[node name="EnemyCannonMount" type="Marker2D" parent="." unique_id=1681182019]
-position = Vector2(1029, 302)
-
 [node name="BattleLanePath" type="Path2D" parent="." unique_id=1209325944]
 curve = SubResource("Curve2D_xmomn")
 
@@ -124,7 +118,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
-[node name="SummonArcherButton" type="Button" parent="UI" unique_id=1142501078]
+[node name="SummonArcherButton" type="Button" parent="UI"]
 custom_minimum_size = Vector2(76, 76)
 offset_left = 100.0
 offset_top = 16.0
@@ -135,7 +129,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("6_archer_icon")
 icon_alignment = 1
 
-[node name="SummonDrummerButton" type="Button" parent="UI" unique_id=1824377261]
+[node name="SummonDrummerButton" type="Button" parent="UI"]
 custom_minimum_size = Vector2(76, 76)
 offset_left = 184.0
 offset_top = 16.0
@@ -146,7 +140,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("9_drummer_icon")
 icon_alignment = 1
 
-[node name="SummonCannonButton" type="Button" parent="UI" unique_id=790197132]
+[node name="SummonCannonButton" type="Button" parent="UI"]
 custom_minimum_size = Vector2(76, 76)
 offset_left = 268.0
 offset_top = 16.0
@@ -169,7 +163,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 
-[node name="DebugSpawnEnemyArcherButton" type="Button" parent="UI" unique_id=1252737714]
+[node name="DebugSpawnEnemyArcherButton" type="Button" parent="UI"]
 visible = false
 custom_minimum_size = Vector2(76, 76)
 offset_left = 1060.0
@@ -181,7 +175,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("6_archer_icon")
 icon_alignment = 1
 
-[node name="DebugSpawnEnemyDrummerButton" type="Button" parent="UI" unique_id=2075653075]
+[node name="DebugSpawnEnemyDrummerButton" type="Button" parent="UI"]
 visible = false
 custom_minimum_size = Vector2(76, 76)
 offset_left = 808.0
@@ -193,7 +187,7 @@ theme_override_constants/icon_max_width = 48
 icon = ExtResource("9_drummer_icon")
 icon_alignment = 1
 
-[node name="DebugSpawnEnemyCannonButton" type="Button" parent="UI" unique_id=1383502556]
+[node name="DebugSpawnEnemyCannonButton" type="Button" parent="UI"]
 visible = false
 custom_minimum_size = Vector2(76, 76)
 offset_left = 892.0
@@ -216,31 +210,31 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_debug_toggle_bg")
 theme_override_styles/focus = SubResource("StyleBoxFlat_debug_toggle_bg")
 text = "Debug (F3)"
 
-[node name="PlayerModeAttackButton" type="Button" parent="UI" unique_id=1116140319]
+[node name="PlayerModeAttackButton" type="Button" parent="UI"]
 custom_minimum_size = Vector2(56, 56)
 offset_left = 512.0
 offset_top = 16.0
 offset_right = 568.0
 offset_bottom = 72.0
 tooltip_text = "Player Mode: Attack"
-theme_override_constants/icon_max_width = 34
 toggle_mode = true
+theme_override_constants/icon_max_width = 34
 icon = ExtResource("7_mode_attack_icon")
 icon_alignment = 1
 
-[node name="PlayerModeDefendButton" type="Button" parent="UI" unique_id=1952593761]
+[node name="PlayerModeDefendButton" type="Button" parent="UI"]
 custom_minimum_size = Vector2(56, 56)
 offset_left = 576.0
 offset_top = 16.0
 offset_right = 632.0
 offset_bottom = 72.0
 tooltip_text = "Player Mode: Defend"
-theme_override_constants/icon_max_width = 34
 toggle_mode = true
+theme_override_constants/icon_max_width = 34
 icon = ExtResource("8_mode_defend_icon")
 icon_alignment = 1
 
-[node name="EnemyModeAttackButton" type="Button" parent="UI" unique_id=49914766]
+[node name="EnemyModeAttackButton" type="Button" parent="UI"]
 visible = false
 custom_minimum_size = Vector2(56, 56)
 offset_left = 860.0
@@ -248,12 +242,12 @@ offset_top = 16.0
 offset_right = 916.0
 offset_bottom = 72.0
 tooltip_text = "[DEBUG] Enemy Mode: Attack"
-theme_override_constants/icon_max_width = 34
 toggle_mode = true
+theme_override_constants/icon_max_width = 34
 icon = ExtResource("7_mode_attack_icon")
 icon_alignment = 1
 
-[node name="EnemyModeDefendButton" type="Button" parent="UI" unique_id=1009120116]
+[node name="EnemyModeDefendButton" type="Button" parent="UI"]
 visible = false
 custom_minimum_size = Vector2(56, 56)
 offset_left = 924.0
@@ -261,7 +255,7 @@ offset_top = 16.0
 offset_right = 980.0
 offset_bottom = 72.0
 tooltip_text = "[DEBUG] Enemy Mode: Defend"
-theme_override_constants/icon_max_width = 34
 toggle_mode = true
+theme_override_constants/icon_max_width = 34
 icon = ExtResource("8_mode_defend_icon")
 icon_alignment = 1

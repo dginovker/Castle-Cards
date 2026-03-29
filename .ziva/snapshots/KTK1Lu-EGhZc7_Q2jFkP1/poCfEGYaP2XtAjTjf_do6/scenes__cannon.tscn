@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://csrbd4quajqmp"]
+
+[ext_resource type="Texture2D" uid="uid://b2htfvsls74go" path="res://assets/units/cannon/cannon-idle.png" id="1_idle"]
+[ext_resource type="Texture2D" uid="uid://d2lk7if6p4hkp" path="res://assets/units/cannon/cannon-shoot-1.png" id="2_shoot1"]
+[ext_resource type="Texture2D" uid="uid://b0ru6fpgwr58c" path="res://assets/units/cannon/cannon-shoot-2.png" id="3_shoot2"]
+[ext_resource type="Script" uid="uid://dedbjuws7es6d" path="res://scripts/cannon_wrapper.gd" id="4_script"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cannon"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_shoot1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_shoot2")
+}],
+"loop": true,
+"name": &"fight",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_idle")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 1.0
+}]
+
+[node name="Cannon" type="AnimatedSprite2D" unique_id=515189479]
+z_index = 9
+sprite_frames = SubResource("SpriteFrames_cannon")
+animation = &"walk"
+script = ExtResource("4_script")
+unit_archetype_name = "cannon"
+move_speed = 0.0
+target_render_height = 44.0
+attack_range = 30.0
+max_health = 1.0
+attack_interval_seconds = 0.8
+defend_limit_targets_near_own_castle = false
+can_attack_castles_in_defend = true
+formation_y_spread_pixels = 0.0

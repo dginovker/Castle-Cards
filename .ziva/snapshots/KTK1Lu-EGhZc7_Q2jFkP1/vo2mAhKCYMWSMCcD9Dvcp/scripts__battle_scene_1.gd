@@ -4,7 +4,6 @@ extends Node2D
 const SWORDSMAN_SCENE: PackedScene = preload("res://scenes/swordsman.tscn")
 const ARCHER_SCENE: PackedScene = preload("res://scenes/archer.tscn")
 const DRUMMER_SCENE: PackedScene = preload("res://scenes/drummer.tscn")
-const CANNON_SCENE: PackedScene = preload("res://scenes/cannon.tscn")
 
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
@@ -23,25 +22,18 @@ enum UnitMode {
 @onready var summon_button: Button = $UI/SummonSwordsmanButton
 @onready var summon_archer_button: Button = get_node_or_null("UI/SummonArcherButton") as Button
 @onready var summon_drummer_button: Button = get_node_or_null("UI/SummonDrummerButton") as Button
-@onready var summon_cannon_button: Button = get_node_or_null("UI/SummonCannonButton") as Button
 @onready var battle_lane_path: Path2D = $BattleLanePath
-@onready var player_cannon_mount: Node2D = get_node_or_null("PlayerCannonMount") as Node2D
-@onready var enemy_cannon_mount: Node2D = get_node_or_null("EnemyCannonMount") as Node2D
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
 @onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
 @onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
 @onready var debug_spawn_enemy_swordsman_button: Button = get_node_or_null("UI/DebugSpawnEnemySwordsmanButton") as Button
 @onready var debug_spawn_enemy_archer_button: Button = get_node_or_null("UI/DebugSpawnEnemyArcherButton") as Button
 @onready var debug_spawn_enemy_drummer_button: Button = get_node_or_null("UI/DebugSpawnEnemyDrummerButton") as Button
-@onready var debug_spawn_enemy_cannon_button: Button = get_node_or_null("UI/DebugSpawnEnemyCannonButton") as Button
 
 @onready var player_mode_attack_button: Button = get_node_or_null("UI/PlayerModeAttackButton") as Button
 @onready var player_mode_defend_button: Button = get_node_or_null("UI/PlayerModeDefendButton") as Button
 @onready var enemy_mode_attack_button: Button = get_node_or_null("UI/EnemyModeAttackButton") as Button
 @onready var enemy_mode_defend_button: Button = get_node_or_null("UI/EnemyModeDefendButton") as Button
-
-var _player_has_purchased_cannon: bool = false
-var _enemy_has_purchased_cannon: bool = false
 
 
 func _ready() -> void:
@@ -53,9 +45,6 @@ func _ready() -> void:
     if summon_drummer_button != null:
         summon_drummer_button.pressed.connect(_on_summon_drummer_pressed)
 
-    if summon_cannon_button != null:
-        summon_cannon_button.pressed.connect(_on_summon_cannon_pressed)
-
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
 
@@ -64,9 +53,6 @@ func _ready() -> void:
 
     if debug_spawn_enemy_drummer_button != null:
         debug_spawn_enemy_drummer_button.pressed.connect(_on_debug_spawn_enemy_drummer_pressed)
-
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed)
 
     if player_mode_attack_button != null:
         player_mode_attack_button.pressed.connect(_on_player_mode_attack_pressed)
@@ -87,12 +73,6 @@ func _ready() -> void:
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
     _apply_debug_toggle_dependent_ui()
-    if summon_cannon_button != null:
-        summon_cannon_button.disabled = _player_has_purchased_cannon
-        summon_cannon_button.modulate = Color(1.0, 1.0, 1.0, 0.45) if _player_has_purchased_cannon else Color(1.0, 1.0, 1.0, 1.0)
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.disabled = _enemy_has_purchased_cannon
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
 
     if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
         push_warning("BattleLanePath.curve is missing or has fewer than 2 points. Edit BattleLanePath in the inspector to define the lane curve.")
@@ -119,12 +99,6 @@ func _set_attack_range_debug_visible(visible_state: bool) -> void:
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
     _apply_debug_toggle_dependent_ui()
-    if summon_cannon_button != null:
-        summon_cannon_button.disabled = _player_has_purchased_cannon
-        summon_cannon_button.modulate = Color(1.0, 1.0, 1.0, 0.45) if _player_has_purchased_cannon else Color(1.0, 1.0, 1.0, 1.0)
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.disabled = _enemy_has_purchased_cannon
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
 
 
 func _apply_debug_attack_range_to_all_soldiers() -> void:
@@ -198,14 +172,6 @@ func _on_debug_spawn_enemy_drummer_pressed() -> void:
     _spawn_drummer_for_team(GameConstants.TEAM_ENEMY)
 
 
-func _on_summon_cannon_pressed() -> void:
-    _spawn_cannon_for_team(GameConstants.TEAM_PLAYER)
-
-
-func _on_debug_spawn_enemy_cannon_pressed() -> void:
-    _spawn_cannon_for_team(GameConstants.TEAM_ENEMY)
-
-
 func _on_player_mode_attack_pressed() -> void:
     player_active_mode = UnitMode.ATTACK
     _sync_mode_buttons_visuals()
@@ -242,49 +208,14 @@ func _spawn_drummer_for_team(team: int) -> void:
     _spawn_unit_for_team(DRUMMER_SCENE, team)
 
 
-func _spawn_cannon_for_team(team: int) -> void:
-    if team == GameConstants.TEAM_PLAYER and _player_has_purchased_cannon:
-        return
-    if team == GameConstants.TEAM_ENEMY and _enemy_has_purchased_cannon:
-        return
-
-    var cannon: Node = _spawn_unit_for_team(CANNON_SCENE, team)
-    if cannon == null:
-        return
-
-    if team == GameConstants.TEAM_PLAYER:
-        _player_has_purchased_cannon = true
-    else:
-        _enemy_has_purchased_cannon = true
-
-    var mount_node: Node2D = player_cannon_mount if team == GameConstants.TEAM_PLAYER else enemy_cannon_mount
-    if mount_node != null:
-        cannon.global_position = mount_node.global_position
-    else:
-        var castle: Castle = player_castle if team == GameConstants.TEAM_PLAYER else enemy_castle
-        if castle != null:
-            cannon.global_position = castle.global_position + Vector2(0.0, -24.0)
-
-    var cannon_sprite: AnimatedSprite2D = cannon as AnimatedSprite2D
-    if cannon_sprite != null:
-        cannon_sprite.flip_h = team == GameConstants.TEAM_ENEMY
-
-    if summon_cannon_button != null:
-        summon_cannon_button.disabled = _player_has_purchased_cannon
-        summon_cannon_button.modulate = Color(1.0, 1.0, 1.0, 0.45) if _player_has_purchased_cannon else Color(1.0, 1.0, 1.0, 1.0)
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.disabled = _enemy_has_purchased_cannon
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
-
-
-func _spawn_unit_for_team(scene: PackedScene, team: int) -> Node:
+func _spawn_unit_for_team(scene: PackedScene, team: int) -> void:
     if battle_lane_path.curve == null or battle_lane_path.curve.get_baked_length() <= 0.0:
         push_warning("Cannot summon: BattleLanePath curve is not configured.")
-        return null
+        return
 
-    var unit: Node = scene.instantiate()
+    var unit = scene.instantiate()
     if unit == null:
-        return null
+        return
 
     add_child(unit)
     unit.team_id = team
@@ -303,7 +234,6 @@ func _spawn_unit_for_team(scene: PackedScene, team: int) -> Node:
 
     unit.setup_lane_travel(battle_lane_path, start_offset, start_offset)
     unit.set_mode(_to_unit_mode(_get_active_mode_for_team(team)))
-    return unit
 
 
 func _apply_debug_toggle_dependent_ui() -> void:
@@ -315,9 +245,6 @@ func _apply_debug_toggle_dependent_ui() -> void:
 
     if debug_spawn_enemy_drummer_button != null:
         debug_spawn_enemy_drummer_button.visible = show_attack_range_debug
-
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
 
     if enemy_mode_attack_button != null:
         enemy_mode_attack_button.visible = show_attack_range_debug
