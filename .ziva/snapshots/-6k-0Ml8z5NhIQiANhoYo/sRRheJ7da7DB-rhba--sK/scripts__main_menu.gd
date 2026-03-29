@@ -3,21 +3,17 @@ extends Node2D
 
 @onready var play_button: Button = %PlayButton
 @onready var upgrades_button: Button = %UpgradesButton
-@onready var options_button: Button = %OptionsButton
 @onready var credits_button: Button = %CreditsButton
 
 func _ready() -> void:
     play_button.pressed.connect(_on_play_pressed)
     upgrades_button.pressed.connect(_on_upgrades_pressed)
-    options_button.pressed.connect(_on_options_pressed)
     credits_button.pressed.connect(_on_credits_pressed)
     
     play_button.mouse_entered.connect(_on_button_mouse_entered.bind(play_button))
     play_button.mouse_exited.connect(_on_button_mouse_exited.bind(play_button))
     upgrades_button.mouse_entered.connect(_on_button_mouse_entered.bind(upgrades_button))
     upgrades_button.mouse_exited.connect(_on_button_mouse_exited.bind(upgrades_button))
-    options_button.mouse_entered.connect(_on_button_mouse_entered.bind(options_button))
-    options_button.mouse_exited.connect(_on_button_mouse_exited.bind(options_button))
     credits_button.mouse_entered.connect(_on_credits_hover.bind(true))
     credits_button.mouse_exited.connect(_on_credits_hover.bind(false))
 
@@ -43,6 +39,3 @@ func _on_play_pressed() -> void:
 
 func _on_upgrades_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/upgrades_shop.tscn")
-
-func _on_options_pressed() -> void:
-    get_tree().change_scene_to_file("res://scenes/options_menu.tscn")

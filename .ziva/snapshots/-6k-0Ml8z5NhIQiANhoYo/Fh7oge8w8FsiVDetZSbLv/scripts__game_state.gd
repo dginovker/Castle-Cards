@@ -5,7 +5,7 @@ signal unit_unlocked(unit_type: String)
 
 const SAVE_FILE = "user://castle_cards_save.json"
 
-var trees: int = 0 :
+var trees: int = 50 :
     set(value):
         trees = value
         trees_changed.emit(trees)
@@ -82,7 +82,7 @@ func wipe_save() -> void:
     # Set trees directly to avoid intermediate saves if we want
     # but the setter will call save_game anyway.
     # To be clean, we can just reset and save.
-    trees = 0
+    trees = 50
     unlocked_units = ["swordsman", "woodcutter"]
     beaten_levels = []
     save_game()
