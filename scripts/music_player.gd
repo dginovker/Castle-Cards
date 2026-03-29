@@ -12,6 +12,14 @@ func _ready() -> void:
     
     music_player.stream = load("res://assets/Castle Cards Theme 1.mp3")
     if music_player.stream:
+        # Set loop property based on the stream type
+        if music_player.stream is AudioStreamMP3:
+            music_player.stream.loop = true
+        elif music_player.stream is AudioStreamOggVorbis:
+            music_player.stream.loop = true
+        elif music_player.stream is AudioStreamWAV:
+            music_player.stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+            
         music_player.bus = "Music"
         music_player.play()
         print("MusicPlayer: Playing music: ", music_player.stream.resource_path)
