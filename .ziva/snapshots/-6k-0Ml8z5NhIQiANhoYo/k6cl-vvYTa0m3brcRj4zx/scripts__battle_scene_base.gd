@@ -503,11 +503,7 @@ func _spawn_growing_tree() -> void:
     if lane_length <= 0.0:
         return
 
-	var player_side_offset: float = _get_lane_offset_near_castle(true)
-	var enemy_side_offset: float = _get_lane_offset_near_castle(false)
-	var min_offset: float = minf(player_side_offset, enemy_side_offset)
-	var max_offset: float = maxf(player_side_offset, enemy_side_offset)
-	var offset: float = randf_range(min_offset, max_offset)
+    var offset: float = randf_range(0.0, lane_length)
     
     # Trigger AI logic
     _on_tree_growing(offset)

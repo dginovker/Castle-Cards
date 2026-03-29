@@ -9,10 +9,10 @@ func _ready() -> void:
     back_button.mouse_exited.connect(_on_button_mouse_exited.bind(back_button))
     
             
-    # Only show Level 1, 2 and 3 for now
+    # Only show Level 1 and 2 for now
     # But set up for a 2x4 grid (8 buttons total)
     for i in range(1, 9):
-        if i > 3:
+        if i > 2:
             # We skip these for now since they don't exist
             continue
             
@@ -44,8 +44,6 @@ func _ready() -> void:
             button.pressed.connect(_on_level_1_pressed)
         elif i == 2:
             button.pressed.connect(_on_level_2_pressed)
-        elif i == 3:
-            button.pressed.connect(_on_level_3_pressed)
         
         button.mouse_entered.connect(_on_button_mouse_entered.bind(button))
         button.mouse_exited.connect(_on_button_mouse_exited.bind(button))
@@ -87,9 +85,6 @@ func _on_level_1_pressed() -> void:
 
 func _on_level_2_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/battle_scene_2.tscn")
-
-func _on_level_3_pressed() -> void:
-    get_tree().change_scene_to_file("res://scenes/battle_scene_3.tscn")
 
 func _on_back_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
