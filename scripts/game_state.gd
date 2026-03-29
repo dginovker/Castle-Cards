@@ -15,6 +15,8 @@ var unlocked_units: Array[String] = ["swordsman", "woodcutter"]
 var beaten_levels: Array[String] = []
 var passive_income_upgrades: int = 0
 var music_volume: float = 0.8
+var total_wins: int = 0
+var total_losses: int = 0
 
 func _ready() -> void:
     load_game()
@@ -69,13 +71,55 @@ func complete_level(level_id: String, reward: int) -> void:
         beaten_levels.append(level_id)
         save_game()
 
+func record_win() -> void:
+    total_wins += 1
+    save_game()
+
+func record_loss() -> void:
+    total_losses += 1
+    save_game()
+
+func get_total_games() -> int:
+    return total_wins + total_losses
+
+func get_win_rate() -> float:
+    var total = get_total_games()
+    if total == 0:
+        return 0.0
+    return (float(total_wins) / total) * 100.0
+
+func get_highest_level_beaten() -> String:
+    if beaten_levels.is_empty():
+        return "None"
+    
+    var max_lvl = 0
+    var display_name = "None"
+    
+    for lvl in beaten_levels:
+        # Assuming format "level_X" or "shores_level_X"
+        var parts = lvl.split("_")
+        var num_str = parts[-1]
+        if num_str.is_valid_int():
+            var num = int(num_str)
+            if num > max_lvl:
+                max_lvl = num
+                # Try to make it look nicer
+                if lvl.begins_with("shores"):
+                    display_name = "Shores Level " + num_str
+                else:
+                    display_name = "Forest Level " + num_str
+    
+    return display_name
+
 func save_game() -> void:
     var save_data = {
         "trees": trees,
         "unlocked_units": unlocked_units,
         "beaten_levels": beaten_levels,
         "passive_income_upgrades": passive_income_upgrades,
-        "music_volume": music_volume
+        "music_volume": music_volume,
+        "total_wins": total_wins,
+        "total_losses": total_losses
     }
     var json_string = JSON.stringify(save_data)
     var file = FileAccess.open(SAVE_FILE, FileAccess.WRITE)
@@ -114,6 +158,10 @@ func load_game() -> void:
                     var mp = get_node_or_null("/root/MusicPlayer")
                     if mp:
                         mp.set_volume(music_volume)
+                if data.has("total_wins"):
+                    total_wins = int(data.get("total_wins"))
+                if data.has("total_losses"):
+                    total_losses = int(data.get("total_losses"))
 
 func wipe_save() -> void:
     # Set trees directly to avoid intermediate saves if we want
@@ -123,4 +171,6 @@ func wipe_save() -> void:
     unlocked_units = ["swordsman", "woodcutter"]
     beaten_levels = []
     passive_income_upgrades = 0
+    total_wins = 0
+    total_losses = 0
     save_game()

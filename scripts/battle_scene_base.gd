@@ -200,16 +200,22 @@ func _on_castle_destroyed(castle: Castle) -> void:
     
     get_tree().paused = true
     if castle.team_id == GameConstants.TEAM_PLAYER:
-        GameState.trees += 1
+        var gs = get_node_or_null("/root/GameState")
+        if gs:
+            gs.record_loss()
+            gs.trees += 1
         _game_over_screen.show_lose(1)
     else:
         var reward: int = 2
-        if GameState.is_level_beaten(level_id):
-            reward = 1
-        elif player_castle.current_health >= player_castle.max_health:
-            reward = 3
-        
-        GameState.complete_level(level_id, reward)
+        var gs = get_node_or_null("/root/GameState")
+        if gs:
+            if gs.is_level_beaten(level_id):
+                reward = 1
+            elif player_castle.current_health >= player_castle.max_health:
+                reward = 3
+            
+            gs.complete_level(level_id, reward)
+            gs.record_win()
         _game_over_screen.show_win(reward)
 
 
