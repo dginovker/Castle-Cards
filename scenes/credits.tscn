@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://crdpp82e0pshj"]
 
 [ext_resource type="Script" path="res://scripts/credits.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://c73c7djix1u5l" path="res://assets/background_and_ground.png" id="2_0ctdu"]
+[ext_resource type="Texture2D" uid="uid://c73c7djix1u5l" path="res://assets/shores_background_and_ground.png" id="2_0ctdu"]
 [ext_resource type="Texture2D" uid="uid://dkb7funvtxffr" path="res://assets/ui-button-long-width.png" id="3_texture_long"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long"]
