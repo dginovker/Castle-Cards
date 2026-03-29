@@ -88,9 +88,6 @@ func _setup_square_button(btn: Button, type: String) -> void:
     
     # Add a bit of padding at the top of the VBox
     var vbox = btn.get_node("VBox")
-    vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    
     var top_padding = Control.new()
     top_padding.custom_minimum_size = Vector2(0, 10)
     vbox.add_child(top_padding)
@@ -99,6 +96,7 @@ func _setup_square_button(btn: Button, type: String) -> void:
     # Light background for cost area to ensure visibility
     var cost_hbox = btn.find_child("CostHBox", true, false)
     if cost_hbox:
+        var vbox = btn.get_node("VBox")
         vbox.alignment = BoxContainer.ALIGNMENT_BEGIN
         
         # Add a spacer to push the cost to the bottom

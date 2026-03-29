@@ -85,51 +85,31 @@ func _setup_square_button(btn: Button, type: String) -> void:
     outline_style.border_color = Color.BLACK
     outline.add_theme_stylebox_override("panel", outline_style)
     btn.add_child(outline)
-    
-    # Add a bit of padding at the top of the VBox
-    var vbox = btn.get_node("VBox")
-    vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    
-    var top_padding = Control.new()
-    top_padding.custom_minimum_size = Vector2(0, 10)
-    vbox.add_child(top_padding)
-    vbox.move_child(top_padding, 0)
 
     # Light background for cost area to ensure visibility
     var cost_hbox = btn.find_child("CostHBox", true, false)
     if cost_hbox:
-        vbox.alignment = BoxContainer.ALIGNMENT_BEGIN
-        
-        # Add a spacer to push the cost to the bottom
-        var spacer = Control.new()
-        spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-        spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        vbox.add_child(spacer)
-        
-        # Wrap the CostHBox in a PanelContainer
+        # Wrap the CostHBox in a PanelContainer to give it a background
         var parent = cost_hbox.get_parent()
+        var index = cost_hbox.get_index()
         parent.remove_child(cost_hbox)
         
         var wrapper = PanelContainer.new()
         wrapper.name = "CostWrapper"
+        # Transparent light background
         var cost_style = StyleBoxFlat.new()
         cost_style.bg_color = Color(1, 1, 1, 0.4)
         cost_style.set_corner_radius_all(4)
         cost_style.content_margin_left = 6
         cost_style.content_margin_right = 6
-        cost_style.content_margin_top = 2
-        cost_style.content_margin_bottom = 2
         wrapper.add_theme_stylebox_override("panel", cost_style)
         
-        vbox.add_child(wrapper)
+        parent.add_child(wrapper)
+        parent.move_child(wrapper, index)
         wrapper.add_child(cost_hbox)
-        cost_hbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
         
-        # Add a tiny bit of padding at the very bottom
-        var bottom_padding = Control.new()
-        bottom_padding.custom_minimum_size = Vector2(0, 4)
-        vbox.add_child(bottom_padding)
+        # Center the hbox inside the wrapper
+        cost_hbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
     
     btn.mouse_entered.connect(_on_button_mouse_entered.bind(btn))
     btn.mouse_exited.connect(_on_button_mouse_exited.bind(btn))
@@ -178,11 +158,10 @@ func _update_passive_income_button() -> void:
     var income_interval = GameState.get_current_passive_income_interval(2.0)
     
     if not is_lvl4_beaten:
-        name_label.text = "Passive Income"
+        name_label.text = "Passive Income\n(Requires Level 4)"
         if status_label:
-            status_label.text = "Requires Level 4"
+            status_label.text = "1 Tree every %0.1fs" % income_interval
             status_label.visible = true
-            status_label.add_theme_color_override("font_color", Color.RED)
         if cost_wrapper: cost_wrapper.visible = false
         elif cost_hbox: cost_hbox.visible = false
         tree_growth_button.disabled = true
@@ -191,7 +170,6 @@ func _update_passive_income_button() -> void:
         if status_label:
             status_label.text = "1 Tree every %0.1fs" % income_interval
             status_label.visible = true
-            status_label.add_theme_color_override("font_color", Color.YELLOW)
         if cost_label: cost_label.text = str(cost)
         if cost_wrapper: cost_wrapper.visible = true
         elif cost_hbox: cost_hbox.visible = true

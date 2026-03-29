@@ -48,8 +48,7 @@ var _enemy_has_purchased_cannon: bool = false
 var _player_wood: int = GameConstants.STARTING_WOOD
 var _enemy_wood: int = GameConstants.STARTING_WOOD
 var _tree_spawn_timer: Timer
-var _player_wood_income_timer: Timer
-var _enemy_wood_income_timer: Timer
+var _wood_income_timer: Timer
 var _game_over_screen: GameOverScreen
 
 func _ready() -> void:
@@ -341,28 +340,16 @@ func _spawn_unit_for_team(scene: PackedScene, team: int) -> Node:
 
 
 func _setup_wood_income() -> void:
-    # Player wood income timer (with upgrades)
-    _player_wood_income_timer = Timer.new()
-    _player_wood_income_timer.one_shot = false
-    _player_wood_income_timer.wait_time = GameState.get_current_passive_income_interval(GameConstants.WOOD_PASSIVE_INCOME_INTERVAL_SECONDS)
-    _player_wood_income_timer.timeout.connect(_on_player_wood_income_timer_timeout)
-    add_child(_player_wood_income_timer)
-    _player_wood_income_timer.start()
-
-    # Enemy wood income timer (no upgrades)
-    _enemy_wood_income_timer = Timer.new()
-    _enemy_wood_income_timer.one_shot = false
-    _enemy_wood_income_timer.wait_time = GameConstants.WOOD_PASSIVE_INCOME_INTERVAL_SECONDS
-    _enemy_wood_income_timer.timeout.connect(_on_enemy_wood_income_timer_timeout)
-    add_child(_enemy_wood_income_timer)
-    _enemy_wood_income_timer.start()
+    _wood_income_timer = Timer.new()
+    _wood_income_timer.one_shot = false
+    _wood_income_timer.wait_time = GameState.get_current_passive_income_interval(GameConstants.WOOD_PASSIVE_INCOME_INTERVAL_SECONDS)
+    _wood_income_timer.timeout.connect(_on_wood_income_timer_timeout)
+    add_child(_wood_income_timer)
+    _wood_income_timer.start()
 
 
-func _on_player_wood_income_timer_timeout() -> void:
+func _on_wood_income_timer_timeout() -> void:
     _add_wood(GameConstants.TEAM_PLAYER, GameConstants.WOOD_PASSIVE_INCOME_AMOUNT)
-
-
-func _on_enemy_wood_income_timer_timeout() -> void:
     _add_wood(GameConstants.TEAM_ENEMY, GameConstants.WOOD_PASSIVE_INCOME_AMOUNT)
 
 
