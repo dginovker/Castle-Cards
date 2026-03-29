@@ -31,6 +31,13 @@ const CANNON_ATTACK_DAMAGE: float = 1.0
 const CANNON_MAX_HEALTH: float = 1.0
 const CANNON_COST_WOOD: int = 10
 
+# Shared unit behavior modes.
+const UNIT_MODE_ATTACK: int = 0
+const UNIT_MODE_DEFEND: int = 1
+
+# In Defend mode, soldiers only engage enemies near their own castle.
+const SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS: float = 220.0
+
 # Physics layer bit used by damageable hurtboxes (Area2D). Keep this shared
 # so every attacker can discover all valid damage targets consistently.
 const COMBAT_HURTBOX_LAYER: int = 1 << 5

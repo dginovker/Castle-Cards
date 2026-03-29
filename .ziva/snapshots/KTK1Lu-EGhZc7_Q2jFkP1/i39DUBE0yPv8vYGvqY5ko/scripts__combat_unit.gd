@@ -22,11 +22,16 @@ enum CombatState {
 @export var attack_animation_name: StringName = &"fight"
 @export var attack_animation_one_shot: bool = true
 @export var attack_animation_return_to_idle_between_swings: bool = true
+@export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
+@export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
+@export var defend_limit_targets_near_own_castle: bool = true
+@export var can_attack_castles_in_defend: bool = false
 
 # Formation / positioning behavior (composition by data)
 @export var attack_uses_frontline_anchor: bool = false
 @export var frontline_anchor_excluded_archetype_name: String = ""
 @export_range(0.0, 1000.0, 1.0) var frontline_follow_distance_pixels: float = 56.0
+@export_range(0.0, 1000.0, 1.0) var defend_retreat_distance_pixels: float = 0.0
 
 # Visual anti-stacking offset (units still pass through each other)
 @export_range(0.0, 64.0, 1.0) var formation_y_spread_pixels: float = 12.0
@@ -81,6 +86,8 @@ var combat_state: CombatState = CombatState.IDLE
 var current_health: float = 0.0
 var current_target_unit: Node
 var current_target_castle: Castle
+var own_castle: Castle
+var enemy_castle: Castle
 var lane_player_side_offset: float = 0.0
 var lane_enemy_side_offset: float = 0.0
 var _attack_cooldown_remaining: float = 0.0
@@ -164,10 +171,26 @@ func setup_lane_travel(path: Path2D, start_offset: float, end_offset: float) -> 
     set_process(true)
 
 
+func set_castle_references(own: Castle, enemy: Castle) -> void:
+    own_castle = own
+    enemy_castle = enemy
+
+
 func set_lane_side_offsets(player_side: float, enemy_side: float) -> void:
     lane_player_side_offset = player_side
     lane_enemy_side_offset = enemy_side
-    _refresh_movement_target()
+    _refresh_movement_target_for_mode()
+
+
+func set_mode(mode: int) -> void:
+    var normalized_mode: int = (
+        GameConstants.UNIT_MODE_DEFEND
+        if mode == GameConstants.UNIT_MODE_DEFEND
+        else GameConstants.UNIT_MODE_ATTACK
+    )
+
+    active_mode = normalized_mode
+    _refresh_movement_target_for_mode()
 
 
 func set_debug_attack_range_visible(visible_state: bool) -> void:
@@ -319,11 +342,11 @@ func _recompute_leadership_bonus_cache() -> void:
     queue_redraw()
 
 
-func _refresh_movement_target() -> void:
+func _refresh_movement_target_for_mode() -> void:
     if lane_curve == null:
         return
 
-    target_offset = _get_attack_destination_offset()
+    target_offset = _get_mode_destination_offset()
     has_target = not is_equal_approx(current_offset, target_offset)
 
     if combat_state == CombatState.ATTACKING:
@@ -341,6 +364,13 @@ func _refresh_movement_target() -> void:
         stop()
 
 
+func _get_mode_destination_offset() -> float:
+    if active_mode == GameConstants.UNIT_MODE_DEFEND:
+        return _get_defend_destination_offset()
+
+    return _get_attack_destination_offset()
+
+
 func _get_attack_destination_offset() -> float:
     if not attack_uses_frontline_anchor:
         return _get_enemy_side_offset()
@@ -356,7 +386,7 @@ func _get_attack_destination_offset() -> float:
         return _clamp_to_lane_bounds(desired_offset)
 
     if _should_return_to_base_when_no_frontline_anchor():
-        return _get_own_side_offset()
+        return _get_defend_destination_offset()
 
     return _get_enemy_side_offset()
 
@@ -365,6 +395,21 @@ func _should_return_to_base_when_no_frontline_anchor() -> bool:
     # Support/follower units (e.g. drummer) should not advance alone.
     # If there is no frontline ally to follow, they fall back toward own base.
     return attack_uses_frontline_anchor and attack_damage <= 0.0
+
+
+func _get_defend_destination_offset() -> float:
+    var own_side_offset: float = _get_own_side_offset()
+
+    if defend_retreat_distance_pixels <= 0.0:
+        return own_side_offset
+
+    var desired_offset: float = (
+        own_side_offset - defend_retreat_distance_pixels
+        if team_id == GameConstants.TEAM_PLAYER
+        else own_side_offset + defend_retreat_distance_pixels
+    )
+
+    return _clamp_to_lane_bounds(desired_offset)
 
 
 func _find_frontline_anchor_offset() -> Dictionary:
@@ -462,7 +507,7 @@ func refresh_attack_range_shape() -> void:
 
 func _process(delta: float) -> void:
     if combat_state != CombatState.ATTACKING:
-        _refresh_movement_target()
+        _refresh_movement_target_for_mode()
 
     _process_leadership_support(delta)
     _update_targets_from_attack_overlap()
@@ -654,6 +699,8 @@ func _update_targets_from_attack_overlap() -> void:
         if unit != null and unit.is_in_group(&"soldiers"):
             if unit == self or unit.get("team_id") == team_id or unit.call("is_dead"):
                 continue
+            if not _is_target_allowed_for_current_mode(unit.global_position, false):
+                continue
             current_target_unit = unit
             current_target_castle = null
             return
@@ -661,6 +708,8 @@ func _update_targets_from_attack_overlap() -> void:
         var castle: Castle = overlap_parent as Castle
         if castle != null:
             if castle.team_id == team_id or castle.is_destroyed():
+                continue
+            if not _is_target_allowed_for_current_mode(castle.global_position, true):
                 continue
             if current_target_castle == null:
                 current_target_castle = castle
@@ -671,6 +720,9 @@ func _is_current_unit_target_attackable() -> bool:
         return false
 
     if current_target_unit == self or current_target_unit.get("team_id") == team_id or current_target_unit.call("is_dead"):
+        return false
+
+    if not _is_target_allowed_for_current_mode(current_target_unit.global_position, false):
         return false
 
     var hurtbox: Area2D = current_target_unit.call("get_hurtbox") as Area2D
@@ -687,11 +739,30 @@ func _is_current_castle_target_attackable() -> bool:
     if current_target_castle.team_id == team_id or current_target_castle.is_destroyed():
         return false
 
+    if not _is_target_allowed_for_current_mode(current_target_castle.global_position, true):
+        return false
+
     var hurtbox: Area2D = current_target_castle.get_hurtbox()
     if hurtbox == null:
         return false
 
     return _attack_area != null and _attack_area.overlaps_area(hurtbox)
+
+
+func _is_target_allowed_for_current_mode(target_global_position: Vector2, is_castle_target: bool) -> bool:
+    if active_mode != GameConstants.UNIT_MODE_DEFEND:
+        return true
+
+    if is_castle_target and not can_attack_castles_in_defend:
+        return false
+
+    if not defend_limit_targets_near_own_castle:
+        return true
+
+    if own_castle == null or not is_instance_valid(own_castle):
+        return true
+
+    return own_castle.global_position.distance_to(target_global_position) <= defend_protection_radius_pixels
 
 
 func _should_draw_health_bar() -> bool:

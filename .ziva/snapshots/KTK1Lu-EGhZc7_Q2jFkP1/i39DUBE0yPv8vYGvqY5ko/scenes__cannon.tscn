@@ -41,4 +41,6 @@ attack_range = 51.0
 attack_damage = 10.0
 max_health = 1.0
 attack_interval_seconds = 4.0
+defend_limit_targets_near_own_castle = false
+can_attack_castles_in_defend = true
 formation_y_spread_pixels = 0.0

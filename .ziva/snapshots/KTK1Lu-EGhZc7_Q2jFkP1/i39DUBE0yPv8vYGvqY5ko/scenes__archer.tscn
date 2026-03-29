@@ -40,5 +40,7 @@ attack_range = 25.0
 attack_damage = 2.0
 max_health = 10.0
 attack_interval_seconds = 0.75
+defend_limit_targets_near_own_castle = false
 attack_uses_frontline_anchor = true
 frontline_anchor_excluded_archetype_name = "archer"
+defend_retreat_distance_pixels = 84.0

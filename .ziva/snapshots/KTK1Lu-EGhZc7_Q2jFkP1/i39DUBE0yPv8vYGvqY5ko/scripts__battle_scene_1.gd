@@ -9,7 +9,14 @@ const CANNON_SCENE: PackedScene = preload("res://scenes/cannon.tscn")
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
 
+enum UnitMode {
+    ATTACK,
+    DEFEND,
+}
+
 @export var show_attack_range_debug: bool = true
+@export var player_active_mode: UnitMode = UnitMode.ATTACK
+@export var enemy_active_mode: UnitMode = UnitMode.ATTACK
 
 @onready var player_castle: Castle = $PlayerCastle as Castle
 @onready var enemy_castle: Castle = $EnemyCastle as Castle
@@ -27,6 +34,11 @@ const DOOR_Y_FACTOR: float = 0.44
 @onready var debug_spawn_enemy_archer_button: Button = get_node_or_null("UI/DebugSpawnEnemyArcherButton") as Button
 @onready var debug_spawn_enemy_drummer_button: Button = get_node_or_null("UI/DebugSpawnEnemyDrummerButton") as Button
 @onready var debug_spawn_enemy_cannon_button: Button = get_node_or_null("UI/DebugSpawnEnemyCannonButton") as Button
+
+@onready var player_mode_attack_button: Button = get_node_or_null("UI/PlayerModeAttackButton") as Button
+@onready var player_mode_defend_button: Button = get_node_or_null("UI/PlayerModeDefendButton") as Button
+@onready var enemy_mode_attack_button: Button = get_node_or_null("UI/EnemyModeAttackButton") as Button
+@onready var enemy_mode_defend_button: Button = get_node_or_null("UI/EnemyModeDefendButton") as Button
 
 var _player_has_purchased_cannon: bool = false
 var _enemy_has_purchased_cannon: bool = false
@@ -56,12 +68,22 @@ func _ready() -> void:
     if debug_spawn_enemy_cannon_button != null:
         debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed)
 
+    if player_mode_attack_button != null:
+        player_mode_attack_button.pressed.connect(_on_player_mode_attack_pressed)
+    if player_mode_defend_button != null:
+        player_mode_defend_button.pressed.connect(_on_player_mode_defend_pressed)
+    if enemy_mode_attack_button != null:
+        enemy_mode_attack_button.pressed.connect(_on_enemy_mode_attack_pressed)
+    if enemy_mode_defend_button != null:
+        enemy_mode_defend_button.pressed.connect(_on_enemy_mode_defend_pressed)
+
     _setup_castles()
 
     if debug_attack_range_toggle != null:
         debug_attack_range_toggle.toggled.connect(_on_debug_attack_range_toggled)
         debug_attack_range_toggle.button_pressed = show_attack_range_debug
 
+    _sync_mode_buttons_visuals()
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
     _apply_debug_toggle_dependent_ui()
@@ -184,6 +206,30 @@ func _on_debug_spawn_enemy_cannon_pressed() -> void:
     _spawn_cannon_for_team(GameConstants.TEAM_ENEMY)
 
 
+func _on_player_mode_attack_pressed() -> void:
+    player_active_mode = UnitMode.ATTACK
+    _sync_mode_buttons_visuals()
+    _apply_mode_to_team_soldiers(GameConstants.TEAM_PLAYER)
+
+
+func _on_player_mode_defend_pressed() -> void:
+    player_active_mode = UnitMode.DEFEND
+    _sync_mode_buttons_visuals()
+    _apply_mode_to_team_soldiers(GameConstants.TEAM_PLAYER)
+
+
+func _on_enemy_mode_attack_pressed() -> void:
+    enemy_active_mode = UnitMode.ATTACK
+    _sync_mode_buttons_visuals()
+    _apply_mode_to_team_soldiers(GameConstants.TEAM_ENEMY)
+
+
+func _on_enemy_mode_defend_pressed() -> void:
+    enemy_active_mode = UnitMode.DEFEND
+    _sync_mode_buttons_visuals()
+    _apply_mode_to_team_soldiers(GameConstants.TEAM_ENEMY)
+
+
 func _spawn_swordsman_for_team(team: int) -> void:
     _spawn_unit_for_team(SWORDSMAN_SCENE, team)
 
@@ -249,8 +295,14 @@ func _spawn_unit_for_team(scene: PackedScene, team: int) -> Node:
     var starts_from_player_side: bool = team == GameConstants.TEAM_PLAYER
     var start_offset: float = player_side_offset if starts_from_player_side else enemy_side_offset
 
+    unit.set_castle_references(
+        player_castle if team == GameConstants.TEAM_PLAYER else enemy_castle,
+        enemy_castle if team == GameConstants.TEAM_PLAYER else player_castle
+    )
     unit.set_lane_side_offsets(player_side_offset, enemy_side_offset)
+
     unit.setup_lane_travel(battle_lane_path, start_offset, start_offset)
+    unit.set_mode(_to_unit_mode(_get_active_mode_for_team(team)))
     return unit
 
 
@@ -267,6 +319,12 @@ func _apply_debug_toggle_dependent_ui() -> void:
     if debug_spawn_enemy_cannon_button != null:
         debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
 
+    if enemy_mode_attack_button != null:
+        enemy_mode_attack_button.visible = show_attack_range_debug
+
+    if enemy_mode_defend_button != null:
+        enemy_mode_defend_button.visible = show_attack_range_debug
+
 
 func _find_debug_toggle() -> CheckButton:
     var toggle: CheckButton = get_node_or_null("UI/Debug") as CheckButton
@@ -274,6 +332,37 @@ func _find_debug_toggle() -> CheckButton:
         return toggle
 
     return get_node_or_null("UI/DebugRangeToggle") as CheckButton
+
+
+func _sync_mode_buttons_visuals() -> void:
+    if player_mode_attack_button != null:
+        player_mode_attack_button.button_pressed = player_active_mode == UnitMode.ATTACK
+
+    if player_mode_defend_button != null:
+        player_mode_defend_button.button_pressed = player_active_mode == UnitMode.DEFEND
+
+    if enemy_mode_attack_button != null:
+        enemy_mode_attack_button.button_pressed = enemy_active_mode == UnitMode.ATTACK
+
+    if enemy_mode_defend_button != null:
+        enemy_mode_defend_button.button_pressed = enemy_active_mode == UnitMode.DEFEND
+
+
+func _get_active_mode_for_team(team: int) -> UnitMode:
+    return player_active_mode if team == GameConstants.TEAM_PLAYER else enemy_active_mode
+
+
+func _to_unit_mode(mode: UnitMode) -> int:
+    return GameConstants.UNIT_MODE_DEFEND if mode == UnitMode.DEFEND else GameConstants.UNIT_MODE_ATTACK
+
+
+func _apply_mode_to_team_soldiers(team: int) -> void:
+    for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
+        var soldier = node
+        if soldier == null or not soldier.is_in_group(&"soldiers") or soldier.get("team_id") != team:
+            continue
+
+        soldier.set_mode(_to_unit_mode(_get_active_mode_for_team(team)))
 
 
 func _get_lane_offset_near_castle(is_player_side: bool) -> float:
