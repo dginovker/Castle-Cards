@@ -45,7 +45,7 @@ func _on_tree_growing(offset: float) -> void:
     else:
         _on_ai_woodcutter_check()
 
-func _on_ai_woodcutter_check() -> void:
+func _on_ai_woodcutter_check(_tree_offset: float = 0.0) -> void:
     var player_woodcutters = _get_unit_count(Woodcutter, GameConstants.TEAM_PLAYER)
     var player_soldiers = _get_soldier_count_excluding_woodcutters(GameConstants.TEAM_PLAYER)
     var enemy_soldiers = _get_soldier_count_excluding_woodcutters(GameConstants.TEAM_ENEMY)

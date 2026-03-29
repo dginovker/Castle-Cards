@@ -13,7 +13,7 @@ func _on_tree_growing(_offset: float) -> void:
     # Level 1 AI: 1 second after a tree is growing...
     get_tree().create_timer(1.0).timeout.connect(_on_ai_woodcutter_check)
 
-func _on_ai_woodcutter_check() -> void:
+func _on_ai_woodcutter_check(_tree_offset: float = 0.0) -> void:
     # Logic 1: if we do not have a woodcutter on the field, spawn a woodcutter
     if _get_enemy_woodcutter_count() == 0:
         _on_debug_spawn_enemy_woodcutter_pressed()

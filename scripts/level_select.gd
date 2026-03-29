@@ -23,13 +23,22 @@ func _ready() -> void:
     shores_button.text = "Go to Shores"
     
     if shores_button.disabled:
-        shores_button.modulate = Color(0.3, 0.3, 0.3, 1.0) # Solid dark grey/stone look
-        shores_button.add_theme_color_override("font_color", Color(0.2, 0.2, 0.2, 1.0))
+        shores_button.modulate = Color(1.0, 1.0, 1.0, 1.0)
+        shores_button.tooltip_text = "Requires beating level 4"
         shores_button.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
+        
+        # Create an opaque dark style for disabled state
+        var disabled_style = shores_button.get_theme_stylebox("normal").duplicate()
+        if disabled_style is StyleBoxTexture:
+            disabled_style.modulate_color = Color(0.5, 0.5, 0.5, 1.0) # Darker but fully opaque
+        shores_button.add_theme_stylebox_override("disabled", disabled_style)
+        shores_button.add_theme_color_override("font_disabled_color", Color(0.3, 0.3, 0.3, 1.0))
     else:
         shores_button.modulate = Color(1, 1, 1, 1)
-        shores_button.remove_theme_color_override("font_color")
+        shores_button.tooltip_text = ""
         shores_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+        shores_button.remove_theme_stylebox_override("disabled")
+        shores_button.remove_theme_color_override("font_disabled_color")
     
             
     # Only show Level 1, 2, 3 and 4 for now
