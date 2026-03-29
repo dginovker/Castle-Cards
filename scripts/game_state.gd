@@ -13,6 +13,7 @@ var trees: int = 0 :
 
 var unlocked_units: Array[String] = ["swordsman", "woodcutter"]
 var beaten_levels: Array[String] = []
+var passive_income_upgrades: int = 0
 
 func _ready() -> void:
     load_game()
@@ -28,6 +29,21 @@ func unlock_unit(unit_type: String, cost: int) -> bool:
         save_game()
         return true
     return false
+
+func purchase_passive_income_upgrade() -> bool:
+    var cost = get_passive_income_upgrade_cost()
+    if trees >= cost:
+        trees -= cost
+        passive_income_upgrades += 1
+        save_game()
+        return true
+    return false
+
+func get_passive_income_upgrade_cost() -> int:
+    return int(pow(2, passive_income_upgrades) * 2)
+
+func get_current_passive_income_interval(base_interval: float) -> float:
+    return maxf(0.5, base_interval - (passive_income_upgrades * 0.1))
 
 func is_level_beaten(level_id: String) -> bool:
     return level_id in beaten_levels
@@ -45,7 +61,8 @@ func save_game() -> void:
     var save_data = {
         "trees": trees,
         "unlocked_units": unlocked_units,
-        "beaten_levels": beaten_levels
+        "beaten_levels": beaten_levels,
+        "passive_income_upgrades": passive_income_upgrades
     }
     var json_string = JSON.stringify(save_data)
     var file = FileAccess.open(SAVE_FILE, FileAccess.WRITE)
@@ -77,6 +94,8 @@ func load_game() -> void:
                     beaten_levels.clear()
                     for level in data.get("beaten_levels"):
                         beaten_levels.append(str(level))
+                if data.has("passive_income_upgrades"):
+                    passive_income_upgrades = int(data.get("passive_income_upgrades"))
 
 func wipe_save() -> void:
     # Set trees directly to avoid intermediate saves if we want
@@ -85,4 +104,5 @@ func wipe_save() -> void:
     trees = 0
     unlocked_units = ["swordsman", "woodcutter"]
     beaten_levels = []
+    passive_income_upgrades = 0
     save_game()

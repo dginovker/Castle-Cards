@@ -199,7 +199,8 @@ func _on_castle_destroyed(castle: Castle) -> void:
     
     get_tree().paused = true
     if castle.team_id == GameConstants.TEAM_PLAYER:
-        _game_over_screen.show_lose()
+        GameState.trees += 1
+        _game_over_screen.show_lose(1)
     else:
         var reward: int = 2
         if GameState.is_level_beaten(level_id):
@@ -341,7 +342,7 @@ func _spawn_unit_for_team(scene: PackedScene, team: int) -> Node:
 func _setup_wood_income() -> void:
     _wood_income_timer = Timer.new()
     _wood_income_timer.one_shot = false
-    _wood_income_timer.wait_time = GameConstants.WOOD_PASSIVE_INCOME_INTERVAL_SECONDS
+    _wood_income_timer.wait_time = GameState.get_current_passive_income_interval(GameConstants.WOOD_PASSIVE_INCOME_INTERVAL_SECONDS)
     _wood_income_timer.timeout.connect(_on_wood_income_timer_timeout)
     add_child(_wood_income_timer)
     _wood_income_timer.start()

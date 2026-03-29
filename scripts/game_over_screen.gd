@@ -32,10 +32,23 @@ func _on_button_mouse_exited(button: Button) -> void:
 
 func show_win(reward_amount: int = 0) -> void:
     title_label.text = "You Win!"
+    _show_reward(reward_amount)
+    retry_button.hide()
+    show()
+
+func show_lose(reward_amount: int = 0) -> void:
+    title_label.text = "You Lose!"
+    _show_reward(reward_amount)
+    retry_button.show()
+    show()
+
+func _show_reward(reward_amount: int) -> void:
     if reward_amount > 0:
         reward_label.text = "+" + str(reward_amount)
         reward_badge.show()
         # Wait a frame to get the correct size for the pivot
+        if not is_inside_tree():
+            await ready
         await get_tree().process_frame
         reward_badge.pivot_offset = reward_badge.size / 2.0
         
@@ -45,14 +58,6 @@ func show_win(reward_amount: int = 0) -> void:
         tween.tween_property(reward_badge, "scale", Vector2.ONE, 0.5)
     else:
         reward_badge.hide()
-    retry_button.hide()
-    show()
-
-func show_lose() -> void:
-    title_label.text = "You Lose!"
-    reward_badge.hide()
-    retry_button.show()
-    show()
 
 func _on_retry_pressed() -> void:
     retry_pressed.emit()

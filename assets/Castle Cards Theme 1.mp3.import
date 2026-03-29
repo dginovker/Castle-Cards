@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dm7hl1vg4gfms"
+path="res://.godot/imported/Castle Cards Theme 1.mp3-da70f9e6f4f1e30327684b173a708dc6.mp3str"
+
+[deps]
+
+source_file="res://assets/Castle Cards Theme 1.mp3"
+dest_files=["res://.godot/imported/Castle Cards Theme 1.mp3-da70f9e6f4f1e30327684b173a708dc6.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
