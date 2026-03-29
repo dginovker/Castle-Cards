@@ -9,8 +9,7 @@ var trees: int = 0 :
     set(value):
         trees = value
         trees_changed.emit(trees)
-        if not _is_loading_save:
-            save_game()
+        save_game()
 
 var unlocked_units: Array[String] = ["swordsman", "woodcutter"]
 var beaten_levels: Array[String] = []
@@ -18,7 +17,6 @@ var passive_income_upgrades: int = 0
 var music_volume: float = 0.8
 var total_wins: int = 0
 var total_losses: int = 0
-var _is_loading_save: bool = false
 
 func _ready() -> void:
     load_game()
@@ -132,54 +130,38 @@ func save_game() -> void:
 func load_game() -> void:
     if not FileAccess.file_exists(SAVE_FILE):
         return
-
+        
     var file = FileAccess.open(SAVE_FILE, FileAccess.READ)
     if file:
         var json_string = file.get_as_text()
         file.close()
-
+        
         var json = JSON.new()
         var parse_result = json.parse(json_string)
         if parse_result == OK:
             var data = json.get_data()
             if data is Dictionary:
-                _is_loading_save = true
-
                 if data.has("trees"):
                     trees = int(data.get("trees"))
-
                 if data.has("unlocked_units"):
                     unlocked_units.clear()
                     for unit in data.get("unlocked_units"):
                         unlocked_units.append(str(unit))
-
-                beaten_levels.clear()
                 if data.has("beaten_levels"):
+                    beaten_levels.clear()
                     for level in data.get("beaten_levels"):
                         beaten_levels.append(str(level))
-                elif data.has("completed_levels"):
-                    # Legacy key migration support.
-                    for level in data.get("completed_levels"):
-                        beaten_levels.append(str(level))
-
                 if data.has("passive_income_upgrades"):
                     passive_income_upgrades = int(data.get("passive_income_upgrades"))
-
                 if data.has("music_volume"):
                     music_volume = float(data.get("music_volume"))
                     var mp = get_node_or_null("/root/MusicPlayer")
                     if mp:
                         mp.set_volume(music_volume)
-
                 if data.has("total_wins"):
                     total_wins = int(data.get("total_wins"))
-
                 if data.has("total_losses"):
                     total_losses = int(data.get("total_losses"))
-
-                _is_loading_save = false
-                # Write back migrated/canonicalized data after a full successful load.
-                save_game()
 
 func wipe_save() -> void:
     # Set trees directly to avoid intermediate saves if we want

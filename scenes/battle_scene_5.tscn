@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/battle_scene_4.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/battle_scene_5.gd" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://c73c7djix1u5l" path="res://assets/shores_background_and_ground.png" id="3_shores_bg"]
+
+[node name="Node2D" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+level_id = "shores_level_5"
+
+[node name="Background" parent="."]
+texture = ExtResource("3_shores_bg")
+
+[node name="Groud" parent="."]
+visible = false
