@@ -53,7 +53,6 @@ corner_radius_bottom_left = 6
 
 [node name="Node2D" type="Node2D" unique_id=524830098]
 script = ExtResource("3_script")
-tree_spawn_interval_seconds = 8.1
 
 [node name="Background" type="Sprite2D" parent="." unique_id=1059486313]
 position = Vector2(576, 185.00006)
@@ -85,8 +84,6 @@ position = Vector2(1029, 302)
 
 [node name="BattleLanePath" type="Path2D" parent="." unique_id=1209325944]
 curve = SubResource("Curve2D_xmomn")
-
-[node name="Trees" type="Node2D" parent="." unique_id=1736941142]
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1162858540]
 
@@ -218,3 +215,4 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_debug_toggle_bg")
 theme_override_styles/hover = SubResource("StyleBoxFlat_debug_toggle_bg")
 theme_override_styles/focus = SubResource("StyleBoxFlat_debug_toggle_bg")
 text = "Debug (F3)"
+

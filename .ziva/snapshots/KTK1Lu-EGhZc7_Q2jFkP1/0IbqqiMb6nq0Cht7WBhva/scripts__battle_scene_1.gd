@@ -15,7 +15,7 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @export_range(0.5, 30.0, 0.1) var tree_spawn_interval_seconds: float = 4.0
 @export_range(0.0, 10.0, 0.1) var tree_spawn_interval_jitter_seconds: float = 1.0
 @export_range(0.5, 20.0, 0.1) var tree_growth_duration_seconds: float = 2.5
-@export_range(8.0, 256.0, 1.0) var tree_target_height_pixels: float = 108.0
+@export_range(8.0, 256.0, 1.0) var tree_target_height_pixels: float = 54.0
 @export_range(0.0, 80.0, 1.0) var tree_spawn_perpendicular_jitter_pixels: float = 12.0
 
 @onready var player_castle: Castle = $PlayerCastle as Castle
@@ -401,7 +401,7 @@ func _spawn_growing_tree() -> void:
     tree_sprite.texture = TREE_TEXTURE
     tree_sprite.centered = true
     tree_sprite.global_position = spawn_position
-    tree_sprite.z_index = 0
+    tree_sprite.z_index = -1
 
     var texture_height: float = maxf(1.0, TREE_TEXTURE.get_height())
     var uniform_scale: float = tree_target_height_pixels / texture_height

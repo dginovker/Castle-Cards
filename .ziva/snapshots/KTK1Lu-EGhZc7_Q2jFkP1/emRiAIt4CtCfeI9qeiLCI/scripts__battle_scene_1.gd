@@ -8,15 +8,8 @@ const CANNON_SCENE: PackedScene = preload("res://scenes/cannon.tscn")
 
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
-const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 
 @export var show_attack_range_debug: bool = true
-
-@export_range(0.5, 30.0, 0.1) var tree_spawn_interval_seconds: float = 4.0
-@export_range(0.0, 10.0, 0.1) var tree_spawn_interval_jitter_seconds: float = 1.0
-@export_range(0.5, 20.0, 0.1) var tree_growth_duration_seconds: float = 2.5
-@export_range(8.0, 256.0, 1.0) var tree_target_height_pixels: float = 108.0
-@export_range(0.0, 80.0, 1.0) var tree_spawn_perpendicular_jitter_pixels: float = 12.0
 
 @onready var player_castle: Castle = $PlayerCastle as Castle
 @onready var enemy_castle: Castle = $EnemyCastle as Castle
@@ -25,7 +18,6 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var summon_drummer_button: Button = get_node_or_null("UI/SummonDrummerButton") as Button
 @onready var summon_cannon_button: Button = get_node_or_null("UI/SummonCannonButton") as Button
 @onready var battle_lane_path: Path2D = $BattleLanePath
-@onready var trees_container: Node2D = get_node_or_null("Trees") as Node2D
 @onready var player_cannon_mount: Node2D = get_node_or_null("PlayerCannonMount") as Node2D
 @onready var enemy_cannon_mount: Node2D = get_node_or_null("EnemyCannonMount") as Node2D
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
@@ -38,11 +30,9 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 
 var _player_has_purchased_cannon: bool = false
 var _enemy_has_purchased_cannon: bool = false
-var _tree_spawn_timer: Timer
 
 
 func _ready() -> void:
-    randomize()
     summon_button.pressed.connect(_on_summon_swordsman_pressed)
 
     if summon_archer_button != null:
@@ -84,8 +74,6 @@ func _ready() -> void:
 
     if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
         push_warning("BattleLanePath.curve is missing or has fewer than 2 points. Edit BattleLanePath in the inspector to define the lane curve.")
-
-    _setup_tree_spawning()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -330,88 +318,3 @@ func _get_castle_door_position(castle: Sprite2D, is_player_side: bool) -> Vector
     var direction: float = 1.0 if is_player_side else -1.0
 
     return castle.global_position + Vector2(direction * x_offset, y_offset)
-
-
-func _setup_tree_spawning() -> void:
-    if TREE_TEXTURE == null:
-        push_warning("Tree texture missing at res://assets/tree.png")
-        return
-
-    if battle_lane_path == null or battle_lane_path.curve == null or battle_lane_path.curve.get_baked_length() <= 0.0:
-        return
-
-    if trees_container == null:
-        trees_container = Node2D.new()
-        trees_container.name = "Trees"
-        add_child(trees_container)
-
-    _tree_spawn_timer = Timer.new()
-    _tree_spawn_timer.one_shot = true
-    _tree_spawn_timer.autostart = false
-    _tree_spawn_timer.timeout.connect(_on_tree_spawn_timer_timeout)
-    add_child(_tree_spawn_timer)
-    _schedule_next_tree_spawn()
-
-
-func _on_tree_spawn_timer_timeout() -> void:
-    _spawn_growing_tree()
-    _schedule_next_tree_spawn()
-
-
-func _schedule_next_tree_spawn() -> void:
-    if _tree_spawn_timer == null:
-        return
-
-    var wait_time: float = tree_spawn_interval_seconds
-    if tree_spawn_interval_jitter_seconds > 0.0:
-        wait_time += randf_range(-tree_spawn_interval_jitter_seconds, tree_spawn_interval_jitter_seconds)
-
-    _tree_spawn_timer.wait_time = maxf(0.1, wait_time)
-    _tree_spawn_timer.start()
-
-
-func _spawn_growing_tree() -> void:
-    if trees_container == null or battle_lane_path == null or battle_lane_path.curve == null or TREE_TEXTURE == null:
-        return
-
-    var curve: Curve2D = battle_lane_path.curve
-    var lane_length: float = curve.get_baked_length()
-    if lane_length <= 0.0:
-        return
-
-    var offset: float = randf_range(0.0, lane_length)
-    var lane_local_position: Vector2 = curve.sample_baked(offset, true)
-
-    var sample_delta: float = 8.0
-    var offset_before: float = maxf(0.0, offset - sample_delta)
-    var offset_after: float = minf(lane_length, offset + sample_delta)
-    var point_before: Vector2 = curve.sample_baked(offset_before, true)
-    var point_after: Vector2 = curve.sample_baked(offset_after, true)
-    var tangent: Vector2 = (point_after - point_before).normalized()
-    var normal: Vector2 = tangent.orthogonal().normalized()
-    if normal == Vector2.ZERO:
-        normal = Vector2.UP
-
-    var perpendicular_jitter: float = randf_range(-tree_spawn_perpendicular_jitter_pixels, tree_spawn_perpendicular_jitter_pixels)
-
-    var lane_global_position: Vector2 = battle_lane_path.to_global(lane_local_position)
-    var spawn_position: Vector2 = lane_global_position + normal * perpendicular_jitter
-
-    var tree_sprite: Sprite2D = Sprite2D.new()
-    tree_sprite.texture = TREE_TEXTURE
-    tree_sprite.centered = true
-    tree_sprite.global_position = spawn_position
-    tree_sprite.z_index = 0
-
-    var texture_height: float = maxf(1.0, TREE_TEXTURE.get_height())
-    var uniform_scale: float = tree_target_height_pixels / texture_height
-    var final_scale: Vector2 = Vector2(uniform_scale, uniform_scale)
-
-    tree_sprite.scale = Vector2.ZERO
-    tree_sprite.modulate = Color(1.0, 1.0, 1.0, 0.7)
-    trees_container.add_child(tree_sprite)
-
-    var grow_tween: Tween = create_tween()
-    grow_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-    grow_tween.tween_property(tree_sprite, "scale", final_scale, tree_growth_duration_seconds)
-    grow_tween.parallel().tween_property(tree_sprite, "modulate:a", 1.0, tree_growth_duration_seconds)
