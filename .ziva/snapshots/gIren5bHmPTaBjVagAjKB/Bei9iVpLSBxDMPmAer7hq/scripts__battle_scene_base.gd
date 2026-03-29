@@ -42,7 +42,6 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var debug_spawn_enemy_drummer_button: Button = %DebugSpawnEnemyDrummerButton
 @onready var debug_spawn_enemy_cannon_button: Button = %DebugSpawnEnemyCannonButton
 @onready var debug_spawn_enemy_woodcutter_button: Button = %DebugSpawnEnemyWoodcutterButton
-@onready var debug_auto_win_button: Button = get_node_or_null("%DebugAutoWinButton")
 
 var _player_has_purchased_cannon: bool = false
 var _enemy_has_purchased_cannon: bool = false
@@ -76,8 +75,6 @@ func _ready() -> void:
         debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed)
     if debug_spawn_enemy_woodcutter_button != null:
         debug_spawn_enemy_woodcutter_button.pressed.connect(_on_debug_spawn_enemy_woodcutter_pressed)
-    if debug_auto_win_button != null:
-        debug_auto_win_button.pressed.connect(_on_debug_auto_win_pressed)
 
     _setup_castles()
 
@@ -271,10 +268,6 @@ func _on_debug_spawn_enemy_woodcutter_pressed() -> void:
     _spawn_unit_for_team_with_cost(WOODCUTTER_SCENE, GameConstants.TEAM_ENEMY, GameConstants.WOODCUTTER_COST_WOOD)
 
 
-func _on_debug_auto_win_pressed() -> void:
-    _on_castle_destroyed(enemy_castle)
-
-
 func _on_summon_cannon_pressed() -> void:
     _spawn_cannon_for_team(GameConstants.TEAM_PLAYER)
 
@@ -455,8 +448,6 @@ func _apply_debug_toggle_dependent_ui() -> void:
         debug_spawn_enemy_woodcutter_button.visible = show_attack_range_debug
     if debug_spawn_enemy_cannon_button != null:
         debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
-    if debug_auto_win_button != null:
-        debug_auto_win_button.visible = show_attack_range_debug
     _refresh_spawn_buttons_affordability()
 
 

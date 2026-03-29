@@ -331,7 +331,15 @@ icon = ExtResource("10_cannon_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Debug" type="CheckButton" parent="UI" unique_id=859335075]
+[node name="DebugAutoWinButton" type="Button" parent="UI/EnemyDebugButtons"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+text = "WIN"
+tooltip_text = "[DEBUG] Instantly win battle"
+
+[node name="DebugRangeToggle" type="CheckButton" parent="UI"]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0

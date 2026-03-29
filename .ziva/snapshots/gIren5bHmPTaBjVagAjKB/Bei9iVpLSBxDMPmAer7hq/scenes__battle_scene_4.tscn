@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="1_5cvnn"]
 [ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="2_u576h"]
-[ext_resource type="Script" path="res://scripts/battle_scene_3.gd" id="3_script"]
+[ext_resource type="Script" path="res://scripts/battle_scene_4.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="5_swordsman_icon"]
 [ext_resource type="Texture2D" uid="uid://bko6255540trt" path="res://assets/units/archer/archer-walking-0.png" id="6_archer_icon"]
@@ -55,7 +55,7 @@ corner_radius_bottom_left = 6
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("3_script")
-level_id = "level_3"
+level_id = "level_4"
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(576, 185.00006)
@@ -332,15 +332,7 @@ icon = ExtResource("10_cannon_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="DebugAutoWinButton" type="Button" parent="UI/EnemyDebugButtons"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-text = "WIN"
-tooltip_text = "[DEBUG] Instantly win battle"
-
-[node name="DebugRangeToggle" type="CheckButton" parent="UI"]
+[node name="Debug" type="CheckButton" parent="UI"]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0

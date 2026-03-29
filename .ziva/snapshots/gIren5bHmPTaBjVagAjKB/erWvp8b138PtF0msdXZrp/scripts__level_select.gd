@@ -74,31 +74,15 @@ func _ready() -> void:
             else:
                 is_unlocked = false
         
-        # Use same locking pattern as Shores button
-        button.disabled = false 
+        button.disabled = not is_unlocked
         
         if not is_unlocked:
             button.tooltip_text = "Requires beating level " + str(i-1)
             button.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
-            button.modulate = Color(1.0, 1.0, 1.0, 1.0)
-            
-            # Disconnect if we have any connection (we'll connect below)
-            # but actually we only connect if is_unlocked
         else:
             button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-            button.tooltip_text = "Play level " + str(i)
         
         _apply_button_style(button)
-        
-        # Override style for locked state if needed
-        if not is_unlocked:
-            var style_locked = button.get_theme_stylebox("normal").duplicate()
-            if style_locked is StyleBoxTexture:
-                style_locked.modulate_color = Color(0.3, 0.3, 0.3, 1.0)
-            button.add_theme_stylebox_override("normal", style_locked)
-            button.add_theme_stylebox_override("hover", style_locked)
-            button.add_theme_stylebox_override("pressed", style_locked)
-            button.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1.0))
         
         # Add a black outline border
         var outline = Panel.new()
@@ -116,15 +100,14 @@ func _ready() -> void:
         
         button.add_child(outline)
         
-        if is_unlocked:
-            if i == 1:
-                button.pressed.connect(_on_level_1_pressed)
-            elif i == 2:
-                button.pressed.connect(_on_level_2_pressed)
-            elif i == 3:
-                button.pressed.connect(_on_level_3_pressed)
-            elif i == 4:
-                button.pressed.connect(_on_level_4_pressed)
+        if i == 1:
+            button.pressed.connect(_on_level_1_pressed)
+        elif i == 2:
+            button.pressed.connect(_on_level_2_pressed)
+        elif i == 3:
+            button.pressed.connect(_on_level_3_pressed)
+        elif i == 4:
+            button.pressed.connect(_on_level_4_pressed)
         
         button.mouse_entered.connect(_on_button_mouse_entered.bind(button))
         button.mouse_exited.connect(_on_button_mouse_exited.bind(button))
