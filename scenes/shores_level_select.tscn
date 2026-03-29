@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/shores_level_select.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="2_bg"]
@@ -28,6 +28,22 @@ texture_margin_top = 10.0
 texture_margin_right = 10.0
 texture_margin_bottom = 10.0
 modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tree_density_bg"]
+bg_color = Color(0, 0, 0, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.35)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
 
 [node name="ShoresLevelSelect" type="Node2D"]
 script = ExtResource("1_script")
@@ -74,6 +90,20 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 48
 text = "Shores Level Select"
+horizontal_alignment = 1
+
+[node name="TreeDensityPanel" type="PanelContainer" parent="UI/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tree_density_bg")
+
+[node name="TreeDensityLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/TreeDensityPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.58, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "Tree Abundance: Sparse"
 horizontal_alignment = 1
 
 [node name="GridContainer" type="GridContainer" parent="UI/CenterContainer/VBoxContainer"]
