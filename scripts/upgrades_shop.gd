@@ -40,7 +40,9 @@ func _ready() -> void:
     tree_growth_button.pressed.connect(_on_passive_income_pressed)
     back_button.pressed.connect(_on_back_pressed)
     
-    GameState.trees_changed.connect(_on_trees_changed)
+    var gs = get_node_or_null("/root/GameState")
+    if gs:
+        gs.trees_changed.connect(_on_trees_changed)
     update_ui()
 
 func _setup_square_button(btn: Button, type: String) -> void:
@@ -152,7 +154,10 @@ func _update_unit_button(btn: Button, type: String) -> void:
     
     if not name_label: return
     
-    if GameState.is_unit_unlocked(type):
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    
+    if gs.is_unit_unlocked(type):
         name_label.text = "%s\n(Unlocked)" % info.name
         btn.disabled = true
         if cost_wrapper: cost_wrapper.visible = false
@@ -160,13 +165,16 @@ func _update_unit_button(btn: Button, type: String) -> void:
     else:
         name_label.text = info.name
         if cost_label: cost_label.text = str(info.cost)
-        btn.disabled = GameState.trees < info.cost
+        btn.disabled = gs.trees < info.cost
         if cost_wrapper: cost_wrapper.visible = true
         elif cost_hbox: cost_hbox.visible = true
 
 func _update_passive_income_button() -> void:
-    var is_lvl4_beaten = GameState.is_level_beaten("level_4")
-    var cost = GameState.get_passive_income_upgrade_cost()
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    
+    var is_lvl4_beaten = gs.is_level_beaten("level_4")
+    var cost = gs.get_passive_income_upgrade_cost()
     var cost_hbox = tree_growth_button.find_child("CostHBox", true, false)
     var cost_wrapper = tree_growth_button.find_child("CostWrapper", true, false)
     var cost_label = tree_growth_button.find_child("CostLabel", true, false)
@@ -175,7 +183,7 @@ func _update_passive_income_button() -> void:
     
     if not name_label: return
     
-    var income_interval = GameState.get_current_passive_income_interval(2.0)
+    var income_interval = gs.get_current_passive_income_interval(2.0)
     
     if not is_lvl4_beaten:
         name_label.text = "Passive Income"
@@ -195,15 +203,19 @@ func _update_passive_income_button() -> void:
         if cost_label: cost_label.text = str(cost)
         if cost_wrapper: cost_wrapper.visible = true
         elif cost_hbox: cost_hbox.visible = true
-        tree_growth_button.disabled = GameState.trees < cost
+        tree_growth_button.disabled = gs.trees < cost
 
 func _buy_upgrade(type: String) -> void:
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
     var info = UPGRADES[type]
-    if GameState.unlock_unit(type, info.cost):
+    if gs.unlock_unit(type, info.cost):
         update_ui()
 
 func _on_passive_income_pressed() -> void:
-    if GameState.purchase_passive_income_upgrade():
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    if gs.purchase_passive_income_upgrade():
         update_ui()
 
 func _on_back_pressed() -> void:

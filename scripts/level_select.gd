@@ -2,11 +2,34 @@ extends Node2D
 
 @onready var grid_container: GridContainer = %GridContainer
 @onready var back_button: Button = %BackButton
+@onready var shores_button: Button = %ShoresButton
 
 func _ready() -> void:
     back_button.pressed.connect(_on_back_pressed)
     back_button.mouse_entered.connect(_on_button_mouse_entered.bind(back_button))
     back_button.mouse_exited.connect(_on_button_mouse_exited.bind(back_button))
+    
+    shores_button.pressed.connect(_on_shores_pressed)
+    shores_button.mouse_entered.connect(_on_button_mouse_entered.bind(shores_button))
+    shores_button.mouse_exited.connect(_on_button_mouse_exited.bind(shores_button))
+    
+    # Access GameState singleton through root node to avoid identifier issues
+    var gs = get_node_or_null("/root/GameState")
+    var forest_complete = false
+    if gs:
+        forest_complete = gs.is_level_beaten("level_4")
+        
+    shores_button.disabled = not forest_complete
+    shores_button.text = "Go to Shores"
+    
+    if shores_button.disabled:
+        shores_button.modulate = Color(0.3, 0.3, 0.3, 1.0) # Solid dark grey/stone look
+        shores_button.add_theme_color_override("font_color", Color(0.2, 0.2, 0.2, 1.0))
+        shores_button.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
+    else:
+        shores_button.modulate = Color(1, 1, 1, 1)
+        shores_button.remove_theme_color_override("font_color")
+        shores_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
     
             
     # Only show Level 1, 2, 3 and 4 for now
@@ -98,3 +121,6 @@ func _on_level_4_pressed() -> void:
 
 func _on_back_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+func _on_shores_pressed() -> void:
+    get_tree().change_scene_to_file("res://scenes/shores_level_select.tscn")

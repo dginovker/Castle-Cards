@@ -19,11 +19,15 @@ var music_volume: float = 0.8
 func _ready() -> void:
     load_game()
     # Initial set for volume in case MusicPlayer is already there
-    MusicPlayer.set_volume(music_volume)
+    var mp = get_node_or_null("/root/MusicPlayer")
+    if mp:
+        mp.set_volume(music_volume)
 
 func _on_music_volume_changed(value: float) -> void:
     music_volume = value
-    MusicPlayer.set_volume(music_volume)
+    var mp = get_node_or_null("/root/MusicPlayer")
+    if mp:
+        mp.set_volume(music_volume)
     save_game()
 
 func is_unit_unlocked(unit_type: String) -> bool:
@@ -107,7 +111,9 @@ func load_game() -> void:
                     passive_income_upgrades = int(data.get("passive_income_upgrades"))
                 if data.has("music_volume"):
                     music_volume = float(data.get("music_volume"))
-                    MusicPlayer.set_volume(music_volume)
+                    var mp = get_node_or_null("/root/MusicPlayer")
+                    if mp:
+                        mp.set_volume(music_volume)
 
 func wipe_save() -> void:
     # Set trees directly to avoid intermediate saves if we want

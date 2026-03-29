@@ -13,8 +13,11 @@ func _ready() -> void:
     confirm_wipe_button.pressed.connect(_on_confirm_wipe_pressed)
     cancel_wipe_button.pressed.connect(_on_cancel_wipe_pressed)
     
-    music_slider.value = GameState.music_volume
     music_slider.value_changed.connect(_on_music_volume_changed)
+    
+    var gs = get_node_or_null("/root/GameState")
+    if gs:
+        music_slider.value = gs.music_volume
     
     # Hover effects for main buttons
     _setup_hover_effect(wipe_button)
@@ -31,7 +34,9 @@ func _on_wipe_pressed() -> void:
     confirmation_popup.visible = true
 
 func _on_confirm_wipe_pressed() -> void:
-    GameState.wipe_save()
+    var gs = get_node_or_null("/root/GameState")
+    if gs:
+        gs.wipe_save()
     confirmation_popup.visible = false
     # Feedback on the original wipe button
     wipe_button.text = "Save Wiped!"
@@ -42,7 +47,9 @@ func _on_cancel_wipe_pressed() -> void:
     confirmation_popup.visible = false
 
 func _on_music_volume_changed(value: float) -> void:
-    GameState._on_music_volume_changed(value)
+    var gs = get_node_or_null("/root/GameState")
+    if gs:
+        gs._on_music_volume_changed(value)
 
 func _on_back_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
