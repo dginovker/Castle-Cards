@@ -184,8 +184,8 @@ func _on_retry_pressed() -> void:
 
 
 func _on_main_menu_pressed() -> void:
-    get_tree().paused = false
-    get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+    # Not implemented yet as per request
+    print("Main Menu pressed - Not implemented yet")
 
 
 func _on_summon_swordsman_pressed() -> void:
