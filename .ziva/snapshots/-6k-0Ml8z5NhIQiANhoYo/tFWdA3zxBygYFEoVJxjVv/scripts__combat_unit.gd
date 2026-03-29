@@ -326,20 +326,9 @@ func _refresh_movement_target() -> void:
         return
 
     target_offset = _get_attack_destination_offset()
-    var dist_to_target: float = absf(current_offset - target_offset)
-    has_target = dist_to_target > 0.5
+    has_target = not is_equal_approx(current_offset, target_offset)
 
     if combat_state == CombatState.ATTACKING:
-        # User requested: Retreat logic takes priority. 
-        # Break attacking state if we need to retreat.
-        var is_retreating: bool = false
-        if team_id == GameConstants.TEAM_PLAYER:
-            is_retreating = target_offset < current_offset
-        else:
-            is_retreating = target_offset > current_offset
-            
-        if is_retreating and dist_to_target > 2.0:
-            _resume_after_attack_lost_target()
         return
 
     if has_target:
@@ -486,7 +475,8 @@ func refresh_attack_range_shape() -> void:
 
 
 func _process(delta: float) -> void:
-    _refresh_movement_target()
+    if combat_state != CombatState.ATTACKING:
+        _refresh_movement_target()
 
     _process_leadership_support(delta)
     _update_targets_from_attack_overlap()
@@ -506,17 +496,8 @@ func _process(delta: float) -> void:
 
 func _process_moving(delta: float) -> void:
     if _has_attack_target():
-        # Check if we are currently performing a retreat. 
-        # Retreat logic takes priority: don't stop to attack if we still need to retreat.
-        var is_retreating: bool = false
-        if team_id == GameConstants.TEAM_PLAYER:
-            is_retreating = target_offset < current_offset
-        else:
-            is_retreating = target_offset > current_offset
-            
-        if not is_retreating or absf(current_offset - target_offset) <= 2.0:
-            _enter_attacking_state()
-            return
+        _enter_attacking_state()
+        return
 
     if not has_target or lane_curve == null:
         combat_state = CombatState.IDLE

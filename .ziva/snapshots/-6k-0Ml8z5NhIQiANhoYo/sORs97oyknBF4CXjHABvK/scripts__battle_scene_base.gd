@@ -13,7 +13,7 @@ const DOOR_Y_FACTOR: float = 0.44
 const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 
 @export var level_id: String = "level_1"
-@export var show_attack_range_debug: bool = false
+@export var show_attack_range_debug: bool = true
 
 @export_range(0.5, 30.0, 0.1) var tree_spawn_interval_seconds: float = 4.0
 @export_range(0.0, 10.0, 0.1) var tree_spawn_interval_jitter_seconds: float = 1.0
@@ -104,7 +104,7 @@ func _update_ai() -> void:
     pass
 
 
-func _on_ai_woodcutter_check(_tree_offset: float = 0.0) -> void:
+func _on_ai_woodcutter_check() -> void:
     # This should be overridden in level scripts
     pass
 
@@ -503,11 +503,11 @@ func _spawn_growing_tree() -> void:
     if lane_length <= 0.0:
         return
 
-    var player_side_offset: float = _get_lane_offset_near_castle(true)
-    var enemy_side_offset: float = _get_lane_offset_near_castle(false)
-    var min_offset: float = minf(player_side_offset, enemy_side_offset)
-    var max_offset: float = maxf(player_side_offset, enemy_side_offset)
-    var offset: float = randf_range(min_offset, max_offset)
+	var player_side_offset: float = _get_lane_offset_near_castle(true)
+	var enemy_side_offset: float = _get_lane_offset_near_castle(false)
+	var min_offset: float = minf(player_side_offset, enemy_side_offset)
+	var max_offset: float = maxf(player_side_offset, enemy_side_offset)
+	var offset: float = randf_range(min_offset, max_offset)
     
     # Trigger AI logic
     _on_tree_growing(offset)
