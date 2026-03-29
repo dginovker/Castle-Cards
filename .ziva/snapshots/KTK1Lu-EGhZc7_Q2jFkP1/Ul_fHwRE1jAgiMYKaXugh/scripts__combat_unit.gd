@@ -456,11 +456,6 @@ func _is_valid_frontline_anchor(unit: Node) -> bool:
     if float(unit.get("attack_damage")) <= 0.0:
         return false
 
-    # Frontline anchors must be mobile; stationary units/structures (e.g. cannon)
-    # should never pull followers backward toward base.
-    if float(unit.get("move_speed")) <= 0.0:
-        return false
-
     return true
 
 
@@ -637,11 +632,6 @@ func _enter_attacking_state() -> void:
 
 
 func _resume_after_attack_lost_target() -> void:
-    # Simplified rule: if a one-shot attack animation is currently playing,
-    # let it finish before changing state/animation.
-    if attack_animation_one_shot and _attack_animation_playing_one_shot and animation == attack_animation_name and is_playing():
-        return
-
     _attack_animation_playing_one_shot = false
 
     if has_target and lane_curve != null and not is_equal_approx(current_offset, target_offset):

@@ -101,7 +101,6 @@ var _leadership_bonus_by_kind: Dictionary = {}
 var _leadership_sources_by_kind: Dictionary = {}
 var _leadership_refresh_remaining: float = 0.0
 var _leadership_applied_targets: Dictionary = {}
-var _attack_animation_playing_one_shot: bool = false
 
 static var _formation_spawn_counter: int = 0
 
@@ -137,8 +136,6 @@ func _ready() -> void:
         animation_finished.connect(on_animation_finished_callable)
 
     health_changed.emit(current_health, max_health)
-    if sprite_frames != null and sprite_frames.has_animation(&"walk"):
-        play(&"walk")
     stop()
     set_process(false)
     queue_redraw()
@@ -283,16 +280,8 @@ func _get_effective_attack_damage() -> float:
 
 
 func _play_attack_animation_for_swing() -> void:
-    if sprite_frames == null or not sprite_frames.has_animation(attack_animation_name):
-        return
-
-    if attack_animation_one_shot:
-        _attack_animation_playing_one_shot = true
-        set_frame_and_progress(0, 0.0)
+    if sprite_frames != null and sprite_frames.has_animation(attack_animation_name):
         play(attack_animation_name)
-        return
-
-    play(attack_animation_name)
 
 
 func _play_non_attack_hold_animation() -> void:
@@ -300,9 +289,6 @@ func _play_non_attack_hold_animation() -> void:
         if sprite_frames != null and sprite_frames.has_animation(attack_animation_name):
             if animation != attack_animation_name:
                 play(attack_animation_name)
-        return
-
-    if _attack_animation_playing_one_shot and animation == attack_animation_name and is_playing():
         return
 
     if not attack_animation_return_to_idle_between_swings:
@@ -454,11 +440,6 @@ func _is_valid_frontline_anchor(unit: Node) -> bool:
     # Only follow allies that are true frontline combatants.
     # This prevents support units (e.g. drummer with 0 attack) from becoming anchors.
     if float(unit.get("attack_damage")) <= 0.0:
-        return false
-
-    # Frontline anchors must be mobile; stationary units/structures (e.g. cannon)
-    # should never pull followers backward toward base.
-    if float(unit.get("move_speed")) <= 0.0:
         return false
 
     return true
@@ -632,18 +613,10 @@ func _enter_attacking_state() -> void:
 
     combat_state = CombatState.ATTACKING
     _attack_cooldown_remaining = 0.0
-    _attack_animation_playing_one_shot = false
     _play_non_attack_hold_animation()
 
 
 func _resume_after_attack_lost_target() -> void:
-    # Simplified rule: if a one-shot attack animation is currently playing,
-    # let it finish before changing state/animation.
-    if attack_animation_one_shot and _attack_animation_playing_one_shot and animation == attack_animation_name and is_playing():
-        return
-
-    _attack_animation_playing_one_shot = false
-
     if has_target and lane_curve != null and not is_equal_approx(current_offset, target_offset):
         combat_state = CombatState.MOVING
         if sprite_frames != null and sprite_frames.has_animation(&"walk"):
@@ -662,8 +635,6 @@ func _on_animation_finished() -> void:
 
     if animation != attack_animation_name:
         return
-
-    _attack_animation_playing_one_shot = false
 
     if combat_state == CombatState.ATTACKING and _has_attack_target():
         _play_non_attack_hold_animation()

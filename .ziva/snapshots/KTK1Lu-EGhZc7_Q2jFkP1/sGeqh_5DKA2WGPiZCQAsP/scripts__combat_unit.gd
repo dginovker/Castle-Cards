@@ -456,11 +456,6 @@ func _is_valid_frontline_anchor(unit: Node) -> bool:
     if float(unit.get("attack_damage")) <= 0.0:
         return false
 
-    # Frontline anchors must be mobile; stationary units/structures (e.g. cannon)
-    # should never pull followers backward toward base.
-    if float(unit.get("move_speed")) <= 0.0:
-        return false
-
     return true
 
 

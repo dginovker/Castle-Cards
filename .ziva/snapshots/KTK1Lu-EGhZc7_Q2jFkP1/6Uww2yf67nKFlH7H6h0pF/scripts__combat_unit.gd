@@ -15,13 +15,10 @@ enum CombatState {
 @export var move_speed: float = 70.0
 @export var target_render_height: float = 48.0
 
-@export_range(0.0, 60.0, 1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
+@export_range(0.0, 30.0, 1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
 @export_range(0.0, 10.0, 1) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
 @export_range(1.0, 30.0, 1) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
-@export var attack_animation_name: StringName = &"fight"
-@export var attack_animation_one_shot: bool = true
-@export var attack_animation_return_to_idle_between_swings: bool = true
 @export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
 @export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
 @export var defend_limit_targets_near_own_castle: bool = true
@@ -101,7 +98,6 @@ var _leadership_bonus_by_kind: Dictionary = {}
 var _leadership_sources_by_kind: Dictionary = {}
 var _leadership_refresh_remaining: float = 0.0
 var _leadership_applied_targets: Dictionary = {}
-var _attack_animation_playing_one_shot: bool = false
 
 static var _formation_spawn_counter: int = 0
 
@@ -128,17 +124,7 @@ func _ready() -> void:
     _ensure_hurtbox()
     _refresh_combat_space_scale()
     refresh_attack_range_shape()
-
-    if sprite_frames != null and sprite_frames.has_animation(attack_animation_name):
-        sprite_frames.set_animation_loop(attack_animation_name, not attack_animation_one_shot)
-
-    var on_animation_finished_callable: Callable = Callable(self, "_on_animation_finished")
-    if not animation_finished.is_connected(on_animation_finished_callable):
-        animation_finished.connect(on_animation_finished_callable)
-
     health_changed.emit(current_health, max_health)
-    if sprite_frames != null and sprite_frames.has_animation(&"walk"):
-        play(&"walk")
     stop()
     set_process(false)
     queue_redraw()
@@ -282,45 +268,6 @@ func _get_effective_attack_damage() -> float:
     return attack_damage * (1.0 + get_total_leadership_bonus())
 
 
-func _play_attack_animation_for_swing() -> void:
-    if sprite_frames == null or not sprite_frames.has_animation(attack_animation_name):
-        return
-
-    if attack_animation_one_shot:
-        _attack_animation_playing_one_shot = true
-        set_frame_and_progress(0, 0.0)
-        play(attack_animation_name)
-        return
-
-    play(attack_animation_name)
-
-
-func _play_non_attack_hold_animation() -> void:
-    if not attack_animation_one_shot:
-        if sprite_frames != null and sprite_frames.has_animation(attack_animation_name):
-            if animation != attack_animation_name:
-                play(attack_animation_name)
-        return
-
-    if _attack_animation_playing_one_shot and animation == attack_animation_name and is_playing():
-        return
-
-    if not attack_animation_return_to_idle_between_swings:
-        return
-
-    if sprite_frames != null and sprite_frames.has_animation(&"idle"):
-        if animation != &"idle":
-            play(&"idle")
-        return
-
-    if sprite_frames != null and sprite_frames.has_animation(&"walk"):
-        if animation != &"walk":
-            play(&"walk")
-        return
-
-    stop()
-
-
 func _get_leadership_radius_pixels() -> float:
     return maxf(0.0, leadership_range * GameConstants.ATTACK_RANGE_UNIT_PIXELS)
 
@@ -456,11 +403,6 @@ func _is_valid_frontline_anchor(unit: Node) -> bool:
     if float(unit.get("attack_damage")) <= 0.0:
         return false
 
-    # Frontline anchors must be mobile; stationary units/structures (e.g. cannon)
-    # should never pull followers backward toward base.
-    if float(unit.get("move_speed")) <= 0.0:
-        return false
-
     return true
 
 
@@ -551,26 +493,24 @@ func _process_attacking(delta: float) -> void:
         _resume_after_attack_lost_target()
         return
 
+    if sprite_frames != null and sprite_frames.has_animation(&"fight") and animation != &"fight":
+        play(&"fight")
+
     _attack_cooldown_remaining -= delta
     if _attack_cooldown_remaining > 0.0:
-        _play_non_attack_hold_animation()
         return
 
     _attack_cooldown_remaining = attack_interval_seconds
 
     var effective_attack_damage: float = _get_effective_attack_damage()
-    var did_attack: bool = false
 
     if _is_current_unit_target_attackable():
         if effective_attack_damage > 0.0:
             current_target_unit.call("take_damage", effective_attack_damage)
-            did_attack = true
-    elif _is_current_castle_target_attackable() and effective_attack_damage > 0.0:
-        current_target_castle.take_damage(effective_attack_damage)
-        did_attack = true
+        return
 
-    if did_attack:
-        _play_attack_animation_for_swing()
+    if _is_current_castle_target_attackable() and effective_attack_damage > 0.0:
+        current_target_castle.take_damage(effective_attack_damage)
 
 
 func _process_leadership_support(_delta: float) -> void:
@@ -632,18 +572,14 @@ func _enter_attacking_state() -> void:
 
     combat_state = CombatState.ATTACKING
     _attack_cooldown_remaining = 0.0
-    _attack_animation_playing_one_shot = false
-    _play_non_attack_hold_animation()
+
+    if sprite_frames != null and sprite_frames.has_animation(&"fight"):
+        play(&"fight")
+    else:
+        stop()
 
 
 func _resume_after_attack_lost_target() -> void:
-    # Simplified rule: if a one-shot attack animation is currently playing,
-    # let it finish before changing state/animation.
-    if attack_animation_one_shot and _attack_animation_playing_one_shot and animation == attack_animation_name and is_playing():
-        return
-
-    _attack_animation_playing_one_shot = false
-
     if has_target and lane_curve != null and not is_equal_approx(current_offset, target_offset):
         combat_state = CombatState.MOVING
         if sprite_frames != null and sprite_frames.has_animation(&"walk"):
@@ -654,19 +590,6 @@ func _resume_after_attack_lost_target() -> void:
 
     combat_state = CombatState.IDLE
     stop()
-
-
-func _on_animation_finished() -> void:
-    if not attack_animation_one_shot:
-        return
-
-    if animation != attack_animation_name:
-        return
-
-    _attack_animation_playing_one_shot = false
-
-    if combat_state == CombatState.ATTACKING and _has_attack_target():
-        _play_non_attack_hold_animation()
 
 
 func _has_attack_target() -> bool:

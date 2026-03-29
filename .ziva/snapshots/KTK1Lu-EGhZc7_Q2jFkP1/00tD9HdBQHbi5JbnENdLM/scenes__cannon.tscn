@@ -30,9 +30,9 @@ animations = [{
 [node name="Cannon" type="AnimatedSprite2D" unique_id=515189479]
 z_index = 9
 sprite_frames = SubResource("SpriteFrames_cannon")
-animation = &"walk"
-frame = 0
-frame_progress = 0.0
+animation = &"fight"
+frame = 1
+frame_progress = 0.6922868
 script = ExtResource("4_script")
 unit_archetype_name = "cannon"
 move_speed = 0.0
