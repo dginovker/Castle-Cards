@@ -105,7 +105,7 @@ func _update_ai() -> void:
     pass
 
 
-func _on_ai_woodcutter_check(tree_offset: float = 0.0) -> void:
+func _on_ai_woodcutter_check(_tree_offset: float = 0.0) -> void:
     # This should be overridden in level scripts
     pass
 

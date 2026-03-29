@@ -1,0 +1,138 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" uid="uid://be5uupf7i47v7" path="res://scripts/main_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="3_ground"]
+[ext_resource type="Texture2D" uid="uid://dkb7funvtxffr" path="res://assets/ui-button-long-width.png" id="4_texture_long"]
+
+[ext_resource type="PackedScene" uid="uid://c1h0k3u2hddoj" path="res://scenes/tree_display.tscn" id="5_tree_display"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long"]
+texture = ExtResource("4_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long_hover"]
+texture = ExtResource("4_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+modulate_color = Color(1.2, 1.2, 1.2, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long_pressed"]
+texture = ExtResource("4_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_credits"]
+
+[node name="MainMenu" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(576, 185)
+texture = ExtResource("2_bg")
+
+[node name="Ground" type="Sprite2D" parent="."]
+position = Vector2(576, 490)
+scale = Vector2(0.665, 0.56)
+texture = ExtResource("3_ground")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_bottom = 60.0
+grow_horizontal = 0
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+
+[node name="TreeDisplay" parent="UI/MarginContainer" instance=ExtResource("5_tree_display")]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="PlayButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(384, 80)
+layout_mode = 2
+pivot_offset = Vector2(192, 40)
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxTexture_long")
+theme_override_styles/hover = SubResource("StyleBoxTexture_long_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_long_pressed")
+text = "Play"
+
+[node name="UpgradesButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(384, 80)
+layout_mode = 2
+pivot_offset = Vector2(192, 40)
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxTexture_long")
+theme_override_styles/hover = SubResource("StyleBoxTexture_long_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_long_pressed")
+text = "Upgrades"
+
+[node name="OptionsButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(384, 80)
+layout_mode = 2
+pivot_offset = Vector2(192, 40)
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxTexture_long")
+theme_override_styles/hover = SubResource("StyleBoxTexture_long_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_long_pressed")
+text = "Options"
+
+[node name="CreditsContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="CreditsButton" type="Button" parent="UI/CreditsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxEmpty_credits")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_credits")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_credits")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_credits")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_credits")
+text = "Credits"

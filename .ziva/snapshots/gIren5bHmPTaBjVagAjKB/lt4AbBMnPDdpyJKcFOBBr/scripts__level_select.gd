@@ -9,49 +9,36 @@ func _ready() -> void:
     back_button.mouse_entered.connect(_on_button_mouse_entered.bind(back_button))
     back_button.mouse_exited.connect(_on_button_mouse_exited.bind(back_button))
     
+    shores_button.pressed.connect(_on_shores_pressed)
+    shores_button.mouse_entered.connect(_on_button_mouse_entered.bind(shores_button))
+    shores_button.mouse_exited.connect(_on_button_mouse_exited.bind(shores_button))
+    
     # Access GameState singleton through root node to avoid identifier issues
     var gs = get_node_or_null("/root/GameState")
     var forest_complete = false
     if gs:
         forest_complete = gs.is_level_beaten("level_4")
         
+    shores_button.disabled = not forest_complete
     shores_button.text = "Go to Shores"
-    shores_button.disabled = false # Never use disabled state to avoid auto-transparency
     
-    if not forest_complete:
-        # LOCKED LOOK: Solid, opaque, but dark and unclickable
-        shores_button.modulate = Color(1.0, 1.0, 1.0, 1.0) # No transparency at all
+    if shores_button.disabled:
+        shores_button.modulate = Color(1.0, 1.0, 1.0, 1.0)
         shores_button.tooltip_text = "Requires beating level 4"
         shores_button.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
         
-        var style_locked = shores_button.get_theme_stylebox("normal").duplicate()
-        if style_locked is StyleBoxTexture:
-            style_locked.modulate_color = Color(0.3, 0.3, 0.3, 1.0) # Solid dark grey texture
-        shores_button.add_theme_stylebox_override("normal", style_locked)
-        shores_button.add_theme_stylebox_override("hover", style_locked)
-        shores_button.add_theme_stylebox_override("pressed", style_locked)
-        shores_button.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1.0)) # Dark text
-        
-        # Disconnect any existing pressed signal
-        if shores_button.pressed.is_connected(_on_shores_pressed):
-            shores_button.pressed.disconnect(_on_shores_pressed)
+        # Create an opaque dark style for disabled state
+        var disabled_style = shores_button.get_theme_stylebox("normal").duplicate()
+        if disabled_style is StyleBoxTexture:
+            disabled_style.modulate_color = Color(0.5, 0.5, 0.5, 1.0) # Darker but fully opaque
+        shores_button.add_theme_stylebox_override("disabled", disabled_style)
+        shores_button.add_theme_color_override("font_disabled_color", Color(0.3, 0.3, 0.3, 1.0))
     else:
-        # UNLOCKED LOOK: Normal bright stone button
         shores_button.modulate = Color(1, 1, 1, 1)
-        shores_button.tooltip_text = "Venture to the Shores"
+        shores_button.tooltip_text = ""
         shores_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-        shores_button.remove_theme_stylebox_override("normal")
-        shores_button.remove_theme_stylebox_override("hover")
-        shores_button.remove_theme_stylebox_override("pressed")
-        shores_button.remove_theme_color_override("font_color")
-        
-        # Connect signal
-        if not shores_button.pressed.is_connected(_on_shores_pressed):
-            shores_button.pressed.connect(_on_shores_pressed)
-        
-        # Add hover effects
-        shores_button.mouse_entered.connect(_on_button_mouse_entered.bind(shores_button))
-        shores_button.mouse_exited.connect(_on_button_mouse_exited.bind(shores_button))
+        shores_button.remove_theme_stylebox_override("disabled")
+        shores_button.remove_theme_color_override("font_disabled_color")
     
             
     # Only show Level 1, 2, 3 and 4 for now
