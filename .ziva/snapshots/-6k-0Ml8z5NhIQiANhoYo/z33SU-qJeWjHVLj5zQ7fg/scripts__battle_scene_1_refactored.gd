@@ -52,6 +52,7 @@ var _game_over_screen: GameOverScreen
 
 
 func _ready() -> void:
+
     randomize()
 
     summon_button.pressed.connect(_on_summon_swordsman_pressed)
@@ -93,30 +94,6 @@ func _ready() -> void:
     _setup_tree_spawning()
     _setup_wood_income()
     _setup_game_over_screen()
-
-
-func _process(_delta: float) -> void:
-    _update_ai()
-
-
-func _update_ai() -> void:
-    # Logic 2: If we have 15+ resources, spawn a swordsman
-    if _enemy_wood >= 15:
-        _on_debug_spawn_enemy_swordsman_pressed()
-
-
-func _on_ai_woodcutter_check() -> void:
-    # Logic 1: if we do not have a woodcutter on the field, spawn a woodcutter
-    if _get_enemy_woodcutter_count() == 0:
-        _on_debug_spawn_enemy_woodcutter_pressed()
-
-
-func _get_enemy_woodcutter_count() -> int:
-    var count: int = 0
-    for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
-        if node is Woodcutter and node.team_id == GameConstants.TEAM_ENEMY:
-            count += 1
-    return count
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -481,9 +458,6 @@ func _schedule_next_tree_spawn() -> void:
 func _spawn_growing_tree() -> void:
     if trees_container == null or battle_lane_path == null or battle_lane_path.curve == null or TREE_TEXTURE == null:
         return
-
-    # AI Logic 1: 1 second after a tree is growing...
-    get_tree().create_timer(1.0).timeout.connect(_on_ai_woodcutter_check)
 
     var curve: Curve2D = battle_lane_path.curve
     var lane_length: float = curve.get_baked_length()
