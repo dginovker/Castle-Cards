@@ -5,12 +5,16 @@ extends Node2D
 @onready var confirmation_popup: Control = %ConfirmationPopup
 @onready var confirm_wipe_button: Button = %ConfirmWipeButton
 @onready var cancel_wipe_button: Button = %CancelWipeButton
+@onready var music_slider: HSlider = %MusicSlider
 
 func _ready() -> void:
     wipe_button.pressed.connect(_on_wipe_pressed)
     back_button.pressed.connect(_on_back_pressed)
     confirm_wipe_button.pressed.connect(_on_confirm_wipe_pressed)
     cancel_wipe_button.pressed.connect(_on_cancel_wipe_pressed)
+    
+    music_slider.value = GameState.music_volume
+    music_slider.value_changed.connect(_on_music_volume_changed)
     
     # Hover effects for main buttons
     _setup_hover_effect(wipe_button)
@@ -36,6 +40,9 @@ func _on_confirm_wipe_pressed() -> void:
 
 func _on_cancel_wipe_pressed() -> void:
     confirmation_popup.visible = false
+
+func _on_music_volume_changed(value: float) -> void:
+    GameState._on_music_volume_changed(value)
 
 func _on_back_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/main_menu.tscn")

@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 [autoload]
 
 GameState="*res://scripts/game_state.gd"
+MusicPlayer="*res://scripts/music_player.gd"
 
 [physics]
 

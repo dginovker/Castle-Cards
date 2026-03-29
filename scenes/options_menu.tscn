@@ -29,6 +29,29 @@ texture_margin_right = 10.0
 texture_margin_bottom = 10.0
 modulate_color = Color(0.8, 0.8, 0.8, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider"]
+bg_color = Color(0.2, 0.1, 0, 0.5)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+expand_margin_top = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_area"]
+bg_color = Color(0.6, 0.4, 0.2, 1)
+corner_radius_top_left = 5
+corner_radius_bottom_left = 5
+expand_margin_top = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_area_highlight"]
+bg_color = Color(0.8, 0.6, 0.4, 1)
+corner_radius_top_left = 5
+corner_radius_bottom_left = 5
+expand_margin_top = 4.0
+expand_margin_bottom = 4.0
+
 [node name="OptionsMenu" type="Node2D"]
 script = ExtResource("1_script")
 
@@ -75,6 +98,39 @@ theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 48
 text = "Options"
 horizontal_alignment = 1
+
+[node name="MusicControl" type="PanelContainer" parent="UI/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(384, 80)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_long")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/CenterContainer/VBoxContainer/MusicControl"]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/MusicControl/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="UI/CenterContainer/VBoxContainer/MusicControl/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 24
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="UI/CenterContainer/VBoxContainer/MusicControl/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/slider = SubResource("StyleBoxFlat_slider")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_area")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_area_highlight")
+max_value = 1.0
+step = 0.05
+value = 0.8
 
 [node name="WipeButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
 unique_name_in_owner = true

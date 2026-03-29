@@ -14,9 +14,17 @@ var trees: int = 0 :
 var unlocked_units: Array[String] = ["swordsman", "woodcutter"]
 var beaten_levels: Array[String] = []
 var passive_income_upgrades: int = 0
+var music_volume: float = 0.8
 
 func _ready() -> void:
     load_game()
+    # Initial set for volume in case MusicPlayer is already there
+    MusicPlayer.set_volume(music_volume)
+
+func _on_music_volume_changed(value: float) -> void:
+    music_volume = value
+    MusicPlayer.set_volume(music_volume)
+    save_game()
 
 func is_unit_unlocked(unit_type: String) -> bool:
     return unit_type in unlocked_units
@@ -62,7 +70,8 @@ func save_game() -> void:
         "trees": trees,
         "unlocked_units": unlocked_units,
         "beaten_levels": beaten_levels,
-        "passive_income_upgrades": passive_income_upgrades
+        "passive_income_upgrades": passive_income_upgrades,
+        "music_volume": music_volume
     }
     var json_string = JSON.stringify(save_data)
     var file = FileAccess.open(SAVE_FILE, FileAccess.WRITE)
@@ -96,6 +105,9 @@ func load_game() -> void:
                         beaten_levels.append(str(level))
                 if data.has("passive_income_upgrades"):
                     passive_income_upgrades = int(data.get("passive_income_upgrades"))
+                if data.has("music_volume"):
+                    music_volume = float(data.get("music_volume"))
+                    MusicPlayer.set_volume(music_volume)
 
 func wipe_save() -> void:
     # Set trees directly to avoid intermediate saves if we want
