@@ -5,6 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="3_ground"]
 [ext_resource type="Texture2D" uid="uid://dkb7funvtxffr" path="res://assets/ui-button-long-width.png" id="4_texture_long"]
 
+[ext_resource type="PackedScene" uid="uid://c1h0k3u2hddoj" path="res://scenes/tree_display.tscn" id="5_tree_display"]
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long"]
 texture = ExtResource("4_texture_long")
 texture_margin_left = 10.0
@@ -41,6 +43,19 @@ scale = Vector2(0.665, 0.56)
 texture = ExtResource("3_ground")
 
 [node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_bottom = 60.0
+grow_horizontal = 0
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+
+[node name="TreeDisplay" parent="UI/MarginContainer" instance=ExtResource("5_tree_display")]
+layout_mode = 2
 
 [node name="CenterContainer" type="CenterContainer" parent="UI"]
 anchors_preset = 15

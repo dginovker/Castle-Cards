@@ -3,6 +3,7 @@ extends Node2D
 
 @onready var play_button: Button = %PlayButton
 @onready var upgrades_button: Button = %UpgradesButton
+@onready var trees_label: Label = %TreesLabel
 
 func _ready() -> void:
     play_button.pressed.connect(_on_play_pressed)
@@ -13,6 +14,12 @@ func _ready() -> void:
     upgrades_button.mouse_entered.connect(_on_button_mouse_entered.bind(upgrades_button))
     upgrades_button.mouse_exited.connect(_on_button_mouse_exited.bind(upgrades_button))
     
+    _update_trees_label()
+    GameState.trees_changed.connect(func(_val): _update_trees_label())
+
+func _update_trees_label() -> void:
+    trees_label.text = "Trees: %d" % GameState.trees
+
 func _on_button_mouse_entered(button: Button) -> void:
     var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
     tween.tween_property(button, "scale", Vector2(1.1, 1.1), 0.2)

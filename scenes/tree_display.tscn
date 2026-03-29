@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/tree_display.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cvisjs8xtdbbv" path="res://assets/tree.png" id="2_icon"]
+
+[node name="TreeDisplay" type="HBoxContainer"]
+offset_right = 100.0
+offset_bottom = 40.0
+theme_override_constants/separation = 8
+alignment = 2
+script = ExtResource("1_script")
+
+[node name="ValueLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 28
+text = "0"
+
+[node name="Icon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5

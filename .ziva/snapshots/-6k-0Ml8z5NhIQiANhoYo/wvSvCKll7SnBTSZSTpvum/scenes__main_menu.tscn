@@ -1,11 +1,9 @@
 [gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://scripts/level_select.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://be5uupf7i47v7" path="res://scripts/main_menu.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="3_ground"]
 [ext_resource type="Texture2D" uid="uid://dkb7funvtxffr" path="res://assets/ui-button-long-width.png" id="4_texture_long"]
-
-[ext_resource type="PackedScene" path="res://scenes/tree_display.tscn" id="5_tree_display"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long"]
 texture = ExtResource("4_texture_long")
@@ -30,7 +28,7 @@ texture_margin_right = 10.0
 texture_margin_bottom = 10.0
 modulate_color = Color(0.8, 0.8, 0.8, 1)
 
-[node name="LevelSelect" type="Node2D"]
+[node name="MainMenu" type="Node2D"]
 script = ExtResource("1_script")
 
 [node name="Background" type="Sprite2D" parent="."]
@@ -44,19 +42,6 @@ texture = ExtResource("3_ground")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="MarginContainer" type="MarginContainer" parent="UI"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -150.0
-offset_bottom = 60.0
-grow_horizontal = 0
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-
-[node name="TreeDisplay" parent="UI/MarginContainer" instance=ExtResource("5_tree_display")]
-layout_mode = 2
-
 [node name="CenterContainer" type="CenterContainer" parent="UI"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -66,34 +51,39 @@ grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/CenterContainer"]
 layout_mode = 2
-theme_override_constants/separation = 40
-alignment = 1
+theme_override_constants/separation = 20
 
-[node name="Title" type="Label" parent="UI/CenterContainer/VBoxContainer"]
+[node name="TreesLabel" type="Label" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 48
-text = "Level Select"
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "Trees: 0"
 horizontal_alignment = 1
 
-[node name="GridContainer" type="GridContainer" parent="UI/CenterContainer/VBoxContainer"]
+[node name="PlayButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(384, 80)
 layout_mode = 2
-theme_override_constants/h_separation = 40
-theme_override_constants/v_separation = 40
-columns = 4
-
-[node name="BackButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 60)
-layout_mode = 2
-size_flags_horizontal = 4
-pivot_offset = Vector2(100, 30)
+pivot_offset = Vector2(192, 40)
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 theme_override_styles/normal = SubResource("StyleBoxTexture_long")
 theme_override_styles/hover = SubResource("StyleBoxTexture_long_hover")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_long_pressed")
-text = "Back to Menu"
+text = "Play"
+
+[node name="UpgradesButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(384, 80)
+layout_mode = 2
+pivot_offset = Vector2(192, 40)
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxTexture_long")
+theme_override_styles/hover = SubResource("StyleBoxTexture_long_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_long_pressed")
+text = "Upgrades"

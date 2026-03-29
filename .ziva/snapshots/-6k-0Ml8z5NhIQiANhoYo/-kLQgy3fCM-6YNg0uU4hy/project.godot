@@ -14,10 +14,6 @@ config/name="New Game Project"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 
-[autoload]
-
-GameState="*res://scripts/game_state.gd"
-
 [physics]
 
 3d/physics_engine="Jolt Physics"

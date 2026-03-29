@@ -8,7 +8,6 @@ func _ready() -> void:
     back_button.mouse_entered.connect(_on_button_mouse_entered.bind(back_button))
     back_button.mouse_exited.connect(_on_button_mouse_exited.bind(back_button))
     
-            
     # Only show Level 1 for now (per user request: "don't make 2 through 12 appear")
     # But set up for a 2x4 grid (8 buttons total)
     for i in range(1, 9):

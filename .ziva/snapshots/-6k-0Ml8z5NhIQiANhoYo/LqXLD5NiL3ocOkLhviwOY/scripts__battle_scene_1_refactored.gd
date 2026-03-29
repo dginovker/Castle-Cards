@@ -344,20 +344,21 @@ func _refresh_wood_ui() -> void:
 
 
 func _refresh_spawn_buttons_affordability() -> void:
+    var gs = get_node("/root/GameState")
     if summon_woodcutter_button != null:
-        summon_woodcutter_button.get_parent().visible = GameState.is_unit_unlocked("woodcutter")
+        summon_woodcutter_button.get_parent().visible = gs.is_unit_unlocked("woodcutter")
         _apply_afford_state(summon_woodcutter_button, _player_wood >= GameConstants.WOODCUTTER_COST_WOOD)
     if summon_button != null:
-        summon_button.get_parent().visible = GameState.is_unit_unlocked("swordsman")
+        summon_button.get_parent().visible = gs.is_unit_unlocked("swordsman")
         _apply_afford_state(summon_button, _player_wood >= GameConstants.SWORDSMAN_COST_WOOD)
     if summon_archer_button != null:
-        summon_archer_button.get_parent().visible = GameState.is_unit_unlocked("archer")
+        summon_archer_button.get_parent().visible = gs.is_unit_unlocked("archer")
         _apply_afford_state(summon_archer_button, _player_wood >= GameConstants.ARCHER_COST_WOOD)
     if summon_drummer_button != null:
-        summon_drummer_button.get_parent().visible = GameState.is_unit_unlocked("drummer")
+        summon_drummer_button.get_parent().visible = gs.is_unit_unlocked("drummer")
         _apply_afford_state(summon_drummer_button, _player_wood >= GameConstants.DRUMMER_COST_WOOD)
     if summon_cannon_button != null:
-        summon_cannon_button.get_parent().visible = GameState.is_unit_unlocked("cannon")
+        summon_cannon_button.get_parent().visible = gs.is_unit_unlocked("cannon")
         _apply_afford_state(summon_cannon_button, (not _player_has_purchased_cannon) and (_player_wood >= GameConstants.CANNON_COST_WOOD))
 
     if debug_spawn_enemy_woodcutter_button != null:

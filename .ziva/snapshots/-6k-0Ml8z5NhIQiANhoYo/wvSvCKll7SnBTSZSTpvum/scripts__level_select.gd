@@ -2,13 +2,16 @@ extends Node2D
 
 @onready var grid_container: GridContainer = %GridContainer
 @onready var back_button: Button = %BackButton
+@onready var trees_label: Label = %TreesLabel
 
 func _ready() -> void:
     back_button.pressed.connect(_on_back_pressed)
     back_button.mouse_entered.connect(_on_button_mouse_entered.bind(back_button))
     back_button.mouse_exited.connect(_on_button_mouse_exited.bind(back_button))
     
-            
+    _update_trees_label()
+    GameState.trees_changed.connect(func(_val): _update_trees_label())
+    
     # Only show Level 1 for now (per user request: "don't make 2 through 12 appear")
     # But set up for a 2x4 grid (8 buttons total)
     for i in range(1, 9):
@@ -83,3 +86,6 @@ func _on_level_1_pressed() -> void:
 
 func _on_back_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+func _update_trees_label() -> void:
+    trees_label.text = "Trees: %d" % GameState.trees
