@@ -5,8 +5,6 @@ const ARCHER_SCENE: PackedScene = preload("res://scenes/archer.tscn")
 const DRUMMER_SCENE: PackedScene = preload("res://scenes/drummer.tscn")
 const CANNON_SCENE: PackedScene = preload("res://scenes/cannon.tscn")
 const WOODCUTTER_SCENE: PackedScene = preload("res://scenes/woodcutter.tscn")
-const GAME_OVER_SCREEN_SCENE: PackedScene = preload("res://scenes/game_over_screen.tscn")
-
 
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
@@ -48,11 +46,9 @@ var _player_wood: int = GameConstants.STARTING_WOOD
 var _enemy_wood: int = GameConstants.STARTING_WOOD
 var _tree_spawn_timer: Timer
 var _wood_income_timer: Timer
-var _game_over_screen: GameOverScreen
 
 
 func _ready() -> void:
-
     randomize()
 
     summon_button.pressed.connect(_on_summon_swordsman_pressed)
@@ -93,11 +89,9 @@ func _ready() -> void:
 
     _setup_tree_spawning()
     _setup_wood_income()
-    _setup_game_over_screen()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
         _set_attack_range_debug_visible(not show_attack_range_debug)
 
@@ -161,35 +155,10 @@ func _on_enemy_castle_health_changed(current_health: float, max_health: float) -
 
 
 func _on_castle_destroyed(castle: Castle) -> void:
-    if _game_over_screen == null:
-        return
-    
-    get_tree().paused = true
-    if castle.team_id == GameConstants.TEAM_PLAYER:
-        _game_over_screen.show_lose()
-    else:
-        _game_over_screen.show_win()
-
-
-func _setup_game_over_screen() -> void:
-    _game_over_screen = GAME_OVER_SCREEN_SCENE.instantiate() as GameOverScreen
-    add_child(_game_over_screen)
-    _game_over_screen.retry_pressed.connect(_on_retry_pressed)
-    _game_over_screen.main_menu_pressed.connect(_on_main_menu_pressed)
-
-
-func _on_retry_pressed() -> void:
-    get_tree().paused = false
-    get_tree().reload_current_scene()
-
-
-func _on_main_menu_pressed() -> void:
-    # Not implemented yet as per request
-    print("Main Menu pressed - Not implemented yet")
+    print("Castle destroyed: ", castle.name)
 
 
 func _on_summon_swordsman_pressed() -> void:
-
     _spawn_unit_for_team_with_cost(SWORDSMAN_SCENE, GameConstants.TEAM_PLAYER, GameConstants.SWORDSMAN_COST_WOOD)
 
 
