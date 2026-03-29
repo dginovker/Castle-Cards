@@ -203,7 +203,7 @@ func set_leadership_bonus_from_source(kind: StringName, source: Object, bonus_am
             _recompute_leadership_bonus_cache()
         return
 
-    var previous: float = per_kind.get(source_key, -1.0)
+    var previous: float = float(per_kind.get(source_key, -1.0))
     if is_equal_approx(previous, normalized_bonus):
         return
 
@@ -247,8 +247,7 @@ func clear_all_leadership_bonuses() -> void:
 func get_total_leadership_bonus() -> float:
     var total: float = 0.0
     for value: Variant in _leadership_bonus_by_kind.values():
-        var numeric_value: float = value
-        total += maxf(0.0, numeric_value)
+        total += maxf(0.0, float(value))
     return total
 
 
@@ -311,8 +310,7 @@ func _recompute_leadership_bonus_cache() -> void:
         var per_kind: Dictionary = _leadership_sources_by_kind.get(kind, {})
         var strongest_for_kind: float = 0.0
         for source_bonus: Variant in per_kind.values():
-            var numeric_source_bonus: float = source_bonus
-            strongest_for_kind = maxf(strongest_for_kind, maxf(0.0, numeric_source_bonus))
+            strongest_for_kind = maxf(strongest_for_kind, maxf(0.0, float(source_bonus)))
 
         if strongest_for_kind > 0.0:
             recomputed[kind] = strongest_for_kind
@@ -402,32 +400,20 @@ func _is_valid_frontline_anchor(unit: Node) -> bool:
         return false
     if not unit.is_in_group(&"soldiers"):
         return false
-
-    if unit.get("team_id") != team_id:
-        return false
-
-    if not unit.has_method("is_dead") or unit.call("is_dead"):
+    if unit.get("team_id") != team_id or unit.call("is_dead"):
         return false
 
     if frontline_anchor_excluded_archetype_name != "" and str(unit.get("unit_archetype_name")) == frontline_anchor_excluded_archetype_name:
         return false
 
     # Only follow allies that are true frontline combatants.
-    # This prevents support units (e.g. drummer/woodcutter) from becoming anchors.
-    var anchor_attack_damage_variant: Variant = unit.get("attack_damage")
-    if anchor_attack_damage_variant == null:
-        return false
-    var anchor_attack_damage: float = anchor_attack_damage_variant
-    if anchor_attack_damage <= 0.0:
+    # This prevents support units (e.g. drummer with 0 attack) from becoming anchors.
+    if float(unit.get("attack_damage")) <= 0.0:
         return false
 
     # Frontline anchors must be mobile; stationary units/structures (e.g. cannon)
     # should never pull followers backward toward base.
-    var anchor_move_speed_variant: Variant = unit.get("move_speed")
-    if anchor_move_speed_variant == null:
-        return false
-    var anchor_move_speed: float = anchor_move_speed_variant
-    if anchor_move_speed <= 0.0:
+    if float(unit.get("move_speed")) <= 0.0:
         return false
 
     return true
@@ -950,7 +936,7 @@ func _assign_formation_y_offset() -> void:
         _formation_y_offset_pixels = 0.0
         return
 
-    var t: float = slot_index / (slot_count - 1.0)
+    var t: float = float(slot_index) / float(slot_count - 1)
     _formation_y_offset_pixels = lerpf(-formation_y_spread_pixels, formation_y_spread_pixels, t)
 
 
@@ -958,13 +944,13 @@ func _get_center_out_slot_index(slot_count: int, sequence_index: int) -> int:
     if slot_count <= 1:
         return 0
 
-    var center: int = int(floor(slot_count * 0.5))
+    var center: int = int(floor(float(slot_count) / 2.0))
     var cycle_index: int = sequence_index % slot_count
 
     if cycle_index == 0:
         return center
 
-    var step: int = int(ceil(cycle_index * 0.5))
+    var step: int = int(ceil(float(cycle_index) / 2.0))
     if cycle_index % 2 == 1:
         return min(slot_count - 1, center + step)
 

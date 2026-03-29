@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/woodcutter.gd" id="1_wood_script"]
+[ext_resource type="Texture2D" path="res://assets/units/woodcutter/walk-empty.png" id="2_walk_empty_0"]
+[ext_resource type="Texture2D" path="res://assets/units/woodcutter/walk-empty-2.png" id="3_walk_empty_1"]
+[ext_resource type="Texture2D" path="res://assets/units/woodcutter/walk-log-1.png" id="4_walk_log_0"]
+[ext_resource type="Texture2D" path="res://assets/units/woodcutter/walk-log-2.png" id="5_walk_log_1"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_woodcutter"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_walk_empty_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_walk_empty_1")
+}],
+"loop": true,
+"name": &"walk_empty",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_walk_log_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_walk_log_1")
+}],
+"loop": true,
+"name": &"walk_log",
+"speed": 5.0
+}]
+
+[node name="Woodcutter" type="AnimatedSprite2D"]
+script = ExtResource("1_wood_script")
+sprite_frames = SubResource("SpriteFrames_woodcutter")
+animation = &"walk_empty"

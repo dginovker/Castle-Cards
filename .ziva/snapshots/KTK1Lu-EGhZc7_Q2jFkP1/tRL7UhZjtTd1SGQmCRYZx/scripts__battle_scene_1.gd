@@ -5,7 +5,6 @@ const SWORDSMAN_SCENE: PackedScene = preload("res://scenes/swordsman.tscn")
 const ARCHER_SCENE: PackedScene = preload("res://scenes/archer.tscn")
 const DRUMMER_SCENE: PackedScene = preload("res://scenes/drummer.tscn")
 const CANNON_SCENE: PackedScene = preload("res://scenes/cannon.tscn")
-const WOODCUTTER_SCENE: PackedScene = preload("res://scenes/woodcutter.tscn")
 
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
@@ -25,7 +24,6 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var summon_archer_button: Button = get_node_or_null("UI/SummonArcherButton") as Button
 @onready var summon_drummer_button: Button = get_node_or_null("UI/SummonDrummerButton") as Button
 @onready var summon_cannon_button: Button = get_node_or_null("UI/SummonCannonButton") as Button
-@onready var summon_woodcutter_button: Button = get_node_or_null("UI/SummonWoodcutterButton") as Button
 @onready var battle_lane_path: Path2D = $BattleLanePath
 @onready var trees_container: Node2D = get_node_or_null("Trees") as Node2D
 @onready var player_cannon_mount: Node2D = get_node_or_null("PlayerCannonMount") as Node2D
@@ -37,7 +35,6 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var debug_spawn_enemy_archer_button: Button = get_node_or_null("UI/DebugSpawnEnemyArcherButton") as Button
 @onready var debug_spawn_enemy_drummer_button: Button = get_node_or_null("UI/DebugSpawnEnemyDrummerButton") as Button
 @onready var debug_spawn_enemy_cannon_button: Button = get_node_or_null("UI/DebugSpawnEnemyCannonButton") as Button
-@onready var debug_spawn_enemy_woodcutter_button: Button = get_node_or_null("UI/DebugSpawnEnemyWoodcutterButton") as Button
 
 var _player_has_purchased_cannon: bool = false
 var _enemy_has_purchased_cannon: bool = false
@@ -57,9 +54,6 @@ func _ready() -> void:
     if summon_cannon_button != null:
         summon_cannon_button.pressed.connect(_on_summon_cannon_pressed)
 
-    if summon_woodcutter_button != null:
-        summon_woodcutter_button.pressed.connect(_on_summon_woodcutter_pressed)
-
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
 
@@ -71,9 +65,6 @@ func _ready() -> void:
 
     if debug_spawn_enemy_cannon_button != null:
         debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed)
-
-    if debug_spawn_enemy_woodcutter_button != null:
-        debug_spawn_enemy_woodcutter_button.pressed.connect(_on_debug_spawn_enemy_woodcutter_pressed)
 
     _setup_castles()
 
@@ -205,14 +196,6 @@ func _on_debug_spawn_enemy_cannon_pressed() -> void:
     _spawn_cannon_for_team(GameConstants.TEAM_ENEMY)
 
 
-func _on_summon_woodcutter_pressed() -> void:
-    _spawn_woodcutter_for_team(GameConstants.TEAM_PLAYER)
-
-
-func _on_debug_spawn_enemy_woodcutter_pressed() -> void:
-    _spawn_woodcutter_for_team(GameConstants.TEAM_ENEMY)
-
-
 func _spawn_swordsman_for_team(team: int) -> void:
     _spawn_unit_for_team(SWORDSMAN_SCENE, team)
 
@@ -223,10 +206,6 @@ func _spawn_archer_for_team(team: int) -> void:
 
 func _spawn_drummer_for_team(team: int) -> void:
     _spawn_unit_for_team(DRUMMER_SCENE, team)
-
-
-func _spawn_woodcutter_for_team(team: int) -> void:
-    _spawn_unit_for_team(WOODCUTTER_SCENE, team)
 
 
 func _spawn_cannon_for_team(team: int) -> void:
@@ -299,9 +278,6 @@ func _apply_debug_toggle_dependent_ui() -> void:
 
     if debug_spawn_enemy_cannon_button != null:
         debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
-
-    if debug_spawn_enemy_woodcutter_button != null:
-        debug_spawn_enemy_woodcutter_button.visible = show_attack_range_debug
 
 
 func _find_debug_toggle() -> CheckButton:
@@ -426,9 +402,6 @@ func _spawn_growing_tree() -> void:
     tree_sprite.centered = true
     tree_sprite.global_position = spawn_position
     tree_sprite.z_index = 0
-    tree_sprite.add_to_group(&"trees")
-    tree_sprite.set_meta("is_fully_grown", false)
-    tree_sprite.set_meta("lane_offset", offset)
 
     var texture_height: float = maxf(1.0, TREE_TEXTURE.get_height())
     var uniform_scale: float = tree_target_height_pixels / texture_height
@@ -442,11 +415,3 @@ func _spawn_growing_tree() -> void:
     grow_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
     grow_tween.tween_property(tree_sprite, "scale", final_scale, tree_growth_duration_seconds)
     grow_tween.parallel().tween_property(tree_sprite, "modulate:a", 1.0, tree_growth_duration_seconds)
-    grow_tween.finished.connect(_on_tree_growth_finished.bind(tree_sprite))
-
-
-func _on_tree_growth_finished(tree_sprite: Sprite2D) -> void:
-    if tree_sprite == null or not is_instance_valid(tree_sprite):
-        return
-
-    tree_sprite.set_meta("is_fully_grown", true)

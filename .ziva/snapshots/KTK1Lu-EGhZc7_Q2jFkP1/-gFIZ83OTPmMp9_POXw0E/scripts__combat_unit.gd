@@ -402,31 +402,21 @@ func _is_valid_frontline_anchor(unit: Node) -> bool:
         return false
     if not unit.is_in_group(&"soldiers"):
         return false
-
-    if unit.get("team_id") != team_id:
-        return false
-
-    if not unit.has_method("is_dead") or unit.call("is_dead"):
+    if unit.get("team_id") != team_id or unit.call("is_dead"):
         return false
 
     if frontline_anchor_excluded_archetype_name != "" and str(unit.get("unit_archetype_name")) == frontline_anchor_excluded_archetype_name:
         return false
 
     # Only follow allies that are true frontline combatants.
-    # This prevents support units (e.g. drummer/woodcutter) from becoming anchors.
-    var anchor_attack_damage_variant: Variant = unit.get("attack_damage")
-    if anchor_attack_damage_variant == null:
-        return false
-    var anchor_attack_damage: float = anchor_attack_damage_variant
+    # This prevents support units (e.g. drummer with 0 attack) from becoming anchors.
+    var anchor_attack_damage = unit.get("attack_damage")
     if anchor_attack_damage <= 0.0:
         return false
 
     # Frontline anchors must be mobile; stationary units/structures (e.g. cannon)
     # should never pull followers backward toward base.
-    var anchor_move_speed_variant: Variant = unit.get("move_speed")
-    if anchor_move_speed_variant == null:
-        return false
-    var anchor_move_speed: float = anchor_move_speed_variant
+    var anchor_move_speed = unit.get("move_speed")
     if anchor_move_speed <= 0.0:
         return false
 

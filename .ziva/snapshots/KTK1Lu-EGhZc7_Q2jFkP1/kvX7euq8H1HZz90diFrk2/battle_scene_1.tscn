@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://fdfppgfw6op5" path="res://scripts/castle.gd" id="6_castle_script"]
 [ext_resource type="Texture2D" uid="uid://b1h0k3u2hddoj" path="res://assets/units/drummer/drumming.png" id="9_drummer_icon"]
 [ext_resource type="Texture2D" uid="uid://b2htfvsls74go" path="res://assets/units/cannon/cannon-idle.png" id="10_cannon_icon"]
-[ext_resource type="Texture2D" uid="uid://b21capj6f1mq8" path="res://assets/units/woodcutter/walk-empty.png" id="11_woodcutter_icon"]
+[ext_resource type="Texture2D" path="res://assets/units/woodcutter/walk-empty.png" id="11_woodcutter_icon"]
 
 [sub_resource type="Curve2D" id="Curve2D_xmomn"]
 _data = {
@@ -117,9 +117,9 @@ show_percentage = false
 
 [node name="SummonSwordsmanButton" type="Button" parent="UI" unique_id=955954823]
 custom_minimum_size = Vector2(76, 76)
-offset_left = 100.0
+offset_left = 16.0
 offset_top = 16.0
-offset_right = 176.0
+offset_right = 92.0
 offset_bottom = 92.0
 tooltip_text = "Summon Swordsman"
 theme_override_constants/icon_max_width = 48
@@ -128,9 +128,9 @@ icon_alignment = 1
 
 [node name="SummonArcherButton" type="Button" parent="UI" unique_id=1142501078]
 custom_minimum_size = Vector2(76, 76)
-offset_left = 184.0
+offset_left = 100.0
 offset_top = 16.0
-offset_right = 260.0
+offset_right = 176.0
 offset_bottom = 92.0
 tooltip_text = "Summon Archer"
 theme_override_constants/icon_max_width = 48
@@ -139,9 +139,9 @@ icon_alignment = 1
 
 [node name="SummonDrummerButton" type="Button" parent="UI" unique_id=1824377261]
 custom_minimum_size = Vector2(76, 76)
-offset_left = 268.0
+offset_left = 184.0
 offset_top = 16.0
-offset_right = 344.0
+offset_right = 260.0
 offset_bottom = 92.0
 tooltip_text = "Summon Drummer"
 theme_override_constants/icon_max_width = 48
@@ -150,9 +150,9 @@ icon_alignment = 1
 
 [node name="SummonCannonButton" type="Button" parent="UI" unique_id=790197132]
 custom_minimum_size = Vector2(76, 76)
-offset_left = 352.0
+offset_left = 268.0
 offset_top = 16.0
-offset_right = 428.0
+offset_right = 344.0
 offset_bottom = 92.0
 tooltip_text = "Summon Cannon (Max 1)"
 theme_override_constants/icon_max_width = 48
@@ -161,9 +161,9 @@ icon_alignment = 1
 
 [node name="SummonWoodcutterButton" type="Button" parent="UI" unique_id=1655701122]
 custom_minimum_size = Vector2(76, 76)
-offset_left = 16.0
+offset_left = 352.0
 offset_top = 16.0
-offset_right = 92.0
+offset_right = 428.0
 offset_bottom = 92.0
 tooltip_text = "Summon Woodcutter"
 theme_override_constants/icon_max_width = 48
