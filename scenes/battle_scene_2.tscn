@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://dl42m0goxv7ma"]
+[gd_scene load_steps=15 format=3 uid="uid://dn70eyagf7hnf"]
 
 [ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="1_5cvnn"]
 [ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="2_u576h"]
-[ext_resource type="Script" uid="uid://bfhop4p3vhdxl" path="res://scripts/battle_scene_1.gd" id="3_script"]
+[ext_resource type="Script" uid="uid://dn70eyagf7hnf" path="res://scripts/battle_scene_2.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="5_swordsman_icon"]
 [ext_resource type="Texture2D" uid="uid://bko6255540trt" path="res://assets/units/archer/archer-walking-0.png" id="6_archer_icon"]
@@ -53,45 +53,45 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[node name="Node2D" type="Node2D" unique_id=524830098]
+[node name="Node2D" type="Node2D"]
 script = ExtResource("3_script")
 
-[node name="Background" type="Sprite2D" parent="." unique_id=1059486313]
+[node name="Background" type="Sprite2D" parent="."]
 position = Vector2(576, 185.00006)
 texture = ExtResource("1_5cvnn")
 
-[node name="Groud" type="Sprite2D" parent="." unique_id=1043487902]
+[node name="Groud" type="Sprite2D" parent="."]
 position = Vector2(576, 490)
 scale = Vector2(0.665, 0.56)
 texture = ExtResource("2_u576h")
 
-[node name="EnemyCastle" type="Sprite2D" parent="." unique_id=47905881]
+[node name="EnemyCastle" type="Sprite2D" parent="."]
 position = Vector2(1052, 330)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_xmomn")
 flip_h = true
 script = ExtResource("6_castle_script")
 
-[node name="PlayerCastle" type="Sprite2D" parent="." unique_id=1632866983]
+[node name="PlayerCastle" type="Sprite2D" parent="."]
 position = Vector2(100, 330)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("4_xmomn")
 script = ExtResource("6_castle_script")
 
-[node name="PlayerCannonMount" type="Marker2D" parent="." unique_id=54462900]
+[node name="PlayerCannonMount" type="Marker2D" parent="."]
 position = Vector2(123, 302)
 
-[node name="EnemyCannonMount" type="Marker2D" parent="." unique_id=1681182019]
+[node name="EnemyCannonMount" type="Marker2D" parent="."]
 position = Vector2(1029, 302)
 
-[node name="BattleLanePath" type="Path2D" parent="." unique_id=1209325944]
+[node name="BattleLanePath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_xmomn")
 
-[node name="Trees" type="Node2D" parent="." unique_id=1736941142]
+[node name="Trees" type="Node2D" parent="."]
 
-[node name="UI" type="CanvasLayer" parent="." unique_id=1162858540]
+[node name="UI" type="CanvasLayer" parent="."]
 
-[node name="PlayerCastleHPBar" type="ProgressBar" parent="UI" unique_id=1258044814]
+[node name="PlayerCastleHPBar" type="ProgressBar" parent="UI"]
 offset_left = 12.0
 offset_top = 152.0
 offset_right = 172.0
@@ -103,7 +103,7 @@ step = 1.0
 value = 20.0
 show_percentage = false
 
-[node name="EnemyCastleHPBar" type="ProgressBar" parent="UI" unique_id=1078524951]
+[node name="EnemyCastleHPBar" type="ProgressBar" parent="UI"]
 offset_left = 980.0
 offset_top = 152.0
 offset_right = 1140.0
@@ -115,59 +115,59 @@ step = 1.0
 value = 20.0
 show_percentage = false
 
-[node name="PlayerWoodDisplay" type="HBoxContainer" parent="UI" unique_id=1885262071]
+[node name="PlayerWoodDisplay" type="HBoxContainer" parent="UI"]
 offset_left = 178.0
 offset_top = 151.0
 offset_right = 248.0
 offset_bottom = 175.0
 theme_override_constants/separation = 4
 
-[node name="PlayerWoodValue" type="Label" parent="UI/PlayerWoodDisplay" unique_id=1447608475]
+[node name="PlayerWoodValue" type="Label" parent="UI/PlayerWoodDisplay"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 18
 text = "5"
 
-[node name="PlayerWoodIcon" type="TextureRect" parent="UI/PlayerWoodDisplay" unique_id=599367814]
+[node name="PlayerWoodIcon" type="TextureRect" parent="UI/PlayerWoodDisplay"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 texture = ExtResource("12_tree_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EnemyWoodDisplay" type="HBoxContainer" parent="UI" unique_id=184444157]
+[node name="EnemyWoodDisplay" type="HBoxContainer" parent="UI"]
 offset_left = 903.0
 offset_top = 151.0
 offset_right = 973.0
 offset_bottom = 175.0
 theme_override_constants/separation = 4
 
-[node name="EnemyWoodIcon" type="TextureRect" parent="UI/EnemyWoodDisplay" unique_id=2109363437]
+[node name="EnemyWoodIcon" type="TextureRect" parent="UI/EnemyWoodDisplay"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 texture = ExtResource("12_tree_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EnemyWoodValue" type="Label" parent="UI/EnemyWoodDisplay" unique_id=1228121702]
+[node name="EnemyWoodValue" type="Label" parent="UI/EnemyWoodDisplay"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 18
 text = "5"
 
-[node name="PlayerSummonButtons" type="HBoxContainer" parent="UI" unique_id=1548569160]
+[node name="PlayerSummonButtons" type="HBoxContainer" parent="UI"]
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 448.0
 offset_bottom = 120.0
 theme_override_constants/separation = 8
 
-[node name="WoodcutterGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=2077064144]
+[node name="WoodcutterGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons"]
 layout_mode = 2
 
-[node name="SummonWoodcutterButton" type="Button" parent="UI/PlayerSummonButtons/WoodcutterGroup" unique_id=842529962]
+[node name="SummonWoodcutterButton" type="Button" parent="UI/PlayerSummonButtons/WoodcutterGroup"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
@@ -177,17 +177,17 @@ icon = ExtResource("11_woodcutter_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="SummonWoodcutterCost" type="Label" parent="UI/PlayerSummonButtons/WoodcutterGroup" unique_id=1553336208]
+[node name="SummonWoodcutterCost" type="Label" parent="UI/PlayerSummonButtons/WoodcutterGroup"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "5"
 horizontal_alignment = 1
 
-[node name="SwordsmanGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=825486676]
+[node name="SwordsmanGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons"]
 layout_mode = 2
 
-[node name="SummonSwordsmanButton" type="Button" parent="UI/PlayerSummonButtons/SwordsmanGroup" unique_id=29533734]
+[node name="SummonSwordsmanButton" type="Button" parent="UI/PlayerSummonButtons/SwordsmanGroup"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
@@ -197,17 +197,17 @@ icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="SummonSwordsmanCost" type="Label" parent="UI/PlayerSummonButtons/SwordsmanGroup" unique_id=2094359511]
+[node name="SummonSwordsmanCost" type="Label" parent="UI/PlayerSummonButtons/SwordsmanGroup"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "10"
 horizontal_alignment = 1
 
-[node name="ArcherGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=1618910947]
+[node name="ArcherGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons"]
 layout_mode = 2
 
-[node name="SummonArcherButton" type="Button" parent="UI/PlayerSummonButtons/ArcherGroup" unique_id=713017891]
+[node name="SummonArcherButton" type="Button" parent="UI/PlayerSummonButtons/ArcherGroup"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
@@ -217,17 +217,17 @@ icon = ExtResource("6_archer_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="SummonArcherCost" type="Label" parent="UI/PlayerSummonButtons/ArcherGroup" unique_id=324041216]
+[node name="SummonArcherCost" type="Label" parent="UI/PlayerSummonButtons/ArcherGroup"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "15"
 horizontal_alignment = 1
 
-[node name="DrummerGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=1105213146]
+[node name="DrummerGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons"]
 layout_mode = 2
 
-[node name="SummonDrummerButton" type="Button" parent="UI/PlayerSummonButtons/DrummerGroup" unique_id=1926403843]
+[node name="SummonDrummerButton" type="Button" parent="UI/PlayerSummonButtons/DrummerGroup"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
@@ -237,17 +237,17 @@ icon = ExtResource("9_drummer_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="SummonDrummerCost" type="Label" parent="UI/PlayerSummonButtons/DrummerGroup" unique_id=908436080]
+[node name="SummonDrummerCost" type="Label" parent="UI/PlayerSummonButtons/DrummerGroup"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "20"
 horizontal_alignment = 1
 
-[node name="CannonGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=785488926]
+[node name="CannonGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons"]
 layout_mode = 2
 
-[node name="SummonCannonButton" type="Button" parent="UI/PlayerSummonButtons/CannonGroup" unique_id=1895716245]
+[node name="SummonCannonButton" type="Button" parent="UI/PlayerSummonButtons/CannonGroup"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
@@ -257,14 +257,14 @@ icon = ExtResource("10_cannon_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="SummonCannonCost" type="Label" parent="UI/PlayerSummonButtons/CannonGroup" unique_id=1666392026]
+[node name="SummonCannonCost" type="Label" parent="UI/PlayerSummonButtons/CannonGroup"]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "40"
 horizontal_alignment = 1
 
-[node name="EnemyDebugButtons" type="HBoxContainer" parent="UI" unique_id=1413583478]
+[node name="EnemyDebugButtons" type="HBoxContainer" parent="UI"]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -276,7 +276,7 @@ grow_horizontal = 0
 theme_override_constants/separation = 8
 alignment = 2
 
-[node name="DebugSpawnEnemyWoodcutterButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=1867742133]
+[node name="DebugSpawnEnemyWoodcutterButton" type="Button" parent="UI/EnemyDebugButtons"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(80, 80)
@@ -287,7 +287,7 @@ icon = ExtResource("11_woodcutter_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=1572875081]
+[node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI/EnemyDebugButtons"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(80, 80)
@@ -298,7 +298,7 @@ icon = ExtResource("5_swordsman_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="DebugSpawnEnemyArcherButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=1665021598]
+[node name="DebugSpawnEnemyArcherButton" type="Button" parent="UI/EnemyDebugButtons"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(80, 80)
@@ -309,7 +309,7 @@ icon = ExtResource("6_archer_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="DebugSpawnEnemyDrummerButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=545974489]
+[node name="DebugSpawnEnemyDrummerButton" type="Button" parent="UI/EnemyDebugButtons"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(80, 80)
@@ -320,7 +320,7 @@ icon = ExtResource("9_drummer_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="DebugSpawnEnemyCannonButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=1367906450]
+[node name="DebugSpawnEnemyCannonButton" type="Button" parent="UI/EnemyDebugButtons"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(80, 80)
@@ -331,7 +331,7 @@ icon = ExtResource("10_cannon_icon")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Debug" type="CheckButton" parent="UI" unique_id=859335075]
+[node name="Debug" type="CheckButton" parent="UI"]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0

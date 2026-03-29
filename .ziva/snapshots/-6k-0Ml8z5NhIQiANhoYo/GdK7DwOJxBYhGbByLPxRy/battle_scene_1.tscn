@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="1_5cvnn"]
 [ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="2_u576h"]
-[ext_resource type="Script" uid="uid://bfhop4p3vhdxl" path="res://scripts/battle_scene_1.gd" id="3_script"]
+[ext_resource type="Script" uid="uid://tui8x57hm2yg" path="res://scripts/battle_scene_1_refactored.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
 [ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="5_swordsman_icon"]
 [ext_resource type="Texture2D" uid="uid://bko6255540trt" path="res://assets/units/archer/archer-walking-0.png" id="6_archer_icon"]
@@ -55,6 +55,7 @@ corner_radius_bottom_left = 6
 
 [node name="Node2D" type="Node2D" unique_id=524830098]
 script = ExtResource("3_script")
+tree_spawn_interval_seconds = 8.1
 
 [node name="Background" type="Sprite2D" parent="." unique_id=1059486313]
 position = Vector2(576, 185.00006)
