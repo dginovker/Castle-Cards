@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://b3pw2k12ibph3" path="res://scripts/game_over_screen.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dkb7funvtxffr" path="res://assets/ui-button-long-width.png" id="2_texture_long"]
 [ext_resource type="Texture2D" uid="uid://ub7v7cbr5gyc" path="res://assets/ui-button-medium-width.png" id="3_texture_medium"]
-[ext_resource type="Texture2D" uid="uid://cvisjs8xtdbbv" path="res://assets/tree.png" id="4_texture_tree"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long"]
 texture = ExtResource("2_texture_long")
@@ -51,22 +50,6 @@ texture_margin_right = 10.0
 texture_margin_bottom = 10.0
 modulate_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
-bg_color = Color(0, 0, 0, 0.6)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.843137, 0, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-expand_margin_left = 20.0
-expand_margin_top = 10.0
-expand_margin_right = 20.0
-expand_margin_bottom = 10.0
-
 [node name="GameOverScreen" type="CanvasLayer"]
 process_mode = 3
 layer = 10
@@ -98,32 +81,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "You Win!"
 horizontal_alignment = 1
-
-[node name="RewardBadge" type="PanelContainer" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="RewardContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/RewardBadge"]
-layout_mode = 2
-theme_override_constants/separation = 10
-alignment = 1
-
-[node name="RewardLabel" type="Label" parent="CenterContainer/VBoxContainer/RewardBadge/RewardContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 48
-text = "+2"
-
-[node name="RewardIcon" type="TextureRect" parent="CenterContainer/VBoxContainer/RewardBadge/RewardContainer"]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-texture = ExtResource("4_texture_tree")
-expand_mode = 1
-stretch_mode = 5
 
 [node name="ButtonsContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2

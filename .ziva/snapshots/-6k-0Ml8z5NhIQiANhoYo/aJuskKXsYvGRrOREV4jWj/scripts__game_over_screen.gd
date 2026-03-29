@@ -7,8 +7,6 @@ signal main_menu_pressed
 @onready var title_label: Label = %TitleLabel
 @onready var reward_badge: PanelContainer = %RewardBadge
 @onready var reward_label: Label = %RewardLabel
-@onready var retry_button: Button = %RetryButton
-@onready var main_menu_button: Button = %MainMenuButton
 
 func _ready() -> void:
     retry_button.pressed.connect(_on_retry_pressed)

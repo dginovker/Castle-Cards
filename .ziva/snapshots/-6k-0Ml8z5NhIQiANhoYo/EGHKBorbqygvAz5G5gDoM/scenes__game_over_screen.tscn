@@ -51,22 +51,6 @@ texture_margin_right = 10.0
 texture_margin_bottom = 10.0
 modulate_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
-bg_color = Color(0, 0, 0, 0.6)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.843137, 0, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-expand_margin_left = 20.0
-expand_margin_top = 10.0
-expand_margin_right = 20.0
-expand_margin_bottom = 10.0
-
 [node name="GameOverScreen" type="CanvasLayer"]
 process_mode = 3
 layer = 10
@@ -99,26 +83,19 @@ theme_override_font_sizes/font_size = 64
 text = "You Win!"
 horizontal_alignment = 1
 
-[node name="RewardBadge" type="PanelContainer" parent="CenterContainer/VBoxContainer"]
+[node name="RewardContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="RewardContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/RewardBadge"]
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="RewardLabel" type="Label" parent="CenterContainer/VBoxContainer/RewardBadge/RewardContainer"]
+[node name="RewardLabel" type="Label" parent="CenterContainer/VBoxContainer/RewardContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 48
 text = "+2"
 
-[node name="RewardIcon" type="TextureRect" parent="CenterContainer/VBoxContainer/RewardBadge/RewardContainer"]
+[node name="RewardIcon" type="TextureRect" parent="CenterContainer/VBoxContainer/RewardContainer"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 texture = ExtResource("4_texture_tree")

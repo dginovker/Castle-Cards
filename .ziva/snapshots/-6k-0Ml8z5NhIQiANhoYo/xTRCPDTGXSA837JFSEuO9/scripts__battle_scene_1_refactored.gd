@@ -191,14 +191,7 @@ func _on_castle_destroyed(castle: Castle) -> void:
     if castle.team_id == GameConstants.TEAM_PLAYER:
         _game_over_screen.show_lose()
     else:
-        var reward: int = 2
-        if GameState.is_level_beaten("level_1"):
-            reward = 1
-        elif player_castle.current_health >= player_castle.max_health:
-            reward = 3
-        
-        GameState.complete_level("level_1", reward)
-        _game_over_screen.show_win(reward)
+        _game_over_screen.show_win()
 
 
 func _setup_game_over_screen() -> void:
