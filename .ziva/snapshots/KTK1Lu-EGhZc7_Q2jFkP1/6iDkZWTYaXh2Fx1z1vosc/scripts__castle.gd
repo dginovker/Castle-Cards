@@ -6,7 +6,6 @@ signal destroyed(castle: Castle)
 
 @export var team_id: int = GameConstants.TEAM_PLAYER
 @export_range(1.0, 10000.0, 1.0) var max_health: float = 20.0
-@export var destroyed_texture: Texture2D = preload("res://assets/player-castle-dead.png")
 
 @export var debug_hurtbox_fill_color: Color = Color(0.2, 0.8, 1.0, 0.14)
 @export var debug_hurtbox_outline_color: Color = Color(0.2, 0.8, 1.0, 0.9)
@@ -17,7 +16,6 @@ var current_health: float = 0.0
 var _hurtbox_area: Area2D
 var _hurtbox_shape_node: CollisionShape2D
 var _debug_hurtbox_visible: bool = false
-var _destroyed_visual_applied: bool = false
 
 
 func _ready() -> void:
@@ -36,7 +34,6 @@ func take_damage(amount: float) -> void:
     health_changed.emit(current_health, max_health)
 
     if is_zero_approx(current_health):
-        _apply_destroyed_visual()
         destroyed.emit(self)
 
 
@@ -67,17 +64,6 @@ func _draw() -> void:
     var hurtbox_rect: Rect2 = Rect2(_hurtbox_shape_node.position - (rect_shape.size * 0.5), rect_shape.size)
     draw_rect(hurtbox_rect, debug_hurtbox_fill_color, true)
     draw_rect(hurtbox_rect, debug_hurtbox_outline_color, false, debug_hurtbox_outline_width)
-
-
-func _apply_destroyed_visual() -> void:
-    if _destroyed_visual_applied:
-        return
-
-    _destroyed_visual_applied = true
-
-    if destroyed_texture != null:
-        texture = destroyed_texture
-        _refresh_hurtbox_shape()
 
 
 func _ensure_hurtbox() -> void:
