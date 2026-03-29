@@ -16,8 +16,8 @@ enum CombatState {
 @export var target_render_height: float = 48.0
 
 @export_range(0.0, 30.0, 1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
-@export_range(0.0, 10.0, 1) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
-@export_range(1.0, 30.0, 1) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
+@export_range(0.0, 10.0, 0.1) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
+@export_range(0.0, 30.0, 0.1) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
 @export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
 @export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
@@ -323,25 +323,17 @@ func _get_attack_destination_offset() -> float:
         return _get_enemy_side_offset()
 
     var result: Dictionary = _find_frontline_anchor_offset()
-    if result.get("found", false):
-        var frontline_offset: float = result.get("offset", _get_enemy_side_offset())
-        var desired_offset: float = (
-            frontline_offset - frontline_follow_distance_pixels
-            if team_id == GameConstants.TEAM_PLAYER
-            else frontline_offset + frontline_follow_distance_pixels
-        )
-        return _clamp_to_lane_bounds(desired_offset)
+    if not result.get("found", false):
+        return _get_enemy_side_offset()
 
-    if _should_return_to_base_when_no_frontline_anchor():
-        return _get_defend_destination_offset()
+    var frontline_offset: float = result.get("offset", _get_enemy_side_offset())
+    var desired_offset: float = (
+        frontline_offset - frontline_follow_distance_pixels
+        if team_id == GameConstants.TEAM_PLAYER
+        else frontline_offset + frontline_follow_distance_pixels
+    )
 
-    return _get_enemy_side_offset()
-
-
-func _should_return_to_base_when_no_frontline_anchor() -> bool:
-    # Support/follower units (e.g. drummer) should not advance alone.
-    # If there is no frontline ally to follow, they fall back toward own base.
-    return attack_uses_frontline_anchor and attack_damage <= 0.0
+    return _clamp_to_lane_bounds(desired_offset)
 
 
 func _get_defend_destination_offset() -> float:

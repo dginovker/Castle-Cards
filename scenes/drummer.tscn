@@ -49,4 +49,4 @@ defend_retreat_distance_pixels = 96.0
 provides_leadership = true
 leadership_kind = &"drummer"
 leadership_bonus_amount = 0.5
-leadership_range = 30.0
+leadership_range = 15.0

@@ -5,7 +5,7 @@ const TEAM_PLAYER: int = 0
 const TEAM_ENEMY: int = 1
 
 # Shared conversion factor for gameplay range units to world pixels.
-const ATTACK_RANGE_UNIT_PIXELS: float = 2.0
+const ATTACK_RANGE_UNIT_PIXELS: float = 8.0
 
 # Soldier baseline stats from the game plan.
 const SOLDIER_ATTACK_RANGE: float = 2.0
