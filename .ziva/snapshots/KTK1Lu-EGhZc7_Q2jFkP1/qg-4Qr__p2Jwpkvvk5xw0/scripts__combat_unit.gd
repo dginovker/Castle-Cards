@@ -15,9 +15,9 @@ enum CombatState {
 @export var move_speed: float = 70.0
 @export var target_render_height: float = 48.0
 
-@export_range(0.0, 30.0, 1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
-@export_range(0.0, 10.0, 0.1) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
-@export_range(0.0, 30.0, 0.1) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
+@export_range(1.0, 30.0, 1) var attack_range: float = GameConstants.SOLDIER_ATTACK_RANGE
+@export_range(1.0, 10.0, 1.0) var attack_damage: float = GameConstants.SOLDIER_ATTACK_DAMAGE
+@export_range(1.0, 30.0, 1.0) var max_health: float = GameConstants.SOLDIER_MAX_HEALTH
 @export_range(0.1, 10.0, 0.05) var attack_interval_seconds: float = 0.55
 @export_enum("Attack", "Defend") var active_mode: int = GameConstants.UNIT_MODE_ATTACK
 @export_range(0.0, 1000.0, 1.0) var defend_protection_radius_pixels: float = GameConstants.SOLDIER_DEFEND_PROTECTION_RADIUS_PIXELS
@@ -37,17 +37,6 @@ enum CombatState {
 @export var debug_range_fill_color: Color = Color(1.0, 0.2, 0.2, 0.14)
 @export var debug_range_outline_color: Color = Color(1.0, 0.2, 0.2, 0.9)
 @export_range(1.0, 8.0, 0.1) var debug_range_outline_width: float = 2.0
-@export var debug_leadership_range_fill_color: Color = Color(0.35, 0.8, 1.0, 0.12)
-@export var debug_leadership_range_outline_color: Color = Color(0.55, 0.9, 1.0, 0.9)
-@export_range(1.0, 8.0, 0.1) var debug_leadership_range_outline_width: float = 2.0
-@export var debug_show_leadership_badge: bool = true
-@export var debug_leadership_badge_bg_color: Color = Color(0.05, 0.1, 0.18, 0.85)
-@export var debug_leadership_badge_border_color: Color = Color(0.45, 0.85, 1.0, 0.95)
-@export var debug_leadership_badge_text_color: Color = Color(0.9, 0.98, 1.0, 1.0)
-@export_range(8, 32, 1) var debug_leadership_badge_font_size: int = 12
-@export_range(2.0, 12.0, 1.0) var debug_leadership_badge_padding_x: float = 5.0
-@export_range(1.0, 8.0, 1.0) var debug_leadership_badge_padding_y: float = 2.0
-@export_range(0.0, 30.0, 1.0) var debug_leadership_badge_vertical_offset_pixels: float = 4.0
 
 @export var show_health_bar: bool = true
 @export var show_health_bar_only_when_damaged: bool = true
@@ -58,18 +47,11 @@ enum CombatState {
 @export_range(2.0, 16.0, 1.0) var health_bar_height_pixels: float = 5.0
 @export_range(0.0, 40.0, 1.0) var health_bar_vertical_offset_pixels: float = 18.0
 
-@export var leadership_aura_color: Color = Color(0.45, 0.85, 1.0, 0.34)
-@export var leadership_aura_outline_color: Color = Color(0.7, 0.95, 1.0, 0.9)
+@export var leadership_aura_color: Color = Color(0.45, 0.85, 1.0, 0.22)
+@export var leadership_aura_outline_color: Color = Color(0.7, 0.95, 1.0, 0.7)
 @export_range(0.0, 2.0, 0.01) var leadership_aura_full_intensity_bonus: float = 1.0
-@export_range(0.0, 1.0, 0.01) var leadership_aura_min_visible_intensity: float = 0.22
 @export_range(0.0, 64.0, 1.0) var leadership_aura_radius_padding_pixels: float = 8.0
 @export_range(1.0, 8.0, 0.1) var leadership_aura_outline_width: float = 1.5
-
-@export var provides_leadership: bool = false
-@export var leadership_kind: StringName = &""
-@export_range(0.0, 2.0, 0.01) var leadership_bonus_amount: float = 0.0
-@export_range(0.0, 30.0, 1.0) var leadership_range: float = 0.0
-@export_range(0.05, 1.0, 0.01) var leadership_refresh_interval_seconds: float = 0.2
 
 var lane_path: Path2D
 var lane_curve: Curve2D
@@ -95,43 +77,22 @@ var _hurtbox_area: Area2D
 var _hurtbox_shape_node: CollisionShape2D
 var _formation_y_offset_pixels: float = 0.0
 var _leadership_bonus_by_kind: Dictionary = {}
-var _leadership_sources_by_kind: Dictionary = {}
-var _leadership_refresh_remaining: float = 0.0
-var _leadership_applied_targets: Dictionary = {}
 
 static var _formation_spawn_counter: int = 0
-
-
-func _refresh_combat_space_scale() -> void:
-    var sx: float = maxf(0.001, absf(scale.x))
-    var sy: float = maxf(0.001, absf(scale.y))
-    var inverse_scale: Vector2 = Vector2(1.0 / sx, 1.0 / sy)
-
-    if _attack_area != null and is_instance_valid(_attack_area):
-        _attack_area.scale = inverse_scale
-
-    if _hurtbox_area != null and is_instance_valid(_hurtbox_area):
-        _hurtbox_area.scale = inverse_scale
 
 
 func _ready() -> void:
     add_to_group(&"soldiers")
     current_health = max_health
-    _leadership_refresh_remaining = 0.0
     _assign_formation_y_offset()
     _apply_visual_scale()
     _ensure_attack_area()
     _ensure_hurtbox()
-    _refresh_combat_space_scale()
     refresh_attack_range_shape()
     health_changed.emit(current_health, max_health)
     stop()
     set_process(false)
     queue_redraw()
-
-
-func _exit_tree() -> void:
-    _clear_leadership_from_previous_targets()
 
 
 func setup_lane_travel(path: Path2D, start_offset: float, end_offset: float) -> void:
@@ -192,63 +153,30 @@ func is_dead() -> bool:
     return current_health <= 0.0
 
 
-func set_leadership_bonus_from_source(kind: StringName, source: Object, bonus_amount: float) -> void:
-    if kind == StringName():
-        return
-
-    if source == null:
-        return
-
-    var source_key: String = str(source.get_instance_id())
-    var per_kind: Dictionary = _leadership_sources_by_kind.get(kind, {})
+func set_leadership_bonus_for_kind(kind: StringName, bonus_amount: float) -> void:
     var normalized_bonus: float = maxf(0.0, bonus_amount)
-
     if normalized_bonus <= 0.0:
-        if per_kind.erase(source_key):
-            if per_kind.is_empty():
-                _leadership_sources_by_kind.erase(kind)
-            else:
-                _leadership_sources_by_kind[kind] = per_kind
-            _recompute_leadership_bonus_cache()
+        if _leadership_bonus_by_kind.erase(kind):
+            queue_redraw()
         return
 
-    var previous: float = float(per_kind.get(source_key, -1.0))
+    var previous: float = float(_leadership_bonus_by_kind.get(kind, -1.0))
     if is_equal_approx(previous, normalized_bonus):
         return
 
-    per_kind[source_key] = normalized_bonus
-    _leadership_sources_by_kind[kind] = per_kind
-    _recompute_leadership_bonus_cache()
-
-
-func clear_leadership_bonus_from_source(kind: StringName, source: Object) -> void:
-    if source == null:
-        return
-
-    var source_key: String = str(source.get_instance_id())
-    var per_kind: Dictionary = _leadership_sources_by_kind.get(kind, {})
-    if per_kind.erase(source_key):
-        if per_kind.is_empty():
-            _leadership_sources_by_kind.erase(kind)
-        else:
-            _leadership_sources_by_kind[kind] = per_kind
-        _recompute_leadership_bonus_cache()
-
-
-func set_leadership_bonus_for_kind(kind: StringName, bonus_amount: float) -> void:
-    # Compatibility helper for single-source leadership setters.
-    set_leadership_bonus_from_source(kind, self, bonus_amount)
+    _leadership_bonus_by_kind[kind] = normalized_bonus
+    queue_redraw()
 
 
 func clear_leadership_bonus_for_kind(kind: StringName) -> void:
-    clear_leadership_bonus_from_source(kind, self)
+    if _leadership_bonus_by_kind.erase(kind):
+        queue_redraw()
 
 
 func clear_all_leadership_bonuses() -> void:
-    if _leadership_sources_by_kind.is_empty() and _leadership_bonus_by_kind.is_empty():
+    if _leadership_bonus_by_kind.is_empty():
         return
 
-    _leadership_sources_by_kind.clear()
     _leadership_bonus_by_kind.clear()
     queue_redraw()
 
@@ -262,31 +190,6 @@ func get_total_leadership_bonus() -> float:
 
 func has_leadership_bonus() -> bool:
     return get_total_leadership_bonus() > 0.0
-
-
-func _get_effective_attack_damage() -> float:
-    return attack_damage * (1.0 + get_total_leadership_bonus())
-
-
-func _get_leadership_radius_pixels() -> float:
-    return maxf(0.0, leadership_range * GameConstants.ATTACK_RANGE_UNIT_PIXELS)
-
-
-func _recompute_leadership_bonus_cache() -> void:
-    var recomputed: Dictionary = {}
-
-    for kind_variant: Variant in _leadership_sources_by_kind.keys():
-        var kind: StringName = kind_variant
-        var per_kind: Dictionary = _leadership_sources_by_kind.get(kind, {})
-        var strongest_for_kind: float = 0.0
-        for source_bonus: Variant in per_kind.values():
-            strongest_for_kind = maxf(strongest_for_kind, maxf(0.0, float(source_bonus)))
-
-        if strongest_for_kind > 0.0:
-            recomputed[kind] = strongest_for_kind
-
-    _leadership_bonus_by_kind = recomputed
-    queue_redraw()
 
 
 func _refresh_movement_target_for_mode() -> void:
@@ -360,7 +263,14 @@ func _find_frontline_anchor_offset() -> Dictionary:
 
     for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
         var unit: Node = node
-        if not _is_valid_frontline_anchor(unit):
+        if unit == null or unit == self:
+            continue
+        if not unit.is_in_group(&"soldiers"):
+            continue
+        if unit.get("team_id") != team_id or unit.call("is_dead"):
+            continue
+
+        if frontline_anchor_excluded_archetype_name != "" and String(unit.get("unit_archetype_name")) == frontline_anchor_excluded_archetype_name:
             continue
 
         var ally_offset: float = lane_curve.get_closest_offset(lane_path.to_local(unit.global_position))
@@ -377,25 +287,6 @@ func _find_frontline_anchor_offset() -> Dictionary:
         "found": found,
         "offset": selected_offset,
     }
-
-
-func _is_valid_frontline_anchor(unit: Node) -> bool:
-    if unit == null or unit == self:
-        return false
-    if not unit.is_in_group(&"soldiers"):
-        return false
-    if unit.get("team_id") != team_id or unit.call("is_dead"):
-        return false
-
-    if frontline_anchor_excluded_archetype_name != "" and String(unit.get("unit_archetype_name")) == frontline_anchor_excluded_archetype_name:
-        return false
-
-    # Only follow allies that are true frontline combatants.
-    # This prevents support units (e.g. drummer with 0 attack) from becoming anchors.
-    if float(unit.get("attack_damage")) <= 0.0:
-        return false
-
-    return true
 
 
 func _get_own_side_offset() -> float:
@@ -443,7 +334,6 @@ func _process(delta: float) -> void:
     if combat_state != CombatState.ATTACKING:
         _refresh_movement_target_for_mode()
 
-    _process_leadership_support(delta)
     _update_targets_from_attack_overlap()
 
     match combat_state:
@@ -494,68 +384,12 @@ func _process_attacking(delta: float) -> void:
 
     _attack_cooldown_remaining = attack_interval_seconds
 
-    var effective_attack_damage: float = _get_effective_attack_damage()
-
     if _is_current_unit_target_attackable():
-        if effective_attack_damage > 0.0:
-            current_target_unit.call("take_damage", effective_attack_damage)
+        current_target_unit.call("take_damage", attack_damage)
         return
 
-    if _is_current_castle_target_attackable() and effective_attack_damage > 0.0:
-        current_target_castle.take_damage(effective_attack_damage)
-
-
-func _process_leadership_support(_delta: float) -> void:
-    if not provides_leadership:
-        _clear_leadership_from_previous_targets()
-        return
-
-    if is_dead():
-        _clear_leadership_from_previous_targets()
-        return
-
-    if leadership_kind == StringName() or leadership_bonus_amount <= 0.0:
-        _clear_leadership_from_previous_targets()
-        return
-
-    var range_pixels: float = _get_leadership_radius_pixels()
-    if range_pixels <= 0.0:
-        _clear_leadership_from_previous_targets()
-        return
-
-    # Re-evaluate leadership every frame so buffs are removed immediately
-    # when units leave range (no sticky out-of-range buffs).
-    _leadership_refresh_remaining = leadership_refresh_interval_seconds
-
-    # Simplified: clear previous grants first, then apply only to units currently in range.
-    # This avoids stale key/instance edge-cases where out-of-range units could keep a bonus.
-    _clear_leadership_from_previous_targets()
-
-    var current_targets: Dictionary = {}
-    for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
-        var unit: CombatUnit = node as CombatUnit
-        if unit == null or unit == self or unit.team_id != team_id or unit.is_dead():
-            continue
-
-        if global_position.distance_to(unit.global_position) > range_pixels:
-            continue
-
-        unit.set_leadership_bonus_from_source(leadership_kind, self, leadership_bonus_amount)
-        current_targets[str(unit.get_instance_id())] = unit
-
-    _leadership_applied_targets = current_targets
-
-
-func _clear_leadership_from_previous_targets() -> void:
-    for unit_variant: Variant in _leadership_applied_targets.values():
-        if unit_variant == null or not is_instance_valid(unit_variant):
-            continue
-
-        var unit_obj: Object = unit_variant
-        if unit_obj != null and unit_obj.has_method("clear_leadership_bonus_from_source"):
-            unit_obj.call("clear_leadership_bonus_from_source", leadership_kind, self)
-
-    _leadership_applied_targets.clear()
+    if _is_current_castle_target_attackable():
+        current_target_castle.take_damage(attack_damage)
 
 
 func _enter_attacking_state() -> void:
@@ -699,107 +533,40 @@ func _should_draw_health_bar() -> bool:
 
 func _get_leadership_aura_intensity() -> float:
     var full_bonus: float = maxf(0.001, leadership_aura_full_intensity_bonus)
-    var raw_intensity: float = clampf(get_total_leadership_bonus() / full_bonus, 0.0, 1.0)
-    if raw_intensity <= 0.0:
-        return 0.0
-
-    # Keep relative scaling, but ensure positive leadership is always visibly readable.
-    return maxf(leadership_aura_min_visible_intensity, raw_intensity)
-
-
-func _should_draw_leadership_badge() -> bool:
-    if not debug_attack_range_visible or not debug_show_leadership_badge:
-        return false
-
-    return get_total_leadership_bonus() > 0.0
-
-
-func _get_leadership_badge_text() -> String:
-    var percentage: int = int(round(get_total_leadership_bonus() * 100.0))
-    return "+%d%%" % percentage
-
-
-func _get_visual_scale_factor() -> float:
-    return maxf(0.001, maxf(absf(scale.x), absf(scale.y)))
+    return clampf(get_total_leadership_bonus() / full_bonus, 0.0, 1.0)
 
 
 func _draw() -> void:
-    var visual_scale: float = _get_visual_scale_factor()
-
     var leadership_intensity: float = _get_leadership_aura_intensity()
     if leadership_intensity > 0.0:
-        var aura_radius_world: float = maxf(6.0, target_render_height * 0.38 + leadership_aura_radius_padding_pixels)
-        var aura_radius_local: float = aura_radius_world / visual_scale
+        var aura_radius: float = maxf(6.0, target_render_height * 0.38 + leadership_aura_radius_padding_pixels)
         var fill_color: Color = leadership_aura_color
         fill_color.a *= leadership_intensity
         var outline_color: Color = leadership_aura_outline_color
         outline_color.a *= leadership_intensity
-        draw_circle(Vector2.ZERO, aura_radius_local, fill_color)
-        draw_arc(Vector2.ZERO, aura_radius_local, 0.0, TAU, 48, outline_color, leadership_aura_outline_width / visual_scale, true)
+        draw_circle(Vector2.ZERO, aura_radius, fill_color)
+        draw_arc(Vector2.ZERO, aura_radius, 0.0, TAU, 48, outline_color, leadership_aura_outline_width, true)
 
-    var should_draw_health: bool = _should_draw_health_bar()
-    var should_draw_badge: bool = _should_draw_leadership_badge()
-    if should_draw_health or should_draw_badge:
-        # Draw overlays in scale-independent space so they remain readable
+    if _should_draw_health_bar():
+        # Draw the healthbar in scale-independent space so it remains visible/readable
         # even if the unit node itself is scaled.
         var sx: float = maxf(0.001, absf(scale.x))
         var sy: float = maxf(0.001, absf(scale.y))
         draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0 / sx, 1.0 / sy))
 
-        var badge_height: float = 0.0
-        var badge_rect: Rect2 = Rect2()
+        var health_ratio: float = clampf(current_health / maxf(0.001, max_health), 0.0, 1.0)
+        var bar_width: float = health_bar_width_pixels
+        var bar_height: float = health_bar_height_pixels
+        var top_left: Vector2 = Vector2(-bar_width * 0.5, -target_render_height * 0.5 - health_bar_vertical_offset_pixels)
+        var bar_rect: Rect2 = Rect2(top_left, Vector2(bar_width, bar_height))
 
-        if should_draw_badge:
-            var badge_font: Font = ThemeDB.fallback_font
-            var badge_text: String = _get_leadership_badge_text()
-            if badge_font != null and not badge_text.is_empty():
-                var text_size: Vector2 = badge_font.get_string_size(
-                    badge_text,
-                    HORIZONTAL_ALIGNMENT_LEFT,
-                    -1.0,
-                    debug_leadership_badge_font_size
-                )
-                var badge_width: float = text_size.x + debug_leadership_badge_padding_x * 2.0
-                badge_height = text_size.y + debug_leadership_badge_padding_y * 2.0
-                var badge_top_left: Vector2 = Vector2(
-                    -badge_width * 0.5,
-                    -target_render_height * 0.5 - health_bar_vertical_offset_pixels - badge_height - debug_leadership_badge_vertical_offset_pixels
-                )
-                badge_rect = Rect2(badge_top_left, Vector2(badge_width, badge_height))
+        draw_rect(bar_rect, health_bar_bg_color, true)
 
-                draw_rect(badge_rect, debug_leadership_badge_bg_color, true)
-                draw_rect(badge_rect, debug_leadership_badge_border_color, false, 1.0)
+        var fill_width: float = bar_width * health_ratio
+        if fill_width > 0.0:
+            draw_rect(Rect2(top_left, Vector2(fill_width, bar_height)), health_bar_fill_color, true)
 
-                var ascent: float = badge_font.get_ascent(debug_leadership_badge_font_size)
-                var text_pos: Vector2 = Vector2(
-                    badge_rect.position.x + debug_leadership_badge_padding_x,
-                    badge_rect.position.y + debug_leadership_badge_padding_y + ascent
-                )
-                draw_string(
-                    badge_font,
-                    text_pos,
-                    badge_text,
-                    HORIZONTAL_ALIGNMENT_LEFT,
-                    -1.0,
-                    debug_leadership_badge_font_size,
-                    debug_leadership_badge_text_color
-                )
-
-        if should_draw_health:
-            var health_ratio: float = clampf(current_health / maxf(0.001, max_health), 0.0, 1.0)
-            var bar_width: float = health_bar_width_pixels
-            var bar_height: float = health_bar_height_pixels
-            var extra_y: float = badge_height + debug_leadership_badge_vertical_offset_pixels if should_draw_badge else 0.0
-            var top_left: Vector2 = Vector2(-bar_width * 0.5, -target_render_height * 0.5 - health_bar_vertical_offset_pixels - extra_y)
-            var bar_rect: Rect2 = Rect2(top_left, Vector2(bar_width, bar_height))
-
-            draw_rect(bar_rect, health_bar_bg_color, true)
-
-            var fill_width: float = bar_width * health_ratio
-            if fill_width > 0.0:
-                draw_rect(Rect2(top_left, Vector2(fill_width, bar_height)), health_bar_fill_color, true)
-
-            draw_rect(bar_rect, health_bar_border_color, false, 1.0)
+        draw_rect(bar_rect, health_bar_border_color, false, 1.0)
 
         # Reset transform so any other debug draw (e.g. range) keeps expected behavior.
         draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
@@ -807,29 +574,12 @@ func _draw() -> void:
     if not debug_attack_range_visible:
         return
 
-    if provides_leadership:
-        var leadership_radius_world: float = _get_leadership_radius_pixels()
-        if leadership_radius_world > 0.0:
-            var leadership_radius_local: float = leadership_radius_world / visual_scale
-            draw_circle(Vector2.ZERO, leadership_radius_local, debug_leadership_range_fill_color)
-            draw_arc(
-                Vector2.ZERO,
-                leadership_radius_local,
-                0.0,
-                TAU,
-                64,
-                debug_leadership_range_outline_color,
-                debug_leadership_range_outline_width / visual_scale,
-                true
-            )
-
-    var radius_world: float = get_attack_range_radius_pixels()
-    if radius_world <= 0.0:
+    var radius: float = get_attack_range_radius_pixels()
+    if radius <= 0.0:
         return
 
-    var radius_local: float = radius_world / visual_scale
-    draw_circle(Vector2.ZERO, radius_local, debug_range_fill_color)
-    draw_arc(Vector2.ZERO, radius_local, 0.0, TAU, 64, debug_range_outline_color, debug_range_outline_width / visual_scale, true)
+    draw_circle(Vector2.ZERO, radius, debug_range_fill_color)
+    draw_arc(Vector2.ZERO, radius, 0.0, TAU, 64, debug_range_outline_color, debug_range_outline_width, true)
 
 
 func _update_world_position_from_offset() -> void:
@@ -854,7 +604,6 @@ func _apply_visual_scale() -> void:
 
     var scale_factor: float = target_render_height / texture_height
     scale = Vector2.ONE * scale_factor
-    _refresh_combat_space_scale()
 
 
 func _ensure_attack_area() -> void:
@@ -877,8 +626,6 @@ func _ensure_attack_area() -> void:
 
     if not (_attack_area_shape_node.shape is CircleShape2D):
         _attack_area_shape_node.shape = CircleShape2D.new()
-
-    _refresh_combat_space_scale()
 
 
 func _ensure_hurtbox() -> void:
@@ -905,7 +652,6 @@ func _ensure_hurtbox() -> void:
         _hurtbox_shape_node.shape = circle_shape
 
     circle_shape.radius = maxf(8.0, target_render_height * 0.22)
-    _refresh_combat_space_scale()
 
 
 func _assign_formation_y_offset() -> void:

@@ -5,7 +5,7 @@ const TEAM_PLAYER: int = 0
 const TEAM_ENEMY: int = 1
 
 # Shared conversion factor for gameplay range units to world pixels.
-const ATTACK_RANGE_UNIT_PIXELS: float = 2.0
+const ATTACK_RANGE_UNIT_PIXELS: float = 48.0
 
 # Soldier baseline stats from the game plan.
 const SOLDIER_ATTACK_RANGE: float = 2.0
@@ -17,13 +17,6 @@ const ARCHER_ATTACK_RANGE: float = 10.0
 const ARCHER_ATTACK_DAMAGE: float = 2.0
 const ARCHER_MAX_HEALTH: float = 2.0
 const ARCHER_ATTACK_INTERVAL_SECONDS: float = 0.75
-
-# Drummer baseline stats from the game plan.
-const DRUMMER_ATTACK_RANGE: float = 0.0
-const DRUMMER_ATTACK_DAMAGE: float = 0.0
-const DRUMMER_MAX_HEALTH: float = 5.0
-const DRUMMER_LEADERSHIP_RANGE: float = 4.0
-const DRUMMER_LEADERSHIP_BONUS: float = 0.5
 
 # Shared unit behavior modes.
 const UNIT_MODE_ATTACK: int = 0

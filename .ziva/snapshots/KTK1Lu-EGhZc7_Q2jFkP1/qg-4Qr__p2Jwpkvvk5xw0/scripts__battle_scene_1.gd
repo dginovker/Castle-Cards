@@ -3,7 +3,6 @@ extends Node2D
 
 const SWORDSMAN_SCENE: PackedScene = preload("res://scenes/swordsman.tscn")
 const ARCHER_SCENE: PackedScene = preload("res://scenes/archer.tscn")
-const DRUMMER_SCENE: PackedScene = preload("res://scenes/drummer.tscn")
 
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
@@ -21,14 +20,12 @@ enum UnitMode {
 @onready var enemy_castle: Castle = $EnemyCastle as Castle
 @onready var summon_button: Button = $UI/SummonSwordsmanButton
 @onready var summon_archer_button: Button = get_node_or_null("UI/SummonArcherButton") as Button
-@onready var summon_drummer_button: Button = get_node_or_null("UI/SummonDrummerButton") as Button
 @onready var battle_lane_path: Path2D = $BattleLanePath
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
 @onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
 @onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
 @onready var debug_spawn_enemy_swordsman_button: Button = get_node_or_null("UI/DebugSpawnEnemySwordsmanButton") as Button
 @onready var debug_spawn_enemy_archer_button: Button = get_node_or_null("UI/DebugSpawnEnemyArcherButton") as Button
-@onready var debug_spawn_enemy_drummer_button: Button = get_node_or_null("UI/DebugSpawnEnemyDrummerButton") as Button
 
 @onready var player_mode_attack_button: Button = get_node_or_null("UI/PlayerModeAttackButton") as Button
 @onready var player_mode_defend_button: Button = get_node_or_null("UI/PlayerModeDefendButton") as Button
@@ -42,17 +39,11 @@ func _ready() -> void:
     if summon_archer_button != null:
         summon_archer_button.pressed.connect(_on_summon_archer_pressed)
 
-    if summon_drummer_button != null:
-        summon_drummer_button.pressed.connect(_on_summon_drummer_pressed)
-
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
 
     if debug_spawn_enemy_archer_button != null:
         debug_spawn_enemy_archer_button.pressed.connect(_on_debug_spawn_enemy_archer_pressed)
-
-    if debug_spawn_enemy_drummer_button != null:
-        debug_spawn_enemy_drummer_button.pressed.connect(_on_debug_spawn_enemy_drummer_pressed)
 
     if player_mode_attack_button != null:
         player_mode_attack_button.pressed.connect(_on_player_mode_attack_pressed)
@@ -164,14 +155,6 @@ func _on_debug_spawn_enemy_archer_pressed() -> void:
     _spawn_archer_for_team(GameConstants.TEAM_ENEMY)
 
 
-func _on_summon_drummer_pressed() -> void:
-    _spawn_drummer_for_team(GameConstants.TEAM_PLAYER)
-
-
-func _on_debug_spawn_enemy_drummer_pressed() -> void:
-    _spawn_drummer_for_team(GameConstants.TEAM_ENEMY)
-
-
 func _on_player_mode_attack_pressed() -> void:
     player_active_mode = UnitMode.ATTACK
     _sync_mode_buttons_visuals()
@@ -202,10 +185,6 @@ func _spawn_swordsman_for_team(team: int) -> void:
 
 func _spawn_archer_for_team(team: int) -> void:
     _spawn_unit_for_team(ARCHER_SCENE, team)
-
-
-func _spawn_drummer_for_team(team: int) -> void:
-    _spawn_unit_for_team(DRUMMER_SCENE, team)
 
 
 func _spawn_unit_for_team(scene: PackedScene, team: int) -> void:
@@ -242,9 +221,6 @@ func _apply_debug_toggle_dependent_ui() -> void:
 
     if debug_spawn_enemy_archer_button != null:
         debug_spawn_enemy_archer_button.visible = show_attack_range_debug
-
-    if debug_spawn_enemy_drummer_button != null:
-        debug_spawn_enemy_drummer_button.visible = show_attack_range_debug
 
     if enemy_mode_attack_button != null:
         enemy_mode_attack_button.visible = show_attack_range_debug
