@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://crdpp82e0pshj"]
+
+[ext_resource type="Script" path="res://scripts/credits.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c73c7djix1u5l" path="res://assets/background_and_ground.png" id="2_0ctdu"]
+[ext_resource type="Texture2D" uid="uid://dkb7funvtxffr" path="res://assets/ui-button-long-width.png" id="3_texture_long"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long"]
+texture = ExtResource("3_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long_pressed"]
+texture = ExtResource("3_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long_hover"]
+texture = ExtResource("3_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+modulate_color = Color(1.2, 1.2, 1.2, 1)
+
+[node name="Credits" type="Control" unique_id=889226997]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=2112015012]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_0ctdu")
+stretch_mode = 6
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1771661829]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=24666214]
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1316257153]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 64
+text = "Credits"
+horizontal_alignment = 1
+
+[node name="CreditsText" type="RichTextLabel" parent="CenterContainer/VBoxContainer" unique_id=336054723]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(800, 200)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "[center]Made by Red Bracket (Daniel Ginovker)
+
+This game was made for the Ziva Game Jam ([url]https://itch.io/jam/ziva-game-jam[/url]).
+
+Source code available at [url]https://github.com/dginovker/Castle-Cards[/url].[/center]"
+scroll_active = false
+
+[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=122579333]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(384, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxTexture_long")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_long_pressed")
+theme_override_styles/hover = SubResource("StyleBoxTexture_long_hover")
+text = "Back"
