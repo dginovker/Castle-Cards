@@ -1,4 +1,3 @@
-class_name BattleScene1
 extends Node2D
 
 const SWORDSMAN_SCENE: PackedScene = preload("res://scenes/swordsman.tscn")
@@ -51,32 +50,25 @@ var _wood_income_timer: Timer
 
 func _ready() -> void:
     randomize()
-    summon_button.pressed.connect(_on_summon_swordsman_pressed)
 
+    summon_button.pressed.connect(_on_summon_swordsman_pressed)
     if summon_archer_button != null:
         summon_archer_button.pressed.connect(_on_summon_archer_pressed)
-
     if summon_drummer_button != null:
         summon_drummer_button.pressed.connect(_on_summon_drummer_pressed)
-
     if summon_cannon_button != null:
         summon_cannon_button.pressed.connect(_on_summon_cannon_pressed)
-
     if summon_woodcutter_button != null:
         summon_woodcutter_button.pressed.connect(_on_summon_woodcutter_pressed)
 
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
-
     if debug_spawn_enemy_archer_button != null:
         debug_spawn_enemy_archer_button.pressed.connect(_on_debug_spawn_enemy_archer_pressed)
-
     if debug_spawn_enemy_drummer_button != null:
         debug_spawn_enemy_drummer_button.pressed.connect(_on_debug_spawn_enemy_drummer_pressed)
-
     if debug_spawn_enemy_cannon_button != null:
         debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed)
-
     if debug_spawn_enemy_woodcutter_button != null:
         debug_spawn_enemy_woodcutter_button.pressed.connect(_on_debug_spawn_enemy_woodcutter_pressed)
 
@@ -93,7 +85,7 @@ func _ready() -> void:
     _refresh_spawn_buttons_affordability()
 
     if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
-        push_warning("BattleLanePath.curve is missing or has fewer than 2 points. Edit BattleLanePath in the inspector to define the lane curve.")
+        push_warning("BattleLanePath.curve is missing or has fewer than 2 points.")
 
     _setup_tree_spawning()
     _setup_wood_income()
@@ -113,27 +105,23 @@ func _set_attack_range_debug_visible(visible_state: bool) -> void:
         return
 
     show_attack_range_debug = visible_state
-
     if debug_attack_range_toggle != null and debug_attack_range_toggle.button_pressed != visible_state:
         debug_attack_range_toggle.button_pressed = visible_state
 
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
     _apply_debug_toggle_dependent_ui()
-    _refresh_spawn_buttons_affordability()
 
 
 func _apply_debug_attack_range_to_all_soldiers() -> void:
     for node: Node in get_tree().get_nodes_in_group(&"soldiers"):
-        var soldier = node
-        if soldier != null:
-            soldier.set_debug_attack_range_visible(show_attack_range_debug)
+        if node != null and node.has_method("set_debug_attack_range_visible"):
+            node.call("set_debug_attack_range_visible", show_attack_range_debug)
 
 
 func _apply_debug_hurtbox_to_castles() -> void:
     if player_castle != null:
         player_castle.set_debug_hurtbox_visible(show_attack_range_debug)
-
     if enemy_castle != null:
         enemy_castle.set_debug_hurtbox_visible(show_attack_range_debug)
 
@@ -171,27 +159,35 @@ func _on_castle_destroyed(castle: Castle) -> void:
 
 
 func _on_summon_swordsman_pressed() -> void:
-    _spawn_swordsman_for_team(GameConstants.TEAM_PLAYER)
+    _spawn_unit_for_team_with_cost(SWORDSMAN_SCENE, GameConstants.TEAM_PLAYER, GameConstants.SWORDSMAN_COST_WOOD)
 
 
 func _on_debug_spawn_enemy_swordsman_pressed() -> void:
-    _spawn_swordsman_for_team(GameConstants.TEAM_ENEMY)
+    _spawn_unit_for_team_with_cost(SWORDSMAN_SCENE, GameConstants.TEAM_ENEMY, GameConstants.SWORDSMAN_COST_WOOD)
 
 
 func _on_summon_archer_pressed() -> void:
-    _spawn_archer_for_team(GameConstants.TEAM_PLAYER)
+    _spawn_unit_for_team_with_cost(ARCHER_SCENE, GameConstants.TEAM_PLAYER, GameConstants.ARCHER_COST_WOOD)
 
 
 func _on_debug_spawn_enemy_archer_pressed() -> void:
-    _spawn_archer_for_team(GameConstants.TEAM_ENEMY)
+    _spawn_unit_for_team_with_cost(ARCHER_SCENE, GameConstants.TEAM_ENEMY, GameConstants.ARCHER_COST_WOOD)
 
 
 func _on_summon_drummer_pressed() -> void:
-    _spawn_drummer_for_team(GameConstants.TEAM_PLAYER)
+    _spawn_unit_for_team_with_cost(DRUMMER_SCENE, GameConstants.TEAM_PLAYER, GameConstants.DRUMMER_COST_WOOD)
 
 
 func _on_debug_spawn_enemy_drummer_pressed() -> void:
-    _spawn_drummer_for_team(GameConstants.TEAM_ENEMY)
+    _spawn_unit_for_team_with_cost(DRUMMER_SCENE, GameConstants.TEAM_ENEMY, GameConstants.DRUMMER_COST_WOOD)
+
+
+func _on_summon_woodcutter_pressed() -> void:
+    _spawn_unit_for_team_with_cost(WOODCUTTER_SCENE, GameConstants.TEAM_PLAYER, GameConstants.WOODCUTTER_COST_WOOD)
+
+
+func _on_debug_spawn_enemy_woodcutter_pressed() -> void:
+    _spawn_unit_for_team_with_cost(WOODCUTTER_SCENE, GameConstants.TEAM_ENEMY, GameConstants.WOODCUTTER_COST_WOOD)
 
 
 func _on_summon_cannon_pressed() -> void:
@@ -200,30 +196,6 @@ func _on_summon_cannon_pressed() -> void:
 
 func _on_debug_spawn_enemy_cannon_pressed() -> void:
     _spawn_cannon_for_team(GameConstants.TEAM_ENEMY)
-
-
-func _on_summon_woodcutter_pressed() -> void:
-    _spawn_woodcutter_for_team(GameConstants.TEAM_PLAYER)
-
-
-func _on_debug_spawn_enemy_woodcutter_pressed() -> void:
-    _spawn_woodcutter_for_team(GameConstants.TEAM_ENEMY)
-
-
-func _spawn_swordsman_for_team(team: int) -> void:
-    _spawn_unit_for_team_with_cost(SWORDSMAN_SCENE, team, GameConstants.SWORDSMAN_COST_WOOD)
-
-
-func _spawn_archer_for_team(team: int) -> void:
-    _spawn_unit_for_team_with_cost(ARCHER_SCENE, team, GameConstants.ARCHER_COST_WOOD)
-
-
-func _spawn_drummer_for_team(team: int) -> void:
-    _spawn_unit_for_team_with_cost(DRUMMER_SCENE, team, GameConstants.DRUMMER_COST_WOOD)
-
-
-func _spawn_woodcutter_for_team(team: int) -> void:
-    _spawn_unit_for_team_with_cost(WOODCUTTER_SCENE, team, GameConstants.WOODCUTTER_COST_WOOD)
 
 
 func _spawn_unit_for_team_with_cost(scene: PackedScene, team: int, cost_wood: int) -> Node:
@@ -243,7 +215,6 @@ func _spawn_cannon_for_team(team: int) -> void:
         return
     if team == GameConstants.TEAM_ENEMY and _enemy_has_purchased_cannon:
         return
-
     if not _try_spend_wood(team, GameConstants.CANNON_COST_WOOD):
         return
 
@@ -260,10 +231,6 @@ func _spawn_cannon_for_team(team: int) -> void:
     var mount_node: Node2D = player_cannon_mount if team == GameConstants.TEAM_PLAYER else enemy_cannon_mount
     if mount_node != null:
         cannon.global_position = mount_node.global_position
-    else:
-        var castle: Castle = player_castle if team == GameConstants.TEAM_PLAYER else enemy_castle
-        if castle != null:
-            cannon.global_position = castle.global_position + Vector2(0.0, -24.0)
 
     var cannon_sprite: AnimatedSprite2D = cannon as AnimatedSprite2D
     if cannon_sprite != null:
@@ -282,18 +249,20 @@ func _spawn_unit_for_team(scene: PackedScene, team: int) -> Node:
         return null
 
     add_child(unit)
-    unit.team_id = team
-    unit.set_debug_attack_range_visible(show_attack_range_debug)
+    unit.set("team_id", team)
+    if unit.has_method("set_debug_attack_range_visible"):
+        unit.call("set_debug_attack_range_visible", show_attack_range_debug)
 
     var player_side_offset: float = _get_lane_offset_near_castle(true)
     var enemy_side_offset: float = _get_lane_offset_near_castle(false)
-    var starts_from_player_side: bool = team == GameConstants.TEAM_PLAYER
-    var start_offset: float = player_side_offset if starts_from_player_side else enemy_side_offset
+    var start_offset: float = player_side_offset if team == GameConstants.TEAM_PLAYER else enemy_side_offset
 
-    unit.set_lane_side_offsets(player_side_offset, enemy_side_offset)
-    unit.setup_lane_travel(battle_lane_path, start_offset, start_offset)
+    if unit.has_method("set_lane_side_offsets"):
+        unit.call("set_lane_side_offsets", player_side_offset, enemy_side_offset)
+    if unit.has_method("setup_lane_travel"):
+        unit.call("setup_lane_travel", battle_lane_path, start_offset, start_offset)
 
-    if unit.has_signal("wood_delivered") and not unit.is_connected("wood_delivered", Callable(self, "_on_wood_delivered")):
+    if unit.has_signal("wood_delivered"):
         unit.connect("wood_delivered", Callable(self, "_on_wood_delivered"))
 
     return unit
@@ -317,107 +286,73 @@ func _on_wood_delivered(team: int, amount: int) -> void:
     _add_wood(team, amount)
 
 
-func _get_wood_for_team(team: int) -> int:
-    return _player_wood if team == GameConstants.TEAM_PLAYER else _enemy_wood
-
-
-func _set_wood_for_team(team: int, value: int) -> void:
-    if team == GameConstants.TEAM_PLAYER:
-        _player_wood = max(0, value)
-    else:
-        _enemy_wood = max(0, value)
-
-
 func _add_wood(team: int, amount: int) -> void:
     if amount == 0:
         return
-
-    _set_wood_for_team(team, _get_wood_for_team(team) + amount)
+    if team == GameConstants.TEAM_PLAYER:
+        _player_wood = max(0, _player_wood + amount)
+    else:
+        _enemy_wood = max(0, _enemy_wood + amount)
     _refresh_wood_ui()
     _refresh_spawn_buttons_affordability()
 
 
 func _try_spend_wood(team: int, amount: int) -> bool:
-    var available: int = _get_wood_for_team(team)
+    var available: int = _player_wood if team == GameConstants.TEAM_PLAYER else _enemy_wood
     if available < amount:
         return false
-
-    _set_wood_for_team(team, available - amount)
-    _refresh_wood_ui()
-    _refresh_spawn_buttons_affordability()
+    _add_wood(team, -amount)
     return true
 
 
 func _refresh_wood_ui() -> void:
     if player_wood_value_label != null:
         player_wood_value_label.text = str(_player_wood)
-
     if enemy_wood_value_label != null:
         enemy_wood_value_label.text = str(_enemy_wood)
 
 
 func _refresh_spawn_buttons_affordability() -> void:
     if summon_woodcutter_button != null:
-        var can_afford_woodcutter: bool = _player_wood >= GameConstants.WOODCUTTER_COST_WOOD
-        summon_woodcutter_button.disabled = not can_afford_woodcutter
-        summon_woodcutter_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if can_afford_woodcutter else Color(1.0, 1.0, 1.0, 0.45)
-
+        _apply_afford_state(summon_woodcutter_button, _player_wood >= GameConstants.WOODCUTTER_COST_WOOD)
     if summon_button != null:
-        var can_afford_swordsman: bool = _player_wood >= GameConstants.SWORDSMAN_COST_WOOD
-        summon_button.disabled = not can_afford_swordsman
-        summon_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if can_afford_swordsman else Color(1.0, 1.0, 1.0, 0.45)
-
+        _apply_afford_state(summon_button, _player_wood >= GameConstants.SWORDSMAN_COST_WOOD)
     if summon_archer_button != null:
-        var can_afford_archer: bool = _player_wood >= GameConstants.ARCHER_COST_WOOD
-        summon_archer_button.disabled = not can_afford_archer
-        summon_archer_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if can_afford_archer else Color(1.0, 1.0, 1.0, 0.45)
-
+        _apply_afford_state(summon_archer_button, _player_wood >= GameConstants.ARCHER_COST_WOOD)
     if summon_drummer_button != null:
-        var can_afford_drummer: bool = _player_wood >= GameConstants.DRUMMER_COST_WOOD
-        summon_drummer_button.disabled = not can_afford_drummer
-        summon_drummer_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if can_afford_drummer else Color(1.0, 1.0, 1.0, 0.45)
-
+        _apply_afford_state(summon_drummer_button, _player_wood >= GameConstants.DRUMMER_COST_WOOD)
     if summon_cannon_button != null:
-        var can_afford_cannon: bool = _player_wood >= GameConstants.CANNON_COST_WOOD
-        var can_buy_player_cannon: bool = (not _player_has_purchased_cannon) and can_afford_cannon
-        summon_cannon_button.disabled = not can_buy_player_cannon
-        summon_cannon_button.modulate = Color(1.0, 1.0, 1.0, 1.0) if can_buy_player_cannon else Color(1.0, 1.0, 1.0, 0.45)
+        _apply_afford_state(summon_cannon_button, (not _player_has_purchased_cannon) and (_player_wood >= GameConstants.CANNON_COST_WOOD))
 
     if debug_spawn_enemy_woodcutter_button != null:
         debug_spawn_enemy_woodcutter_button.disabled = _enemy_wood < GameConstants.WOODCUTTER_COST_WOOD
-
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.disabled = _enemy_wood < GameConstants.SWORDSMAN_COST_WOOD
-
     if debug_spawn_enemy_archer_button != null:
         debug_spawn_enemy_archer_button.disabled = _enemy_wood < GameConstants.ARCHER_COST_WOOD
-
     if debug_spawn_enemy_drummer_button != null:
         debug_spawn_enemy_drummer_button.disabled = _enemy_wood < GameConstants.DRUMMER_COST_WOOD
-
     if debug_spawn_enemy_cannon_button != null:
-        var can_afford_enemy_cannon: bool = _enemy_wood >= GameConstants.CANNON_COST_WOOD
-        var can_buy_enemy_cannon: bool = (not _enemy_has_purchased_cannon) and can_afford_enemy_cannon
-        debug_spawn_enemy_cannon_button.disabled = not can_buy_enemy_cannon
+        debug_spawn_enemy_cannon_button.disabled = _enemy_has_purchased_cannon or _enemy_wood < GameConstants.CANNON_COST_WOOD
         debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
+
+
+func _apply_afford_state(button: Button, can_afford: bool) -> void:
+    button.disabled = not can_afford
+    button.modulate = Color(1.0, 1.0, 1.0, 1.0) if can_afford else Color(1.0, 1.0, 1.0, 0.45)
 
 
 func _apply_debug_toggle_dependent_ui() -> void:
     if debug_spawn_enemy_swordsman_button != null:
         debug_spawn_enemy_swordsman_button.visible = show_attack_range_debug
-
     if debug_spawn_enemy_archer_button != null:
         debug_spawn_enemy_archer_button.visible = show_attack_range_debug
-
     if debug_spawn_enemy_drummer_button != null:
         debug_spawn_enemy_drummer_button.visible = show_attack_range_debug
-
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
-
     if debug_spawn_enemy_woodcutter_button != null:
         debug_spawn_enemy_woodcutter_button.visible = show_attack_range_debug
-
+    if debug_spawn_enemy_cannon_button != null:
+        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
     _refresh_spawn_buttons_affordability()
 
 
@@ -425,7 +360,6 @@ func _find_debug_toggle() -> CheckButton:
     var toggle: CheckButton = get_node_or_null("UI/Debug") as CheckButton
     if toggle != null:
         return toggle
-
     return get_node_or_null("UI/DebugRangeToggle") as CheckButton
 
 
@@ -433,54 +367,31 @@ func _get_lane_offset_near_castle(is_player_side: bool) -> float:
     var curve: Curve2D = battle_lane_path.curve
     if curve == null:
         return 0.0
-
     var lane_length: float = curve.get_baked_length()
     if lane_length <= 0.0:
         return 0.0
 
-    var door_global_position: Vector2 = (
-        _get_player_castle_door_position()
-        if is_player_side
-        else _get_enemy_castle_door_position()
-    )
-
+    var door_global_position: Vector2 = _get_castle_door_position(player_castle if is_player_side else enemy_castle, is_player_side)
     var door_local_position: Vector2 = battle_lane_path.to_local(door_global_position)
     return clampf(curve.get_closest_offset(door_local_position), 0.0, lane_length)
-
-
-func _get_player_castle_door_position() -> Vector2:
-    return _get_castle_door_position(player_castle, true)
-
-
-func _get_enemy_castle_door_position() -> Vector2:
-    return _get_castle_door_position(enemy_castle, false)
 
 
 func _get_castle_door_position(castle: Sprite2D, is_player_side: bool) -> Vector2:
     if castle.texture == null:
         return castle.global_position
-
     var texture_size: Vector2 = castle.texture.get_size()
-    var scaled_size: Vector2 = Vector2(
-        texture_size.x * absf(castle.scale.x),
-        texture_size.y * absf(castle.scale.y)
-    )
-
+    var scaled_size: Vector2 = Vector2(texture_size.x * absf(castle.scale.x), texture_size.y * absf(castle.scale.y))
     var x_offset: float = scaled_size.x * DOOR_X_FACTOR
     var y_offset: float = scaled_size.y * DOOR_Y_FACTOR
     var direction: float = 1.0 if is_player_side else -1.0
-
     return castle.global_position + Vector2(direction * x_offset, y_offset)
 
 
 func _setup_tree_spawning() -> void:
     if TREE_TEXTURE == null:
-        push_warning("Tree texture missing at res://assets/tree.png")
         return
-
     if battle_lane_path == null or battle_lane_path.curve == null or battle_lane_path.curve.get_baked_length() <= 0.0:
         return
-
     if trees_container == null:
         trees_container = Node2D.new()
         trees_container.name = "Trees"
@@ -488,7 +399,6 @@ func _setup_tree_spawning() -> void:
 
     _tree_spawn_timer = Timer.new()
     _tree_spawn_timer.one_shot = true
-    _tree_spawn_timer.autostart = false
     _tree_spawn_timer.timeout.connect(_on_tree_spawn_timer_timeout)
     add_child(_tree_spawn_timer)
     _schedule_next_tree_spawn()
@@ -502,11 +412,9 @@ func _on_tree_spawn_timer_timeout() -> void:
 func _schedule_next_tree_spawn() -> void:
     if _tree_spawn_timer == null:
         return
-
     var wait_time: float = tree_spawn_interval_seconds
     if tree_spawn_interval_jitter_seconds > 0.0:
         wait_time += randf_range(-tree_spawn_interval_jitter_seconds, tree_spawn_interval_jitter_seconds)
-
     _tree_spawn_timer.wait_time = maxf(0.1, wait_time)
     _tree_spawn_timer.start()
 
@@ -524,19 +432,15 @@ func _spawn_growing_tree() -> void:
     var lane_local_position: Vector2 = curve.sample_baked(offset, true)
 
     var sample_delta: float = 8.0
-    var offset_before: float = maxf(0.0, offset - sample_delta)
-    var offset_after: float = minf(lane_length, offset + sample_delta)
-    var point_before: Vector2 = curve.sample_baked(offset_before, true)
-    var point_after: Vector2 = curve.sample_baked(offset_after, true)
+    var point_before: Vector2 = curve.sample_baked(maxf(0.0, offset - sample_delta), true)
+    var point_after: Vector2 = curve.sample_baked(minf(lane_length, offset + sample_delta), true)
     var tangent: Vector2 = (point_after - point_before).normalized()
     var normal: Vector2 = tangent.orthogonal().normalized()
     if normal == Vector2.ZERO:
         normal = Vector2.UP
 
     var perpendicular_jitter: float = randf_range(-tree_spawn_perpendicular_jitter_pixels, tree_spawn_perpendicular_jitter_pixels)
-
-    var lane_global_position: Vector2 = battle_lane_path.to_global(lane_local_position)
-    var spawn_position: Vector2 = lane_global_position + normal * perpendicular_jitter
+    var spawn_position: Vector2 = battle_lane_path.to_global(lane_local_position) + normal * perpendicular_jitter
 
     var tree_sprite: Sprite2D = Sprite2D.new()
     tree_sprite.texture = TREE_TEXTURE
@@ -565,5 +469,4 @@ func _spawn_growing_tree() -> void:
 func _on_tree_growth_finished(tree_sprite: Sprite2D) -> void:
     if tree_sprite == null or not is_instance_valid(tree_sprite):
         return
-
     tree_sprite.set_meta("is_fully_grown", true)

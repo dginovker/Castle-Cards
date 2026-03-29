@@ -29,19 +29,7 @@ const DRUMMER_LEADERSHIP_BONUS: float = 0.5
 const CANNON_ATTACK_RANGE: float = 5.0
 const CANNON_ATTACK_DAMAGE: float = 1.0
 const CANNON_MAX_HEALTH: float = 1.0
-
-# Economy tuning.
-const STARTING_WOOD: int = 20
-const WOOD_PASSIVE_INCOME_AMOUNT: int = 1
-const WOOD_PASSIVE_INCOME_INTERVAL_SECONDS: float = 5.0
-const WOODCUTTER_DELIVERY_WOOD: int = 15
-
-# Unit spawn costs (latest balance pass from gameplay request).
-const WOODCUTTER_COST_WOOD: int = 5
-const SWORDSMAN_COST_WOOD: int = 10
-const ARCHER_COST_WOOD: int = 15
-const DRUMMER_COST_WOOD: int = 20
-const CANNON_COST_WOOD: int = 40
+const CANNON_COST_WOOD: int = 10
 
 # Physics layer bit used by damageable hurtboxes (Area2D). Keep this shared
 # so every attacker can discover all valid damage targets consistently.

@@ -1,7 +1,6 @@
 class_name Woodcutter
 extends AnimatedSprite2D
 
-signal wood_delivered(team: int, amount: int)
 
 enum WoodcutterState {
     SEARCHING_TREE,
@@ -206,7 +205,6 @@ func _process_returning_with_log(delta: float) -> void:
     _move_towards_offset(own_offset, carry_speed, delta)
 
     if _is_offset_reached(own_offset):
-        wood_delivered.emit(team_id, GameConstants.WOODCUTTER_DELIVERY_WOOD)
         queue_free()
 
 
