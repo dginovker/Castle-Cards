@@ -15,7 +15,7 @@ enum WoodcutterState {
 @export_range(0.1, 1.0, 0.05) var carrying_speed_multiplier: float = 0.5
 @export_range(0.1, 5.0, 0.1) var chop_pause_seconds: float = 1.0
 @export_range(1.0, 30.0, 1.0) var max_health: float = 2.0
-@export var target_render_height: float = 48.0
+@export var target_render_height: float = 44.0
 @export var walk_empty_animation: StringName = &"walk_empty"
 @export var walk_log_animation: StringName = &"walk_log"
 

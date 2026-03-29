@@ -31,9 +31,9 @@ const CANNON_ATTACK_DAMAGE: float = 1.0
 const CANNON_MAX_HEALTH: float = 1.0
 
 # Economy tuning.
-const STARTING_WOOD: int = 5
+const STARTING_WOOD: int = 20
 const WOOD_PASSIVE_INCOME_AMOUNT: int = 1
-const WOOD_PASSIVE_INCOME_INTERVAL_SECONDS: float = 2.0
+const WOOD_PASSIVE_INCOME_INTERVAL_SECONDS: float = 5.0
 const WOODCUTTER_DELIVERY_WOOD: int = 15
 
 # Unit spawn costs (latest balance pass from gameplay request).

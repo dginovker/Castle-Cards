@@ -35,4 +35,3 @@ animations = [{
 script = ExtResource("1_wood_script")
 sprite_frames = SubResource("SpriteFrames_woodcutter")
 animation = &"walk_empty"
-target_render_height = 48.0
