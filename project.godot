@@ -17,7 +17,15 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 [autoload]
 
 GameState="*res://scripts/game_state.gd"
+MusicManager="*res://scripts/music_manager.gd"
 MusicPlayer="*res://scripts/music_player.gd"
+
+[display]
+
+window/size/viewport_width=1152.0
+window/size/viewport_height=648.0
+window/stretch/mode="canvas_items"
+window/stretch/scale_mode="integer"
 
 [physics]
 
