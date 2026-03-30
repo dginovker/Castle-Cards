@@ -7,6 +7,7 @@ const DRUMMER_SCENE: PackedScene = preload("res://scenes/drummer.tscn")
 const CANNON_SCENE: PackedScene = preload("res://scenes/cannon.tscn")
 const WOODCUTTER_SCENE: PackedScene = preload("res://scenes/woodcutter.tscn")
 const GAME_OVER_SCREEN_SCENE: PackedScene = preload("res://scenes/game_over_screen.tscn")
+const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/pause_menu.tscn")
 
 const DOOR_X_FACTOR: float = 0.30
 const DOOR_Y_FACTOR: float = 0.44
@@ -46,14 +47,16 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var debug_spawn_enemy_woodcutter_button: Button = %DebugSpawnEnemyWoodcutterButton
 @onready var debug_auto_win_button: Button = get_node_or_null("%DebugAutoWinButton")
 
-var _player_has_purchased_cannon: bool = false
-var _enemy_has_purchased_cannon: bool = false
+var _player_cannon_spawned: bool = false
+var _enemy_cannon_spawned: bool = false
 var _player_wood: int = GameConstants.STARTING_WOOD
 var _enemy_wood: int = GameConstants.STARTING_WOOD
 var _tree_spawn_timer: Timer
 var _player_wood_income_timer: Timer
 var _enemy_wood_income_timer: Timer
 var _game_over_screen: GameOverScreen
+var _pause_menu: PauseMenu
+var _pause_button: Button
 
 func _ready() -> void:
     randomize()
@@ -83,6 +86,9 @@ func _ready() -> void:
 
     _setup_castles()
 
+    if GameState.is_unit_unlocked("cannon"):
+        _spawn_cannon_for_team(GameConstants.TEAM_PLAYER, true)
+
     if debug_attack_range_toggle != null:
         debug_attack_range_toggle.toggled.connect(_on_debug_attack_range_toggled)
         debug_attack_range_toggle.button_pressed = show_attack_range_debug
@@ -100,6 +106,7 @@ func _ready() -> void:
     _setup_tree_spawning()
     _setup_wood_income()
     _setup_game_over_screen()
+    _setup_pause_menu()
 
 
 func _process(_delta: float) -> void:
@@ -138,8 +145,15 @@ func _get_soldier_count_excluding_woodcutters(team: int) -> int:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
-        _set_attack_range_debug_visible(not show_attack_range_debug)
+    if event is InputEventKey and event.pressed and not event.echo:
+        if event.keycode == KEY_F3:
+            _set_attack_range_debug_visible(not show_attack_range_debug)
+        elif event.keycode == KEY_ESCAPE:
+            if _pause_menu != null:
+                if _pause_menu.visible:
+                    _pause_menu.hide_pause()
+                else:
+                    _pause_menu.show_pause()
 
 
 func _on_debug_attack_range_toggled(is_pressed: bool) -> void:
@@ -236,6 +250,60 @@ func _setup_game_over_screen() -> void:
     _game_over_screen.main_menu_pressed.connect(_on_main_menu_pressed)
 
 
+func _setup_pause_menu() -> void:
+    _pause_menu = PAUSE_MENU_SCENE.instantiate() as PauseMenu
+    var ui_node = get_node_or_null("UI")
+    if ui_node:
+        ui_node.add_child(_pause_menu)
+    else:
+        add_child(_pause_menu)
+    _pause_menu.resume_pressed.connect(_on_resume_pressed)
+    _pause_menu.restart_pressed.connect(_on_retry_pressed)
+    _pause_menu.main_menu_pressed.connect(_on_main_menu_pressed)
+    
+    # Create pause button in the top right
+    _pause_button = Button.new()
+    _pause_button.text = "Pause"
+    # Position it in the top-right corner
+    _pause_button.size = Vector2(100, 45)
+    _pause_button.position = Vector2(get_viewport_rect().size.x - 120, 20)
+    _pause_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+    
+    var style_normal = StyleBoxTexture.new()
+    style_normal.texture = preload("res://assets/ui-button-medium-width.png")
+    style_normal.texture_margin_left = 10
+    style_normal.texture_margin_top = 10
+    style_normal.texture_margin_right = 10
+    style_normal.texture_margin_bottom = 10
+    
+    var style_hover = style_normal.duplicate()
+    style_hover.modulate_color = Color(1.2, 1.2, 1.2, 1)
+    
+    var style_pressed = style_normal.duplicate()
+    style_pressed.modulate_color = Color(0.8, 0.8, 0.8, 1)
+    
+    _pause_button.add_theme_stylebox_override("normal", style_normal)
+    _pause_button.add_theme_stylebox_override("hover", style_hover)
+    _pause_button.add_theme_stylebox_override("pressed", style_pressed)
+    _pause_button.add_theme_font_size_override("font_size", 18)
+    _pause_button.add_theme_color_override("font_outline_color", Color.BLACK)
+    _pause_button.add_theme_constant_override("outline_size", 4)
+    
+    if ui_node:
+        ui_node.add_child(_pause_button)
+    _pause_button.pressed.connect(_on_pause_button_pressed)
+
+
+func _on_pause_button_pressed() -> void:
+    if _pause_menu:
+        _pause_menu.show_pause()
+
+
+func _on_resume_pressed() -> void:
+    if _pause_menu:
+        _pause_menu.hide_pause()
+
+
 func _on_retry_pressed() -> void:
     get_tree().paused = false
     get_tree().reload_current_scene()
@@ -302,23 +370,26 @@ func _spawn_unit_for_team_with_cost(scene: PackedScene, team: int, cost_wood: in
     return unit
 
 
-func _spawn_cannon_for_team(team: int) -> void:
-    if team == GameConstants.TEAM_PLAYER and _player_has_purchased_cannon:
+func _spawn_cannon_for_team(team: int, free: bool = false) -> void:
+    if team == GameConstants.TEAM_PLAYER and _player_cannon_spawned:
         return
-    if team == GameConstants.TEAM_ENEMY and _enemy_has_purchased_cannon:
+    if team == GameConstants.TEAM_ENEMY and _enemy_cannon_spawned:
         return
-    if not _try_spend_wood(team, GameConstants.CANNON_COST_WOOD):
-        return
+    
+    if not free:
+        if not _try_spend_wood(team, GameConstants.CANNON_COST_WOOD):
+            return
 
     var cannon: Node = _spawn_unit_for_team(CANNON_SCENE, team)
     if cannon == null:
-        _add_wood(team, GameConstants.CANNON_COST_WOOD)
+        if not free:
+            _add_wood(team, GameConstants.CANNON_COST_WOOD)
         return
 
     if team == GameConstants.TEAM_PLAYER:
-        _player_has_purchased_cannon = true
+        _player_cannon_spawned = true
     else:
-        _enemy_has_purchased_cannon = true
+        _enemy_cannon_spawned = true
 
     var mount_node: Node2D = player_cannon_mount if team == GameConstants.TEAM_PLAYER else enemy_cannon_mount
     if mount_node != null:
@@ -425,8 +496,9 @@ func _refresh_spawn_buttons_affordability() -> void:
         summon_drummer_button.get_parent().visible = GameState.is_unit_unlocked("drummer")
         _apply_afford_state(summon_drummer_button, _player_wood >= GameConstants.DRUMMER_COST_WOOD)
     if summon_cannon_button != null:
-        summon_cannon_button.get_parent().visible = GameState.is_unit_unlocked("cannon")
-        _apply_afford_state(summon_cannon_button, (not _player_has_purchased_cannon) and (_player_wood >= GameConstants.CANNON_COST_WOOD))
+        # Permanent unlock: player never buys it during the game.
+        # It's either spawned at start or not available.
+        summon_cannon_button.get_parent().visible = false
 
     if debug_spawn_enemy_woodcutter_button != null:
         debug_spawn_enemy_woodcutter_button.disabled = _enemy_wood < GameConstants.WOODCUTTER_COST_WOOD
@@ -437,8 +509,8 @@ func _refresh_spawn_buttons_affordability() -> void:
     if debug_spawn_enemy_drummer_button != null:
         debug_spawn_enemy_drummer_button.disabled = _enemy_wood < GameConstants.DRUMMER_COST_WOOD
     if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.disabled = _enemy_has_purchased_cannon or _enemy_wood < GameConstants.CANNON_COST_WOOD
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
+        debug_spawn_enemy_cannon_button.disabled = _enemy_cannon_spawned or _enemy_wood < GameConstants.CANNON_COST_WOOD
+        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_cannon_spawned
 
 
 func _apply_afford_state(button: Button, can_afford: bool) -> void:
@@ -456,7 +528,7 @@ func _apply_debug_toggle_dependent_ui() -> void:
     if debug_spawn_enemy_woodcutter_button != null:
         debug_spawn_enemy_woodcutter_button.visible = show_attack_range_debug
     if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_has_purchased_cannon
+        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_cannon_spawned
     if debug_auto_win_button != null:
         debug_auto_win_button.visible = show_attack_range_debug
     _refresh_spawn_buttons_affordability()
