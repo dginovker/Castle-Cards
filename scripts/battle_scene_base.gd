@@ -39,13 +39,6 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var player_wood_value_label: Label = get_node_or_null("UI/PlayerWoodDisplay/PlayerWoodValue") as Label
 @onready var player_wood_rate_label: Label = get_node_or_null("UI/PlayerWoodRateLabel") as Label
 @onready var enemy_wood_value_label: Label = get_node_or_null("UI/EnemyWoodDisplay/EnemyWoodValue") as Label
-@onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
-@onready var debug_spawn_enemy_swordsman_button: Button = %DebugSpawnEnemySwordsmanButton
-@onready var debug_spawn_enemy_archer_button: Button = %DebugSpawnEnemyArcherButton
-@onready var debug_spawn_enemy_drummer_button: Button = %DebugSpawnEnemyDrummerButton
-@onready var debug_spawn_enemy_cannon_button: Button = %DebugSpawnEnemyCannonButton
-@onready var debug_spawn_enemy_woodcutter_button: Button = %DebugSpawnEnemyWoodcutterButton
-@onready var debug_auto_win_button: Button = get_node_or_null("%DebugAutoWinButton")
 
 var _player_cannon_spawned: bool = false
 var _enemy_cannon_spawned: bool = false
@@ -71,31 +64,13 @@ func _ready() -> void:
     if summon_woodcutter_button != null:
         summon_woodcutter_button.pressed.connect(_on_summon_woodcutter_pressed)
 
-    if debug_spawn_enemy_swordsman_button != null:
-        debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
-    if debug_spawn_enemy_archer_button != null:
-        debug_spawn_enemy_archer_button.pressed.connect(_on_debug_spawn_enemy_archer_pressed)
-    if debug_spawn_enemy_drummer_button != null:
-        debug_spawn_enemy_drummer_button.pressed.connect(_on_debug_spawn_enemy_drummer_pressed)
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed)
-    if debug_spawn_enemy_woodcutter_button != null:
-        debug_spawn_enemy_woodcutter_button.pressed.connect(_on_debug_spawn_enemy_woodcutter_pressed)
-    if debug_auto_win_button != null:
-        debug_auto_win_button.pressed.connect(_on_debug_auto_win_pressed)
-
     _setup_castles()
 
     if GameState.is_unit_unlocked("cannon"):
         _spawn_cannon_for_team(GameConstants.TEAM_PLAYER, true)
 
-    if debug_attack_range_toggle != null:
-        debug_attack_range_toggle.toggled.connect(_on_debug_attack_range_toggled)
-        debug_attack_range_toggle.button_pressed = show_attack_range_debug
-
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
-    _apply_debug_toggle_dependent_ui()
 
     _refresh_wood_ui()
     _refresh_spawn_buttons_affordability()
@@ -146,9 +121,7 @@ func _get_soldier_count_excluding_woodcutters(team: int) -> int:
 
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
-        if event.keycode == KEY_F3:
-            _set_attack_range_debug_visible(not show_attack_range_debug)
-        elif event.keycode == KEY_ESCAPE:
+        if event.keycode == KEY_ESCAPE:
             if _pause_menu != null:
                 if _pause_menu.visible:
                     _pause_menu.hide_pause()
@@ -156,21 +129,13 @@ func _unhandled_input(event: InputEvent) -> void:
                     _pause_menu.show_pause()
 
 
-func _on_debug_attack_range_toggled(is_pressed: bool) -> void:
-    _set_attack_range_debug_visible(is_pressed)
-
-
 func _set_attack_range_debug_visible(visible_state: bool) -> void:
     if show_attack_range_debug == visible_state:
         return
 
     show_attack_range_debug = visible_state
-    if debug_attack_range_toggle != null and debug_attack_range_toggle.button_pressed != visible_state:
-        debug_attack_range_toggle.button_pressed = visible_state
-
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
-    _apply_debug_toggle_dependent_ui()
 
 
 func _apply_debug_attack_range_to_all_soldiers() -> void:
@@ -479,7 +444,20 @@ func _try_spend_wood(team: int, amount: int) -> bool:
     return true
 
 
-func _refresh_wood_ui() -> void: var bonus_per_tree: int = GameState.get_tree_yield_bonus_per_tree(); var total_per_tree: int = GameConstants.WOODCUTTER_DELIVERY_WOOD + bonus_per_tree; var wood_tooltip: String = "Woodcutters deliver %d wood/tree (base %d + bonus %d)." % [total_per_tree, GameConstants.WOODCUTTER_DELIVERY_WOOD, bonus_per_tree]; if player_wood_value_label != null: player_wood_value_label.text = str(_player_wood); player_wood_value_label.tooltip_text = wood_tooltip; if player_wood_display != null: player_wood_display.tooltip_text = wood_tooltip; if player_wood_rate_label != null: player_wood_rate_label.text = "%d/tree" % total_per_tree; player_wood_rate_label.tooltip_text = wood_tooltip; if enemy_wood_value_label != null: enemy_wood_value_label.text = str(_enemy_wood)
+func _refresh_wood_ui() -> void:
+    var bonus_per_tree: int = GameState.get_tree_yield_bonus_per_tree()
+    var total_per_tree: int = GameConstants.WOODCUTTER_DELIVERY_WOOD + bonus_per_tree
+    var wood_tooltip: String = "Woodcutters deliver %d wood/tree (base %d + bonus %d)." % [total_per_tree, GameConstants.WOODCUTTER_DELIVERY_WOOD, bonus_per_tree]
+    if player_wood_value_label != null:
+        player_wood_value_label.text = str(_player_wood)
+        player_wood_value_label.tooltip_text = wood_tooltip
+    if player_wood_display != null:
+        player_wood_display.tooltip_text = wood_tooltip
+    if player_wood_rate_label != null:
+        player_wood_rate_label.text = "%d/tree" % total_per_tree
+        player_wood_rate_label.tooltip_text = wood_tooltip
+    if enemy_wood_value_label != null:
+        enemy_wood_value_label.text = str(_enemy_wood)
 
 
 func _refresh_spawn_buttons_affordability() -> void:
@@ -500,45 +478,10 @@ func _refresh_spawn_buttons_affordability() -> void:
         # It's either spawned at start or not available.
         summon_cannon_button.get_parent().visible = false
 
-    if debug_spawn_enemy_woodcutter_button != null:
-        debug_spawn_enemy_woodcutter_button.disabled = _enemy_wood < GameConstants.WOODCUTTER_COST_WOOD
-    if debug_spawn_enemy_swordsman_button != null:
-        debug_spawn_enemy_swordsman_button.disabled = _enemy_wood < GameConstants.SWORDSMAN_COST_WOOD
-    if debug_spawn_enemy_archer_button != null:
-        debug_spawn_enemy_archer_button.disabled = _enemy_wood < GameConstants.ARCHER_COST_WOOD
-    if debug_spawn_enemy_drummer_button != null:
-        debug_spawn_enemy_drummer_button.disabled = _enemy_wood < GameConstants.DRUMMER_COST_WOOD
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.disabled = _enemy_cannon_spawned or _enemy_wood < GameConstants.CANNON_COST_WOOD
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_cannon_spawned
-
 
 func _apply_afford_state(button: Button, can_afford: bool) -> void:
     button.disabled = not can_afford
     button.modulate = Color(1.0, 1.0, 1.0, 1.0) if can_afford else Color(1.0, 1.0, 1.0, 0.45)
-
-
-func _apply_debug_toggle_dependent_ui() -> void:
-    if debug_spawn_enemy_swordsman_button != null:
-        debug_spawn_enemy_swordsman_button.visible = show_attack_range_debug
-    if debug_spawn_enemy_archer_button != null:
-        debug_spawn_enemy_archer_button.visible = show_attack_range_debug
-    if debug_spawn_enemy_drummer_button != null:
-        debug_spawn_enemy_drummer_button.visible = show_attack_range_debug
-    if debug_spawn_enemy_woodcutter_button != null:
-        debug_spawn_enemy_woodcutter_button.visible = show_attack_range_debug
-    if debug_spawn_enemy_cannon_button != null:
-        debug_spawn_enemy_cannon_button.visible = show_attack_range_debug and not _enemy_cannon_spawned
-    if debug_auto_win_button != null:
-        debug_auto_win_button.visible = show_attack_range_debug
-    _refresh_spawn_buttons_affordability()
-
-
-func _find_debug_toggle() -> CheckButton:
-    var toggle: CheckButton = get_node_or_null("UI/Debug") as CheckButton
-    if toggle != null:
-        return toggle
-    return get_node_or_null("UI/DebugRangeToggle") as CheckButton
 
 
 func _get_lane_offset_near_castle(is_player_side: bool) -> float:
