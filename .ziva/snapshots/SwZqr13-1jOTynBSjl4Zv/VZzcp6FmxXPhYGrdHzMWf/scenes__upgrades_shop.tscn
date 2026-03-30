@@ -1,0 +1,448 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrades_shop.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="3_ground"]
+[ext_resource type="Texture2D" uid="uid://dkb7funvtxffr" path="res://assets/ui-button-long-width.png" id="4_texture_long"]
+
+[ext_resource type="PackedScene" path="res://scenes/tree_display.tscn" id="5_tree_display"]
+[ext_resource type="Texture2D" uid="uid://cvisjs8xtdbbv" path="res://assets/tree.png" id="6_tree_icon"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long"]
+texture = ExtResource("4_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long_hover"]
+texture = ExtResource("4_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+modulate_color = Color(1.2, 1.2, 1.2, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_long_pressed"]
+texture = ExtResource("4_texture_long")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+modulate_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="UpgradesShop" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(576, 185)
+texture = ExtResource("2_bg")
+
+[node name="Ground" type="Sprite2D" parent="."]
+position = Vector2(576, 490)
+scale = Vector2(0.665, 0.56)
+texture = ExtResource("3_ground")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_bottom = 60.0
+grow_horizontal = 0
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+
+[node name="TreeDisplay" parent="UI/MarginContainer" instance=ExtResource("5_tree_display")]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="Title" type="Label" parent="UI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 48
+text = "Upgrades Shop"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 60
+alignment = 1
+
+[node name="UnitsSection" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 32
+text = "Units"
+horizontal_alignment = 1
+
+[node name="UnitsGrid" type="GridContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="ArcherButton" type="Button" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+pivot_offset = Vector2(80, 80)
+mouse_default_cursor_shape = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/ArcherButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/ArcherButton/VBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/ArcherButton/VBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Archer"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/ArcherButton/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "(Unlocked)"
+horizontal_alignment = 1
+
+[node name="CostHBox" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/ArcherButton/VBox"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="CostLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/ArcherButton/VBox/CostHBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "8"
+
+[node name="TreeIcon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/ArcherButton/VBox/CostHBox"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_tree_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DrummerButton" type="Button" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+pivot_offset = Vector2(80, 80)
+mouse_default_cursor_shape = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/DrummerButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/DrummerButton/VBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/DrummerButton/VBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Drummer"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/DrummerButton/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "(Unlocked)"
+horizontal_alignment = 1
+
+[node name="CostHBox" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/DrummerButton/VBox"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="CostLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/DrummerButton/VBox/CostHBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "15"
+
+[node name="TreeIcon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UnitsSection/UnitsGrid/DrummerButton/VBox/CostHBox"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_tree_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UpgradesSection" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 32
+text = "Upgrades"
+horizontal_alignment = 1
+
+[node name="UpgradesGrid" type="GridContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="CannonButton" type="Button" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+pivot_offset = Vector2(80, 80)
+mouse_default_cursor_shape = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/CannonButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/CannonButton/VBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/CannonButton/VBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Cannon"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/CannonButton/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "(Unlocked)"
+horizontal_alignment = 1
+
+[node name="CostHBox" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/CannonButton/VBox"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="CostLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/CannonButton/VBox/CostHBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "30"
+
+[node name="TreeIcon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/CannonButton/VBox/CostHBox"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_tree_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TreeGrowthButton" type="Button" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+pivot_offset = Vector2(80, 80)
+mouse_default_cursor_shape = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeGrowthButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeGrowthButton/VBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeGrowthButton/VBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Tree Growth"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeGrowthButton/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="CostHBox" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeGrowthButton/VBox"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="CostLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeGrowthButton/VBox/CostHBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "2"
+
+[node name="TreeIcon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeGrowthButton/VBox/CostHBox"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_tree_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TreeYieldButton" type="Button" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+pivot_offset = Vector2(80, 80)
+mouse_default_cursor_shape = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Lumber Efficiency"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "+0 wood/tree"
+horizontal_alignment = 1
+
+[node name="CostHBox" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="CostLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox/CostHBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "20"
+
+[node name="TreeIcon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox/CostHBox"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_tree_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BackButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+pivot_offset = Vector2(200, 30)
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_long")
+theme_override_styles/hover = SubResource("StyleBoxTexture_long_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_long_pressed")
+text = "Back to Menu"

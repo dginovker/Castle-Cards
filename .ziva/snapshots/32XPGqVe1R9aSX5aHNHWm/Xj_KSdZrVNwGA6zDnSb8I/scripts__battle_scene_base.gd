@@ -203,17 +203,14 @@ func _on_enemy_castle_health_changed(current_health: float, max_health: float) -
 func _on_castle_destroyed(castle: Castle) -> void:
     if _game_over_screen == null:
         return
-
+    
     get_tree().paused = true
-    var level_reward_multiplier: int = 2 if level_id.begins_with("shores_") else 1
-
     if castle.team_id == GameConstants.TEAM_PLAYER:
-        var lose_reward: int = 1 * level_reward_multiplier
         var gs = get_node_or_null("/root/GameState")
         if gs:
             gs.record_loss()
-            gs.trees += lose_reward
-        _game_over_screen.show_lose(lose_reward)
+            gs.trees += 1
+        _game_over_screen.show_lose(1)
     else:
         var reward: int = 2
         var gs = get_node_or_null("/root/GameState")
@@ -222,8 +219,7 @@ func _on_castle_destroyed(castle: Castle) -> void:
                 reward = 1
             elif player_castle.current_health >= player_castle.max_health:
                 reward = 3
-
-            reward *= level_reward_multiplier
+            
             gs.complete_level(level_id, reward)
             gs.record_win()
         _game_over_screen.show_win(reward)

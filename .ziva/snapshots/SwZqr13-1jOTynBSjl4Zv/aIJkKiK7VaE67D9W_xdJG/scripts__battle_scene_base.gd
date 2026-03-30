@@ -34,9 +34,7 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var enemy_cannon_mount: Node2D = get_node_or_null("EnemyCannonMount") as Node2D
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
 @onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
-@onready var player_wood_display: Control = get_node_or_null("UI/PlayerWoodDisplay") as Control
 @onready var player_wood_value_label: Label = get_node_or_null("UI/PlayerWoodDisplay/PlayerWoodValue") as Label
-@onready var player_wood_rate_label: Label = get_node_or_null("UI/PlayerWoodRateLabel") as Label
 @onready var enemy_wood_value_label: Label = get_node_or_null("UI/EnemyWoodDisplay/EnemyWoodValue") as Label
 @onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
 @onready var debug_spawn_enemy_swordsman_button: Button = %DebugSpawnEnemySwordsmanButton
@@ -90,7 +88,6 @@ func _ready() -> void:
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
     _apply_debug_toggle_dependent_ui()
-
     _refresh_wood_ui()
     _refresh_spawn_buttons_affordability()
 
@@ -203,17 +200,14 @@ func _on_enemy_castle_health_changed(current_health: float, max_health: float) -
 func _on_castle_destroyed(castle: Castle) -> void:
     if _game_over_screen == null:
         return
-
+    
     get_tree().paused = true
-    var level_reward_multiplier: int = 2 if level_id.begins_with("shores_") else 1
-
     if castle.team_id == GameConstants.TEAM_PLAYER:
-        var lose_reward: int = 1 * level_reward_multiplier
         var gs = get_node_or_null("/root/GameState")
         if gs:
             gs.record_loss()
-            gs.trees += lose_reward
-        _game_over_screen.show_lose(lose_reward)
+            gs.trees += 1
+        _game_over_screen.show_lose(1)
     else:
         var reward: int = 2
         var gs = get_node_or_null("/root/GameState")
@@ -222,8 +216,7 @@ func _on_castle_destroyed(castle: Castle) -> void:
                 reward = 1
             elif player_castle.current_health >= player_castle.max_health:
                 reward = 3
-
-            reward *= level_reward_multiplier
+            
             gs.complete_level(level_id, reward)
             gs.record_win()
         _game_over_screen.show_win(reward)
@@ -408,7 +401,7 @@ func _try_spend_wood(team: int, amount: int) -> bool:
     return true
 
 
-func _refresh_wood_ui() -> void: var bonus_per_tree: int = GameState.get_tree_yield_bonus_per_tree(); var total_per_tree: int = GameConstants.WOODCUTTER_DELIVERY_WOOD + bonus_per_tree; var wood_tooltip: String = "Woodcutters deliver %d wood/tree (base %d + bonus %d)." % [total_per_tree, GameConstants.WOODCUTTER_DELIVERY_WOOD, bonus_per_tree]; if player_wood_value_label != null: player_wood_value_label.text = str(_player_wood); player_wood_value_label.tooltip_text = wood_tooltip; if player_wood_display != null: player_wood_display.tooltip_text = wood_tooltip; if player_wood_rate_label != null: player_wood_rate_label.text = "%d/tree" % total_per_tree; player_wood_rate_label.tooltip_text = wood_tooltip; if enemy_wood_value_label != null: enemy_wood_value_label.text = str(_enemy_wood)
+func _refresh_wood_ui() -> void: if player_wood_value_label != null: player_wood_value_label.text = str(_player_wood); player_wood_value_label.tooltip_text = ("Woodcutters deliver +%d extra wood per tree." % GameState.get_tree_yield_bonus_per_tree()) if GameState.get_tree_yield_bonus_per_tree() > 0 else "Woodcutters deliver base wood per tree."; if enemy_wood_value_label != null: enemy_wood_value_label.text = str(_enemy_wood)
 
 
 func _refresh_spawn_buttons_affordability() -> void:

@@ -15,41 +15,38 @@ func _populate_level_buttons() -> void:
         child.queue_free()
 
     var gs: Node = get_node_or_null("/root/GameState")
-    
-    # Level 5
-    var l5_unlocked: bool = gs and gs.is_level_beaten("level_4")
-    _create_level_button("5", "Play Shores level 5", l5_unlocked, "Requires beating forest level 4", _on_level_5_pressed)
-    
-    # Level 6
-    var l6_unlocked: bool = gs and gs.is_level_beaten("shores_level_5")
-    _create_level_button("6", "Play Shores level 6", l6_unlocked, "Requires beating shores level 5", _on_level_6_pressed)
+    var is_unlocked: bool = false
+    if gs:
+        is_unlocked = gs.is_level_beaten("level_4")
 
-    no_levels_label.visible = false
-
-func _create_level_button(lvl_text: String, tooltip: String, unlocked: bool, locked_tooltip: String, press_handler: Callable) -> void:
     var button := Button.new()
-    button.text = lvl_text
+    button.text = "5"
     button.custom_minimum_size = Vector2(160, 160)
     button.pivot_offset = Vector2(80, 80)
 
     _apply_button_style(button)
 
-    if unlocked:
-        button.tooltip_text = tooltip
+    if is_unlocked:
+        button.tooltip_text = "Play Shores level 5"
         button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-        button.pressed.connect(press_handler)
+        button.pressed.connect(_on_level_5_pressed)
     else:
-        button.tooltip_text = locked_tooltip
+        button.tooltip_text = "Requires beating forest level 4"
         button.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
-        button.disabled = true
+
+        var style_locked: StyleBox = button.get_theme_stylebox("normal").duplicate()
+        if style_locked is StyleBoxTexture:
+            style_locked.modulate_color = Color(0.3, 0.3, 0.3, 1.0)
+        button.add_theme_stylebox_override("normal", style_locked)
+        button.add_theme_stylebox_override("hover", style_locked)
+        button.add_theme_stylebox_override("pressed", style_locked)
+        button.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1.0))
 
     button.mouse_entered.connect(_on_button_mouse_entered.bind(button))
     button.mouse_exited.connect(_on_button_mouse_exited.bind(button))
 
     grid_container.add_child(button)
-
-func _on_level_6_pressed() -> void:
-    get_tree().change_scene_to_file("res://scenes/battle_scene_6.tscn")
+    no_levels_label.visible = false
 
 func _apply_button_style(button: Button) -> void:
     var texture: Texture2D = load("res://assets/shores_background_and_ground.png")

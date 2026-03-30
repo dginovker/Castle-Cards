@@ -1,0 +1,287 @@
+extends Node2D
+
+@onready var archer_button: Button = %ArcherButton
+@onready var drummer_button: Button = %DrummerButton
+@onready var cannon_button: Button = %CannonButton
+@onready var tree_growth_button: Button = %TreeGrowthButton
+@onready var tree_yield_button: Button = %TreeYieldButton
+@onready var back_button: Button = %BackButton
+
+const UPGRADES = {
+    "archer": {
+        "name": "Archer",
+        "cost": 8,
+        "icon": "res://assets/units/archer/archer-walking-0.png",
+    },
+    "drummer": {
+        "name": "Drummer",
+        "cost": 15,
+        "icon": "res://assets/units/drummer/drumming.png",
+    },
+    "cannon": {
+        "name": "Cannon",
+        "cost": 30,
+        "icon": "res://assets/units/cannon/cannon-idle.png",
+    },
+    "passive_income": {
+        "name": "Passive Wood Income",
+        "icon": "res://assets/tree.png",
+    },
+    "tree_yield": {
+        "name": "Lumber Efficiency",
+        "icon": "res://assets/tree.png",
+    }
+}
+
+func _ready() -> void:
+    _setup_square_button(archer_button, "archer")
+    _setup_square_button(drummer_button, "drummer")
+    _setup_square_button(cannon_button, "cannon")
+    _setup_square_button(tree_growth_button, "passive_income")
+    _setup_square_button(tree_yield_button, "tree_yield")
+    
+    archer_button.pressed.connect(func(): _buy_upgrade("archer"))
+    drummer_button.pressed.connect(func(): _buy_upgrade("drummer"))
+    cannon_button.pressed.connect(func(): _buy_upgrade("cannon"))
+    tree_growth_button.pressed.connect(_on_passive_income_pressed)
+    tree_yield_button.pressed.connect(_on_tree_yield_pressed)
+    back_button.pressed.connect(_on_back_pressed)
+    
+    var gs = get_node_or_null("/root/GameState")
+    if gs:
+        gs.trees_changed.connect(_on_trees_changed)
+    update_ui()
+
+func _setup_square_button(btn: Button, type: String) -> void:
+    var info = UPGRADES[type]
+    
+    # Apply square style similar to level select
+    var bg_texture = load("res://assets/background.png")
+    var style_normal = StyleBoxTexture.new()
+    style_normal.texture = bg_texture
+    
+    var style_hover = style_normal.duplicate()
+    style_hover.modulate_color = Color(1.2, 1.2, 1.2, 1)
+    
+    var style_pressed = style_normal.duplicate()
+    style_pressed.modulate_color = Color(0.8, 0.8, 0.8, 1)
+    
+    var style_disabled = style_normal.duplicate()
+    # Darker background for disabled buttons makes icons pop more
+    style_disabled.modulate_color = Color(0.3, 0.3, 0.3, 1)
+    
+    btn.add_theme_stylebox_override("normal", style_normal)
+    btn.add_theme_stylebox_override("hover", style_hover)
+    btn.add_theme_stylebox_override("pressed", style_pressed)
+    btn.add_theme_stylebox_override("disabled", style_disabled)
+    btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+    
+    # Set the icon if Icon exists
+    var icon_rect = btn.find_child("Icon", true, false)
+    if icon_rect and icon_rect is TextureRect:
+        icon_rect.texture = load(info.icon)
+    
+    # Black outline like level select
+    var outline = Panel.new()
+    outline.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    var outline_style = StyleBoxFlat.new()
+    outline_style.draw_center = false
+    outline_style.border_width_left = 4
+    outline_style.border_width_top = 4
+    outline_style.border_width_right = 4
+    outline_style.border_width_bottom = 4
+    outline_style.border_color = Color.BLACK
+    outline.add_theme_stylebox_override("panel", outline_style)
+    btn.add_child(outline)
+    
+    # Add a bit of padding at the top of the VBox
+    var vbox = btn.get_node("VBox")
+    vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    
+    var top_padding = Control.new()
+    top_padding.custom_minimum_size = Vector2(0, 10)
+    vbox.add_child(top_padding)
+    vbox.move_child(top_padding, 0)
+
+    # Light background for cost area to ensure visibility
+    var cost_hbox = btn.find_child("CostHBox", true, false)
+    if cost_hbox:
+        vbox.alignment = BoxContainer.ALIGNMENT_BEGIN
+        
+        # Add a spacer to push the cost to the bottom
+        var spacer = Control.new()
+        spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+        spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        vbox.add_child(spacer)
+        
+        # Wrap the CostHBox in a PanelContainer
+        var parent = cost_hbox.get_parent()
+        parent.remove_child(cost_hbox)
+        
+        var wrapper = PanelContainer.new()
+        wrapper.name = "CostWrapper"
+        var cost_style = StyleBoxFlat.new()
+        cost_style.bg_color = Color(1, 1, 1, 0.4)
+        cost_style.set_corner_radius_all(4)
+        cost_style.content_margin_left = 6
+        cost_style.content_margin_right = 6
+        cost_style.content_margin_top = 2
+        cost_style.content_margin_bottom = 2
+        wrapper.add_theme_stylebox_override("panel", cost_style)
+        
+        vbox.add_child(wrapper)
+        wrapper.add_child(cost_hbox)
+        cost_hbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+        
+        # Add a tiny bit of padding at the very bottom
+        var bottom_padding = Control.new()
+        bottom_padding.custom_minimum_size = Vector2(0, 4)
+        vbox.add_child(bottom_padding)
+    
+    btn.mouse_entered.connect(_on_button_mouse_entered.bind(btn))
+    btn.mouse_exited.connect(_on_button_mouse_exited.bind(btn))
+
+func _on_trees_changed(_new_count: int) -> void:
+    update_ui()
+
+func update_ui() -> void:
+    _update_unit_button(archer_button, "archer")
+    _update_unit_button(drummer_button, "drummer")
+    _update_unit_button(cannon_button, "cannon")
+    _update_passive_income_button()
+    _update_tree_yield_button()
+
+func _update_unit_button(btn: Button, type: String) -> void:
+    var info = UPGRADES[type]
+    var cost_hbox = btn.find_child("CostHBox", true, false)
+    var cost_wrapper = btn.find_child("CostWrapper", true, false)
+    var cost_label = btn.find_child("CostLabel", true, false)
+    var name_label = btn.find_child("NameLabel", true, false)
+    
+    if not name_label: return
+    
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    
+    if gs.is_unit_unlocked(type):
+        name_label.text = "%s\n(Unlocked)" % info.name
+        btn.disabled = true
+        if cost_wrapper: cost_wrapper.visible = false
+        elif cost_hbox: cost_hbox.visible = false
+    else:
+        name_label.text = info.name
+        if cost_label: cost_label.text = str(info.cost)
+        btn.disabled = gs.trees < info.cost
+        if cost_wrapper: cost_wrapper.visible = true
+        elif cost_hbox: cost_hbox.visible = true
+
+func _update_passive_income_button() -> void:
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    
+    var is_lvl4_beaten = gs.is_level_beaten("level_4")
+    var cost = gs.get_passive_income_upgrade_cost()
+    var cost_hbox = tree_growth_button.find_child("CostHBox", true, false)
+    var cost_wrapper = tree_growth_button.find_child("CostWrapper", true, false)
+    var cost_label = tree_growth_button.find_child("CostLabel", true, false)
+    var name_label = tree_growth_button.find_child("NameLabel", true, false)
+    var status_label = tree_growth_button.find_child("StatusLabel", true, false)
+    
+    if not name_label: return
+    
+    var income_interval = gs.get_current_passive_income_interval(2.0)
+    
+    if not is_lvl4_beaten:
+        name_label.text = "Passive Income"
+        if status_label:
+            status_label.text = "Requires Level 4"
+            status_label.visible = true
+            status_label.add_theme_color_override("font_color", Color.RED)
+        if cost_wrapper: cost_wrapper.visible = false
+        elif cost_hbox: cost_hbox.visible = false
+        tree_growth_button.disabled = true
+    else:
+        name_label.text = "Passive Income"
+        if status_label:
+            status_label.text = "1 Tree every %0.1fs" % income_interval
+            status_label.visible = true
+            status_label.add_theme_color_override("font_color", Color.YELLOW)
+        if cost_label: cost_label.text = str(cost)
+        if cost_wrapper: cost_wrapper.visible = true
+        elif cost_hbox: cost_hbox.visible = true
+        tree_growth_button.disabled = gs.trees < cost
+
+func _buy_upgrade(type: String) -> void:
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    var info = UPGRADES[type]
+    if gs.unlock_unit(type, info.cost):
+        update_ui()
+
+func _on_passive_income_pressed() -> void:
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    if gs.purchase_passive_income_upgrade():
+        update_ui()
+
+func _update_tree_yield_button() -> void:
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+
+    var is_unlocked: bool = gs.is_level_beaten("shores_level_5")
+    var cost: int = gs.get_tree_yield_upgrade_cost()
+    var current_bonus: int = gs.get_tree_yield_bonus_per_tree()
+    var next_bonus: int = current_bonus + 5
+
+    var cost_hbox = tree_yield_button.find_child("CostHBox", true, false)
+    var cost_wrapper = tree_yield_button.find_child("CostWrapper", true, false)
+    var cost_label = tree_yield_button.find_child("CostLabel", true, false)
+    var name_label = tree_yield_button.find_child("NameLabel", true, false)
+    var status_label = tree_yield_button.find_child("StatusLabel", true, false)
+
+    if not name_label:
+        return
+
+    name_label.text = "Lumber Efficiency"
+
+    if not is_unlocked:
+        if status_label:
+            status_label.text = "Requires Shores L5"
+            status_label.visible = true
+            status_label.add_theme_color_override("font_color", Color.RED)
+        if cost_wrapper: cost_wrapper.visible = false
+        elif cost_hbox: cost_hbox.visible = false
+        tree_yield_button.disabled = true
+        return
+
+    if status_label:
+        status_label.text = "+%d wood/tree (next +%d)" % [current_bonus, next_bonus]
+        status_label.visible = true
+        status_label.add_theme_color_override("font_color", Color.YELLOW)
+
+    if cost_label:
+        cost_label.text = str(cost)
+    if cost_wrapper: cost_wrapper.visible = true
+    elif cost_hbox: cost_hbox.visible = true
+
+    tree_yield_button.disabled = gs.trees < cost
+
+func _on_tree_yield_pressed() -> void:
+    var gs = get_node_or_null("/root/GameState")
+    if not gs: return
+    if gs.purchase_tree_yield_upgrade():
+        update_ui()
+
+func _on_back_pressed() -> void:
+    get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+func _on_button_mouse_entered(button: Button) -> void:
+    if button.disabled: return
+    var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+    tween.tween_property(button, "scale", Vector2(1.1, 1.1), 0.2)
+
+func _on_button_mouse_exited(button: Button) -> void:
+    var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+    tween.tween_property(button, "scale", Vector2(1.0, 1.0), 0.2)
