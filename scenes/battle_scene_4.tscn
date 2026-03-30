@@ -121,6 +121,7 @@ offset_left = 178.0
 offset_top = 151.0
 offset_right = 248.0
 offset_bottom = 175.0
+mouse_filter = 0
 theme_override_constants/separation = 4
 
 [node name="PlayerWoodValue" type="Label" parent="UI/PlayerWoodDisplay" unique_id=1823284991]
@@ -136,6 +137,17 @@ layout_mode = 2
 texture = ExtResource("12_tree_icon")
 expand_mode = 1
 stretch_mode = 5
+
+[node name="PlayerWoodRateLabel" type="Label" parent="UI" unique_id=1312456777]
+offset_left = 178.0
+offset_top = 174.0
+offset_right = 270.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.419608, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+text = "15/tree"
 
 [node name="EnemyWoodDisplay" type="HBoxContainer" parent="UI" unique_id=151375174]
 offset_left = 903.0

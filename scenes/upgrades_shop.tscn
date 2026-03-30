@@ -373,9 +373,9 @@ stretch_mode = 5
 
 [node name="TreeYieldButton" type="Button" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 160)
+custom_minimum_size = Vector2(160, 190)
 layout_mode = 2
-pivot_offset = Vector2(80, 80)
+pivot_offset = Vector2(80, 95)
 mouse_default_cursor_shape = 2
 
 [node name="VBox" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton"]
@@ -406,12 +406,14 @@ horizontal_alignment = 1
 
 [node name="StatusLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
 visible = false
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+autowrap_mode = 3
 theme_override_colors/font_color = Color(1, 1, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 14
-text = "+0 wood/tree"
+text = "15 wood/tree\nNext: 20"
 horizontal_alignment = 1
 
 [node name="CostHBox" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]

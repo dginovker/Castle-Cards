@@ -34,7 +34,9 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @onready var enemy_cannon_mount: Node2D = get_node_or_null("EnemyCannonMount") as Node2D
 @onready var player_castle_hp_bar: ProgressBar = $UI/PlayerCastleHPBar
 @onready var enemy_castle_hp_bar: ProgressBar = $UI/EnemyCastleHPBar
+@onready var player_wood_display: Control = get_node_or_null("UI/PlayerWoodDisplay") as Control
 @onready var player_wood_value_label: Label = get_node_or_null("UI/PlayerWoodDisplay/PlayerWoodValue") as Label
+@onready var player_wood_rate_label: Label = get_node_or_null("UI/PlayerWoodRateLabel") as Label
 @onready var enemy_wood_value_label: Label = get_node_or_null("UI/EnemyWoodDisplay/EnemyWoodValue") as Label
 @onready var debug_attack_range_toggle: CheckButton = _find_debug_toggle()
 @onready var debug_spawn_enemy_swordsman_button: Button = %DebugSpawnEnemySwordsmanButton
@@ -88,6 +90,7 @@ func _ready() -> void:
     _apply_debug_attack_range_to_all_soldiers()
     _apply_debug_hurtbox_to_castles()
     _apply_debug_toggle_dependent_ui()
+
     _refresh_wood_ui()
     _refresh_spawn_buttons_affordability()
 
@@ -401,11 +404,7 @@ func _try_spend_wood(team: int, amount: int) -> bool:
     return true
 
 
-func _refresh_wood_ui() -> void:
-    if player_wood_value_label != null:
-        player_wood_value_label.text = str(_player_wood)
-    if enemy_wood_value_label != null:
-        enemy_wood_value_label.text = str(_enemy_wood)
+func _refresh_wood_ui() -> void: var bonus_per_tree: int = GameState.get_tree_yield_bonus_per_tree(); var total_per_tree: int = GameConstants.WOODCUTTER_DELIVERY_WOOD + bonus_per_tree; var wood_tooltip: String = "Woodcutters deliver %d wood/tree (base %d + bonus %d)." % [total_per_tree, GameConstants.WOODCUTTER_DELIVERY_WOOD, bonus_per_tree]; if player_wood_value_label != null: player_wood_value_label.text = str(_player_wood); player_wood_value_label.tooltip_text = wood_tooltip; if player_wood_display != null: player_wood_display.tooltip_text = wood_tooltip; if player_wood_rate_label != null: player_wood_rate_label.text = "%d/tree" % total_per_tree; player_wood_rate_label.tooltip_text = wood_tooltip; if enemy_wood_value_label != null: enemy_wood_value_label.text = str(_enemy_wood)
 
 
 func _refresh_spawn_buttons_affordability() -> void:

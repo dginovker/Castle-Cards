@@ -232,8 +232,10 @@ func _update_tree_yield_button() -> void:
 
     var is_unlocked: bool = gs.is_level_beaten("shores_level_5")
     var cost: int = gs.get_tree_yield_upgrade_cost()
+    var base_yield: int = GameConstants.WOODCUTTER_DELIVERY_WOOD
     var current_bonus: int = gs.get_tree_yield_bonus_per_tree()
-    var next_bonus: int = current_bonus + 5
+    var current_total: int = base_yield + current_bonus
+    var next_total: int = current_total + 5
 
     var cost_hbox = tree_yield_button.find_child("CostHBox", true, false)
     var cost_wrapper = tree_yield_button.find_child("CostWrapper", true, false)
@@ -257,7 +259,9 @@ func _update_tree_yield_button() -> void:
         return
 
     if status_label:
-        status_label.text = "+%d wood/tree (next +%d)" % [current_bonus, next_bonus]
+        status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        status_label.custom_minimum_size = Vector2(0, 48)
+        status_label.text = "%d wood/tree\nNext: %d" % [current_total, next_total]
         status_label.visible = true
         status_label.add_theme_color_override("font_color", Color.YELLOW)
 
