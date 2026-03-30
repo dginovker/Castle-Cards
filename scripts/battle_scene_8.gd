@@ -4,10 +4,10 @@ const AI_WOOD_PER_TREE: int = 25
 const AI_PASSIVE_INCOME_INTERVAL_SECONDS: float = 1.6
 
 func _ready() -> void:
-    level_id = "shores_level_7"
+    level_id = "shores_level_8"
     super._ready()
 
-    # AI Level 7 has the cannon unlock, so it starts with it.
+    # AI Level 8 has the cannon unlock, so it starts with it.
 
     if _enemy_wood_income_timer != null:
         _enemy_wood_income_timer.wait_time = AI_PASSIVE_INCOME_INTERVAL_SECONDS

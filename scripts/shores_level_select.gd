@@ -28,6 +28,10 @@ func _populate_level_buttons() -> void:
     var l7_unlocked: bool = gs and gs.is_level_beaten("shores_level_6")
     _create_level_button("7", "Play Shores level 7", l7_unlocked, "Requires beating shores level 6", _on_level_7_pressed)
 
+    # Level 8
+    var l8_unlocked: bool = gs and gs.is_level_beaten("shores_level_7")
+    _create_level_button("8", "Play Shores level 8", l8_unlocked, "Requires beating shores level 7", _on_level_8_pressed)
+
     no_levels_label.visible = false
 
 func _create_level_button(lvl_text: String, tooltip: String, unlocked: bool, locked_tooltip: String, press_handler: Callable) -> void:
@@ -57,6 +61,9 @@ func _on_level_6_pressed() -> void:
 
 func _on_level_7_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/battle_scene_7.tscn")
+
+func _on_level_8_pressed() -> void:
+    get_tree().change_scene_to_file("res://scenes/battle_scene_8.tscn")
 
 func _apply_button_style(button: Button) -> void:
     var texture: Texture2D = load("res://assets/shores_background_and_ground.png")
