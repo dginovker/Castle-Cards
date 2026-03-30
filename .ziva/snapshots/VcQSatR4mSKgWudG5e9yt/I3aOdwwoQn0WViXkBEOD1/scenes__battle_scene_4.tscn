@@ -1,0 +1,366 @@
+[gd_scene format=3 uid="uid://cuadk27fi3qem"]
+
+[ext_resource type="Texture2D" uid="uid://bhhl6hc5qjtej" path="res://assets/background.png" id="1_5cvnn"]
+[ext_resource type="Texture2D" uid="uid://cspoiyydbdy76" path="res://assets/groud.png" id="2_u576h"]
+[ext_resource type="Script" uid="uid://brj3gkm20fn5r" path="res://scripts/battle_scene_4.gd" id="3_script"]
+[ext_resource type="Texture2D" uid="uid://ebfel20dtma" path="res://assets/player-castle.png" id="4_xmomn"]
+[ext_resource type="Texture2D" uid="uid://gie1u6uttoy5" path="res://assets/units/soldier/walking-0.png" id="5_swordsman_icon"]
+[ext_resource type="Texture2D" uid="uid://bko6255540trt" path="res://assets/units/archer/archer-walking-0.png" id="6_archer_icon"]
+[ext_resource type="Script" uid="uid://fdfppgfw6op5" path="res://scripts/castle.gd" id="6_castle_script"]
+[ext_resource type="Texture2D" uid="uid://b1h0k3u2hddoj" path="res://assets/units/drummer/drumming.png" id="9_drummer_icon"]
+[ext_resource type="Texture2D" uid="uid://b2htfvsls74go" path="res://assets/units/cannon/cannon-idle.png" id="10_cannon_icon"]
+[ext_resource type="Texture2D" uid="uid://b21capj6f1mq8" path="res://assets/units/woodcutter/walk-empty.png" id="11_woodcutter_icon"]
+[ext_resource type="Texture2D" uid="uid://cvisjs8xtdbbv" path="res://assets/tree.png" id="12_tree_icon"]
+
+[sub_resource type="Curve2D" id="Curve2D_xmomn"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 138, 422, 0, 0, 0, 0, 356, 459, 0, 0, 0, 0, 581, 489, 0, 0, 0, 0, 804, 459, 0, 0, 0, 0, 1017, 426)
+}
+point_count = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
+bg_color = Color(0.121569, 0.121569, 0.121569, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0509804, 0.0509804, 0.0509804, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.803922, 0.203922, 0.203922, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_debug_toggle_bg"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 0.55)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Node2D" type="Node2D" unique_id=2108997549]
+script = ExtResource("3_script")
+level_id = "level_4"
+
+[node name="Background" type="Sprite2D" parent="." unique_id=299413580]
+position = Vector2(576, 185.00006)
+texture = ExtResource("1_5cvnn")
+
+[node name="Groud" type="Sprite2D" parent="." unique_id=241490860]
+position = Vector2(576, 490)
+scale = Vector2(0.665, 0.56)
+texture = ExtResource("2_u576h")
+
+[node name="EnemyCastle" type="Sprite2D" parent="." unique_id=2125361748]
+position = Vector2(1052, 330)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("4_xmomn")
+flip_h = true
+script = ExtResource("6_castle_script")
+
+[node name="PlayerCastle" type="Sprite2D" parent="." unique_id=1849224342]
+position = Vector2(100, 330)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("4_xmomn")
+script = ExtResource("6_castle_script")
+
+[node name="PlayerCannonMount" type="Marker2D" parent="." unique_id=1740435504]
+position = Vector2(123, 302)
+
+[node name="EnemyCannonMount" type="Marker2D" parent="." unique_id=1664515839]
+position = Vector2(1029, 302)
+
+[node name="BattleLanePath" type="Path2D" parent="." unique_id=868214371]
+curve = SubResource("Curve2D_xmomn")
+
+[node name="Trees" type="Node2D" parent="." unique_id=1577287471]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1023324114]
+
+[node name="PlayerCastleHPBar" type="ProgressBar" parent="UI" unique_id=1253106860]
+offset_left = 12.0
+offset_top = 152.0
+offset_right = 172.0
+offset_bottom = 174.0
+theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+max_value = 20.0
+step = 1.0
+value = 20.0
+show_percentage = false
+
+[node name="EnemyCastleHPBar" type="ProgressBar" parent="UI" unique_id=1372698536]
+offset_left = 980.0
+offset_top = 152.0
+offset_right = 1140.0
+offset_bottom = 174.0
+theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+max_value = 20.0
+step = 1.0
+value = 20.0
+show_percentage = false
+
+[node name="PlayerWoodDisplay" type="HBoxContainer" parent="UI" unique_id=2013711311]
+offset_left = 178.0
+offset_top = 151.0
+offset_right = 248.0
+offset_bottom = 175.0
+mouse_filter = 0
+theme_override_constants/separation = 4
+
+[node name="PlayerWoodValue" type="Label" parent="UI/PlayerWoodDisplay" unique_id=1823284991]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
+text = "5"
+
+[node name="PlayerWoodIcon" type="TextureRect" parent="UI/PlayerWoodDisplay" unique_id=1973856981]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("12_tree_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PlayerWoodRateLabel" type="Label" parent="UI" unique_id=1312456777]
+offset_left = 178.0
+offset_top = 174.0
+offset_right = 270.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.419608, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+text = "15/tree"
+
+[node name="EnemyWoodDisplay" type="HBoxContainer" parent="UI" unique_id=151375174]
+offset_left = 903.0
+offset_top = 151.0
+offset_right = 973.0
+offset_bottom = 175.0
+theme_override_constants/separation = 4
+
+[node name="EnemyWoodIcon" type="TextureRect" parent="UI/EnemyWoodDisplay" unique_id=468297865]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("12_tree_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EnemyWoodValue" type="Label" parent="UI/EnemyWoodDisplay" unique_id=1478575873]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
+text = "5"
+
+[node name="PlayerSummonButtons" type="HBoxContainer" parent="UI" unique_id=1956572944]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 448.0
+offset_bottom = 120.0
+theme_override_constants/separation = 8
+
+[node name="WoodcutterGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=1706408796]
+layout_mode = 2
+
+[node name="SummonWoodcutterButton" type="Button" parent="UI/PlayerSummonButtons/WoodcutterGroup" unique_id=1501182269]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "Summon Woodcutter"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("11_woodcutter_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="SummonWoodcutterCost" type="Label" parent="UI/PlayerSummonButtons/WoodcutterGroup" unique_id=1971969194]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "5"
+horizontal_alignment = 1
+
+[node name="SwordsmanGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=1211392663]
+layout_mode = 2
+
+[node name="SummonSwordsmanButton" type="Button" parent="UI/PlayerSummonButtons/SwordsmanGroup" unique_id=265099907]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "Summon Swordsman"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("5_swordsman_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="SummonSwordsmanCost" type="Label" parent="UI/PlayerSummonButtons/SwordsmanGroup" unique_id=779812524]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "10"
+horizontal_alignment = 1
+
+[node name="ArcherGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=1086188052]
+layout_mode = 2
+
+[node name="SummonArcherButton" type="Button" parent="UI/PlayerSummonButtons/ArcherGroup" unique_id=64086772]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "Summon Archer"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("6_archer_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="SummonArcherCost" type="Label" parent="UI/PlayerSummonButtons/ArcherGroup" unique_id=2068679608]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "15"
+horizontal_alignment = 1
+
+[node name="DrummerGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=1107214173]
+layout_mode = 2
+
+[node name="SummonDrummerButton" type="Button" parent="UI/PlayerSummonButtons/DrummerGroup" unique_id=1541991748]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "Summon Drummer"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("9_drummer_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="SummonDrummerCost" type="Label" parent="UI/PlayerSummonButtons/DrummerGroup" unique_id=2143132253]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "20"
+horizontal_alignment = 1
+
+[node name="CannonGroup" type="VBoxContainer" parent="UI/PlayerSummonButtons" unique_id=784501531]
+layout_mode = 2
+
+[node name="SummonCannonButton" type="Button" parent="UI/PlayerSummonButtons/CannonGroup" unique_id=1185862576]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "Summon Cannon (Max 1)"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("10_cannon_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="SummonCannonCost" type="Label" parent="UI/PlayerSummonButtons/CannonGroup" unique_id=367290504]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "40"
+horizontal_alignment = 1
+
+[node name="EnemyDebugButtons" type="HBoxContainer" parent="UI" unique_id=731246652]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -448.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 96.0
+grow_horizontal = 0
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="DebugSpawnEnemyWoodcutterButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=1099560341]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "[DEBUG] Spawn Enemy Woodcutter"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("11_woodcutter_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="DebugSpawnEnemySwordsmanButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=484439976]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "[DEBUG] Spawn Enemy Swordsman"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("5_swordsman_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="DebugSpawnEnemyArcherButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=1258378231]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "[DEBUG] Spawn Enemy Archer"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("6_archer_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="DebugSpawnEnemyDrummerButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=697623573]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "[DEBUG] Spawn Enemy Drummer"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("9_drummer_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="DebugSpawnEnemyCannonButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=854926003]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "[DEBUG] Spawn Enemy Cannon (Max 1)"
+theme_override_constants/icon_max_width = 56
+icon = ExtResource("10_cannon_icon")
+icon_alignment = 1
+expand_icon = true
+
+[node name="DebugAutoWinButton" type="Button" parent="UI/EnemyDebugButtons" unique_id=71683680]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+tooltip_text = "[DEBUG] Instantly win battle"
+text = "WIN"
+
+[node name="DebugRangeToggle" type="CheckButton" parent="UI" unique_id=1657127691]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+offset_right = 148.0
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_debug_toggle_bg")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_debug_toggle_bg")
+theme_override_styles/hover = SubResource("StyleBoxFlat_debug_toggle_bg")
+theme_override_styles/focus = SubResource("StyleBoxFlat_debug_toggle_bg")
+text = "Debug (F3)"
