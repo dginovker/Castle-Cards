@@ -4,7 +4,6 @@ extends Node2D
 @onready var drummer_button: Button = %DrummerButton
 @onready var cannon_button: Button = %CannonButton
 @onready var tree_growth_button: Button = %TreeGrowthButton
-@onready var tree_yield_button: Button = %TreeYieldButton
 @onready var back_button: Button = %BackButton
 
 const UPGRADES = {
@@ -26,10 +25,6 @@ const UPGRADES = {
     "passive_income": {
         "name": "Passive Wood Income",
         "icon": "res://assets/tree.png",
-    },
-    "tree_yield": {
-        "name": "Lumber Efficiency",
-        "icon": "res://assets/tree.png",
     }
 }
 
@@ -38,13 +33,11 @@ func _ready() -> void:
     _setup_square_button(drummer_button, "drummer")
     _setup_square_button(cannon_button, "cannon")
     _setup_square_button(tree_growth_button, "passive_income")
-    _setup_square_button(tree_yield_button, "tree_yield")
     
     archer_button.pressed.connect(func(): _buy_upgrade("archer"))
     drummer_button.pressed.connect(func(): _buy_upgrade("drummer"))
     cannon_button.pressed.connect(func(): _buy_upgrade("cannon"))
     tree_growth_button.pressed.connect(_on_passive_income_pressed)
-    tree_yield_button.pressed.connect(_on_tree_yield_pressed)
     back_button.pressed.connect(_on_back_pressed)
     
     var gs = get_node_or_null("/root/GameState")
@@ -151,7 +144,6 @@ func update_ui() -> void:
     _update_unit_button(drummer_button, "drummer")
     _update_unit_button(cannon_button, "cannon")
     _update_passive_income_button()
-    _update_tree_yield_button()
 
 func _update_unit_button(btn: Button, type: String) -> void:
     var info = UPGRADES[type]
@@ -224,54 +216,6 @@ func _on_passive_income_pressed() -> void:
     var gs = get_node_or_null("/root/GameState")
     if not gs: return
     if gs.purchase_passive_income_upgrade():
-        update_ui()
-
-func _update_tree_yield_button() -> void:
-    var gs = get_node_or_null("/root/GameState")
-    if not gs: return
-
-    var is_unlocked: bool = gs.is_level_beaten("shores_level_5")
-    var cost: int = gs.get_tree_yield_upgrade_cost()
-    var current_bonus: int = gs.get_tree_yield_bonus_per_tree()
-    var next_bonus: int = current_bonus + 5
-
-    var cost_hbox = tree_yield_button.find_child("CostHBox", true, false)
-    var cost_wrapper = tree_yield_button.find_child("CostWrapper", true, false)
-    var cost_label = tree_yield_button.find_child("CostLabel", true, false)
-    var name_label = tree_yield_button.find_child("NameLabel", true, false)
-    var status_label = tree_yield_button.find_child("StatusLabel", true, false)
-
-    if not name_label:
-        return
-
-    name_label.text = "Lumber Efficiency"
-
-    if not is_unlocked:
-        if status_label:
-            status_label.text = "Requires Shores L5"
-            status_label.visible = true
-            status_label.add_theme_color_override("font_color", Color.RED)
-        if cost_wrapper: cost_wrapper.visible = false
-        elif cost_hbox: cost_hbox.visible = false
-        tree_yield_button.disabled = true
-        return
-
-    if status_label:
-        status_label.text = "+%d wood/tree (next +%d)" % [current_bonus, next_bonus]
-        status_label.visible = true
-        status_label.add_theme_color_override("font_color", Color.YELLOW)
-
-    if cost_label:
-        cost_label.text = str(cost)
-    if cost_wrapper: cost_wrapper.visible = true
-    elif cost_hbox: cost_hbox.visible = true
-
-    tree_yield_button.disabled = gs.trees < cost
-
-func _on_tree_yield_pressed() -> void:
-    var gs = get_node_or_null("/root/GameState")
-    if not gs: return
-    if gs.purchase_tree_yield_upgrade():
         update_ui()
 
 func _on_back_pressed() -> void:

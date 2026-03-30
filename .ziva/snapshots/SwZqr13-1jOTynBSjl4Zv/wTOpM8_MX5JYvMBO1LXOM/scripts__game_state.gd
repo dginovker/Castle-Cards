@@ -15,7 +15,6 @@ var trees: int = 0 :
 var unlocked_units: Array[String] = ["swordsman", "woodcutter"]
 var beaten_levels: Array[String] = []
 var passive_income_upgrades: int = 0
-var tree_yield_upgrades: int = 0
 var music_volume: float = 0.8
 var total_wins: int = 0
 var total_losses: int = 0
@@ -61,23 +60,6 @@ func get_passive_income_upgrade_cost() -> int:
 
 func get_current_passive_income_interval(base_interval: float) -> float:
     return maxf(0.5, base_interval - (passive_income_upgrades * 0.1))
-
-func purchase_tree_yield_upgrade() -> bool:
-    if not is_level_beaten("shores_level_5"):
-        return false
-    var cost: int = get_tree_yield_upgrade_cost()
-    if trees >= cost:
-        trees -= cost
-        tree_yield_upgrades += 1
-        save_game()
-        return true
-    return false
-
-func get_tree_yield_upgrade_cost() -> int:
-    return int(20 * pow(2, tree_yield_upgrades))
-
-func get_tree_yield_bonus_per_tree() -> int:
-    return tree_yield_upgrades * 5
 
 func is_level_beaten(level_id: String) -> bool:
     return level_id in beaten_levels
@@ -137,7 +119,6 @@ func save_game() -> void:
         "unlocked_units": unlocked_units,
         "beaten_levels": beaten_levels,
         "passive_income_upgrades": passive_income_upgrades,
-        "tree_yield_upgrades": tree_yield_upgrades,
         "music_volume": music_volume,
         "total_wins": total_wins,
         "total_losses": total_losses
@@ -184,9 +165,6 @@ func load_game() -> void:
                 if data.has("passive_income_upgrades"):
                     passive_income_upgrades = int(data.get("passive_income_upgrades"))
 
-                if data.has("tree_yield_upgrades"):
-                    tree_yield_upgrades = int(data.get("tree_yield_upgrades"))
-
                 if data.has("music_volume"):
                     music_volume = float(data.get("music_volume"))
                     var mp = get_node_or_null("/root/MusicPlayer")
@@ -211,7 +189,6 @@ func wipe_save() -> void:
     unlocked_units = ["swordsman", "woodcutter"]
     beaten_levels = []
     passive_income_upgrades = 0
-    tree_yield_upgrades = 0
     total_wins = 0
     total_losses = 0
     save_game()

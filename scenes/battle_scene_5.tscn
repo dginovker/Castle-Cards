@@ -8,10 +8,10 @@
 script = ExtResource("2_script")
 level_id = "shores_level_5"
 
-[node name="Background" parent="." index="0"]
+[node name="Background" parent="." index="0" unique_id=299413580]
 position = Vector2(593, 222)
 scale = Vector2(1.545, 1.545)
 texture = ExtResource("3_shores_bg")
 
-[node name="Groud" parent="." index="1"]
+[node name="Groud" parent="." index="1" unique_id=241490860]
 visible = false

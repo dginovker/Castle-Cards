@@ -2,7 +2,6 @@ extends BattleSceneBase
 
 func _ready() -> void:
     level_id = "shores_level_5"
-    tree_density = TreeDensity.SPARSE
     super._ready()
 
 func _update_ai() -> void:

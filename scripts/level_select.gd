@@ -16,30 +16,22 @@ func _ready() -> void:
         forest_complete = gs.is_level_beaten("level_4")
         
     shores_button.text = "Go to Shores"
-    shores_button.disabled = false # Never use disabled state to avoid auto-transparency
-    
+    shores_button.disabled = false
+    shores_button.modulate = Color(1, 1, 1, 1)
+
+    # Keep scene-authored button visuals; only control behavior.
     if not forest_complete:
-        # LOCKED: keep full-opacity visual (not faded), but unclickable.
-        # Keep scene-defined styleboxes intact so the button doesn't look washed out.
-        shores_button.modulate = Color(1.0, 1.0, 1.0, 1.0)
         shores_button.tooltip_text = "Requires beating level 4"
         shores_button.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
-
-        # Disconnect any existing pressed signal
-        if shores_button.pressed.is_connected(_on_shores_pressed):
-            shores_button.pressed.disconnect(_on_shores_pressed)
     else:
-        # UNLOCKED LOOK: Normal bright stone button
-        shores_button.modulate = Color(1, 1, 1, 1)
         shores_button.tooltip_text = "Venture to the Shores"
         shores_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-        
-        # Connect signal
-        if not shores_button.pressed.is_connected(_on_shores_pressed):
-            shores_button.pressed.connect(_on_shores_pressed)
-        
-        # Add hover effects
+
+    if not shores_button.pressed.is_connected(_on_shores_pressed):
+        shores_button.pressed.connect(_on_shores_pressed)
+    if not shores_button.mouse_entered.is_connected(_on_button_mouse_entered.bind(shores_button)):
         shores_button.mouse_entered.connect(_on_button_mouse_entered.bind(shores_button))
+    if not shores_button.mouse_exited.is_connected(_on_button_mouse_exited.bind(shores_button)):
         shores_button.mouse_exited.connect(_on_button_mouse_exited.bind(shores_button))
     
             
@@ -171,4 +163,7 @@ func _on_back_pressed() -> void:
     get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _on_shores_pressed() -> void:
+    var gs = get_node_or_null("/root/GameState")
+    if gs and not gs.is_level_beaten("level_4"):
+        return
     get_tree().change_scene_to_file("res://scenes/shores_level_select.tscn")

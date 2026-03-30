@@ -371,69 +371,6 @@ texture = ExtResource("6_tree_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TreeYieldButton" type="Button" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 160)
-layout_mode = 2
-pivot_offset = Vector2(80, 80)
-mouse_default_cursor_shape = 2
-
-[node name="VBox" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-alignment = 1
-
-[node name="Icon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
-custom_minimum_size = Vector2(64, 64)
-layout_mode = 2
-size_flags_horizontal = 4
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="NameLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
-layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 18
-text = "Lumber Efficiency"
-horizontal_alignment = 1
-
-[node name="StatusLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 14
-text = "+0 wood/tree"
-horizontal_alignment = 1
-
-[node name="CostHBox" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox"]
-layout_mode = 2
-mouse_filter = 2
-alignment = 1
-
-[node name="CostLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox/CostHBox"]
-layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 18
-text = "20"
-
-[node name="TreeIcon" type="TextureRect" parent="UI/CenterContainer/VBoxContainer/HBoxContainer/UpgradesSection/UpgradesGrid/TreeYieldButton/VBox/CostHBox"]
-custom_minimum_size = Vector2(24, 24)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("6_tree_icon")
-expand_mode = 1
-stretch_mode = 5
-
 [node name="BackButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 60)

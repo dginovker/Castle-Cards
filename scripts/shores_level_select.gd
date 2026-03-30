@@ -34,21 +34,13 @@ func _populate_level_buttons() -> void:
         button.tooltip_text = "Requires beating forest level 4"
         button.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
 
-    # Match Forest selector visuals: black outline border.
-    var outline := Panel.new()
-    outline.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-    var outline_style := StyleBoxFlat.new()
-    outline_style.draw_center = false
-    outline_style.border_width_left = 4
-    outline_style.border_width_top = 4
-    outline_style.border_width_right = 4
-    outline_style.border_width_bottom = 4
-    outline_style.border_color = Color(0, 0, 0, 1)
-    outline.add_theme_stylebox_override("panel", outline_style)
-
-    button.add_child(outline)
+        var style_locked: StyleBox = button.get_theme_stylebox("normal").duplicate()
+        if style_locked is StyleBoxTexture:
+            style_locked.modulate_color = Color(0.3, 0.3, 0.3, 1.0)
+        button.add_theme_stylebox_override("normal", style_locked)
+        button.add_theme_stylebox_override("hover", style_locked)
+        button.add_theme_stylebox_override("pressed", style_locked)
+        button.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1.0))
 
     button.mouse_entered.connect(_on_button_mouse_entered.bind(button))
     button.mouse_exited.connect(_on_button_mouse_exited.bind(button))

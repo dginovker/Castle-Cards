@@ -15,9 +15,6 @@ const TREE_TEXTURE: Texture2D = preload("res://assets/tree.png")
 @export var level_id: String = "level_1"
 @export var show_attack_range_debug: bool = false
 
-enum TreeDensity { ABUNDANT, SPARSE }
-
-@export var tree_density: TreeDensity = TreeDensity.ABUNDANT
 @export_range(0.5, 30.0, 0.1) var tree_spawn_interval_seconds: float = 4.0
 @export_range(0.0, 10.0, 0.1) var tree_spawn_interval_jitter_seconds: float = 1.0
 @export_range(0.5, 20.0, 0.1) var tree_growth_duration_seconds: float = 2.5
@@ -56,7 +53,50 @@ var _player_wood_income_timer: Timer
 var _enemy_wood_income_timer: Timer
 var _game_over_screen: GameOverScreen
 
-func _ready() -> void: randomize(); if level_id.begins_with("shores_"): tree_density = TreeDensity.SPARSE; summon_button.pressed.connect(_on_summon_swordsman_pressed); if summon_archer_button != null: summon_archer_button.pressed.connect(_on_summon_archer_pressed); if summon_drummer_button != null: summon_drummer_button.pressed.connect(_on_summon_drummer_pressed); if summon_cannon_button != null: summon_cannon_button.pressed.connect(_on_summon_cannon_pressed); if summon_woodcutter_button != null: summon_woodcutter_button.pressed.connect(_on_summon_woodcutter_pressed); if debug_spawn_enemy_swordsman_button != null: debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed); if debug_spawn_enemy_archer_button != null: debug_spawn_enemy_archer_button.pressed.connect(_on_debug_spawn_enemy_archer_pressed); if debug_spawn_enemy_drummer_button != null: debug_spawn_enemy_drummer_button.pressed.connect(_on_debug_spawn_enemy_drummer_pressed); if debug_spawn_enemy_cannon_button != null: debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed); if debug_spawn_enemy_woodcutter_button != null: debug_spawn_enemy_woodcutter_button.pressed.connect(_on_debug_spawn_enemy_woodcutter_pressed); if debug_auto_win_button != null: debug_auto_win_button.pressed.connect(_on_debug_auto_win_pressed); _setup_castles(); if debug_attack_range_toggle != null: debug_attack_range_toggle.toggled.connect(_on_debug_attack_range_toggled); if debug_attack_range_toggle != null: debug_attack_range_toggle.button_pressed = show_attack_range_debug; _apply_debug_attack_range_to_all_soldiers(); _apply_debug_hurtbox_to_castles(); _apply_debug_toggle_dependent_ui(); _refresh_wood_ui(); _refresh_spawn_buttons_affordability(); if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2: push_warning("BattleLanePath.curve is missing or has fewer than 2 points."); _setup_tree_spawning(); _setup_wood_income(); _setup_game_over_screen()
+func _ready() -> void:
+    randomize()
+
+    summon_button.pressed.connect(_on_summon_swordsman_pressed)
+    if summon_archer_button != null:
+        summon_archer_button.pressed.connect(_on_summon_archer_pressed)
+    if summon_drummer_button != null:
+        summon_drummer_button.pressed.connect(_on_summon_drummer_pressed)
+    if summon_cannon_button != null:
+        summon_cannon_button.pressed.connect(_on_summon_cannon_pressed)
+    if summon_woodcutter_button != null:
+        summon_woodcutter_button.pressed.connect(_on_summon_woodcutter_pressed)
+
+    if debug_spawn_enemy_swordsman_button != null:
+        debug_spawn_enemy_swordsman_button.pressed.connect(_on_debug_spawn_enemy_swordsman_pressed)
+    if debug_spawn_enemy_archer_button != null:
+        debug_spawn_enemy_archer_button.pressed.connect(_on_debug_spawn_enemy_archer_pressed)
+    if debug_spawn_enemy_drummer_button != null:
+        debug_spawn_enemy_drummer_button.pressed.connect(_on_debug_spawn_enemy_drummer_pressed)
+    if debug_spawn_enemy_cannon_button != null:
+        debug_spawn_enemy_cannon_button.pressed.connect(_on_debug_spawn_enemy_cannon_pressed)
+    if debug_spawn_enemy_woodcutter_button != null:
+        debug_spawn_enemy_woodcutter_button.pressed.connect(_on_debug_spawn_enemy_woodcutter_pressed)
+    if debug_auto_win_button != null:
+        debug_auto_win_button.pressed.connect(_on_debug_auto_win_pressed)
+
+    _setup_castles()
+
+    if debug_attack_range_toggle != null:
+        debug_attack_range_toggle.toggled.connect(_on_debug_attack_range_toggled)
+        debug_attack_range_toggle.button_pressed = show_attack_range_debug
+
+    _apply_debug_attack_range_to_all_soldiers()
+    _apply_debug_hurtbox_to_castles()
+    _apply_debug_toggle_dependent_ui()
+    _refresh_wood_ui()
+    _refresh_spawn_buttons_affordability()
+
+    if battle_lane_path.curve == null or battle_lane_path.curve.point_count < 2:
+        push_warning("BattleLanePath.curve is missing or has fewer than 2 points.")
+
+    _setup_tree_spawning()
+    _setup_wood_income()
+    _setup_game_over_screen()
 
 
 func _process(_delta: float) -> void:
@@ -339,8 +379,7 @@ func _on_enemy_wood_income_timer_timeout() -> void:
     _add_wood(GameConstants.TEAM_ENEMY, GameConstants.WOOD_PASSIVE_INCOME_AMOUNT)
 
 
-func _on_wood_delivered(team: int, amount: int) -> void:
-    _add_wood(team, amount)
+func _on_wood_delivered(team: int, amount: int) -> void: _add_wood(team, amount + (GameState.get_tree_yield_bonus_per_tree() if team == GameConstants.TEAM_PLAYER else 0))
 
 
 func _add_wood(team: int, amount: int) -> void:
@@ -468,13 +507,19 @@ func _setup_tree_spawning() -> void:
     _schedule_next_tree_spawn()
 
 
-func _on_tree_spawn_timer_timeout() -> void: _spawn_growing_tree(); _schedule_next_tree_spawn()
+func _on_tree_spawn_timer_timeout() -> void:
+    _spawn_growing_tree()
+    _schedule_next_tree_spawn()
 
 
-func _schedule_next_tree_spawn() -> void: if _tree_spawn_timer == null: return; var wait_time: float = tree_spawn_interval_seconds * _get_tree_spawn_interval_multiplier(); if tree_spawn_interval_jitter_seconds > 0.0: wait_time += randf_range(-tree_spawn_interval_jitter_seconds, tree_spawn_interval_jitter_seconds); _tree_spawn_timer.wait_time = maxf(0.1, wait_time); _tree_spawn_timer.start()
-
-
-func _get_tree_spawn_interval_multiplier() -> float: return 1.75 if tree_density == TreeDensity.SPARSE else 1.0
+func _schedule_next_tree_spawn() -> void:
+    if _tree_spawn_timer == null:
+        return
+    var wait_time: float = tree_spawn_interval_seconds
+    if tree_spawn_interval_jitter_seconds > 0.0:
+        wait_time += randf_range(-tree_spawn_interval_jitter_seconds, tree_spawn_interval_jitter_seconds)
+    _tree_spawn_timer.wait_time = maxf(0.1, wait_time)
+    _tree_spawn_timer.start()
 
 
 func _spawn_growing_tree() -> void:
