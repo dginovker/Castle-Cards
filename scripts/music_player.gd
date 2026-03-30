@@ -23,6 +23,12 @@ func _ready() -> void:
         music_player.bus = "Music"
         music_player.play()
         print("MusicPlayer: Playing music: ", music_player.stream.resource_path)
+        
+        # Sync with GameState volume if it already exists
+        var gs = get_node_or_null("/root/GameState")
+        if gs and "music_volume" in gs:
+            print("MusicPlayer: Syncing volume from GameState: ", gs.music_volume)
+            set_volume(gs.music_volume)
     else:
         push_error("MusicPlayer: Could not load music file!")
 
@@ -33,6 +39,16 @@ func _ensure_music_bus_exists() -> void:
         AudioServer.set_bus_name(bus_index, "Music")
         # Connect to Master bus
         AudioServer.set_bus_send(bus_index, "Master")
+        print("MusicPlayer: Created 'Music' bus")
+    
+    # Ensure Master bus is audible
+    var master_index = AudioServer.get_bus_index("Master")
+    # Always ensure it's not muted and has volume
+    AudioServer.set_bus_mute(master_index, false)
+    if AudioServer.get_bus_volume_db(master_index) < -40:
+        AudioServer.set_bus_volume_db(master_index, 0)
+        print("MusicPlayer: Reset Master bus volume to 0dB")
+    print("MusicPlayer: Master bus unmuted")
 
 func set_volume(value: float) -> void:
     _ensure_music_bus_exists()
@@ -43,3 +59,4 @@ func set_volume(value: float) -> void:
         AudioServer.set_bus_volume_db(bus_index, db)
         # If volume is 0 (value = 0), mute it completely
         AudioServer.set_bus_mute(bus_index, value <= 0)
+        print("MusicPlayer: Volume set to ", value, " (", db, " dB)")
